@@ -3,9 +3,9 @@ package com.games.crispin.skateboardbuilderapp;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import com.games.crispin.crispinmobile.Crispin;
 
@@ -24,16 +24,12 @@ public class MainActivity extends AppCompatActivity {
         // Add graphical view to frame layout
         Crispin.init(this, frameLayout, () -> new TestScene());
 
-        // Linear Layout for Android UI components
-        LinearLayout linearLayout = new LinearLayout(context);
+        // Create layout inflater (inflate XML layout to a view)
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
 
-        // Add button to linear layout
-        Button button = new Button(context);
-        button.setText("Test Button");
-        linearLayout.addView(button);
-
-        // Add linear layout to application
-        frameLayout.addView(linearLayout);
+        // Inflate home layout
+        View homeLayout = inflater.inflate(R.layout.activity_main, null);
+        frameLayout.addView(homeLayout);
 
         setContentView(frameLayout);
     }
