@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.games.crispin.crispinmobile.Crispin;
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
 
         // Inflate home layout
-        View homeLayout = inflater.inflate(R.layout.activity_main, null);
+        View homeLayout = inflater.inflate(R.layout.home_activity, null);
 
         // Add graphical view to frame layout
         Crispin.init(this, frameLayout, () -> new TestScene(homeLayout));

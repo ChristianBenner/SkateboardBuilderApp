@@ -12,3 +12,10 @@
 /captures
 .externalNativeBuild
 app/src/main/res/raw/skateboard.obj
+app/src/main/res/drawable/deck.png
+app/src/main/res/drawable/deck2.png
+app/src/main/res/drawable/decktest.png
+app/src/main/res/drawable/grip.png
+app/src/main/res/drawable/grip2.png
+app/src/main/res/drawable/specularmap.png
+app/src/main/res/drawable/specularmaptest.png
