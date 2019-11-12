@@ -16,9 +16,12 @@ import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -26,7 +29,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TestScene extends Scene {
     private Camera3D camera3D;
@@ -86,105 +91,58 @@ public class TestScene extends Scene {
         return m;
     }
 
-    class Skateboard
-    {
-        private int deck;
-        private int grip;
-        private int trucks;
-        private int bearings;
-        private int wheels;
-        private String name;
-
-        public Skateboard()
-        {
-            deck = 0;
-            grip = 0;
-            trucks = 0;
-            bearings = 0;
-            wheels = 0;
-            name = "Skateboard";
-        }
-
-        public int getDeck()
-        {
-            return deck;
-        }
-
-        public void setDeck(int deck)
-        {
-            this.deck = deck;
-        }
-
-        public int getGrip()
-        {
-            return grip;
-        }
-
-        public void setGrip(int grip)
-        {
-            this.grip = grip;
-        }
-
-        public int getTrucks()
-        {
-            return trucks;
-        }
-
-        public void setTrucks(int trucks)
-        {
-            this.trucks = trucks;
-        }
-
-        public int getBearings()
-        {
-            return bearings;
-        }
-
-        public void setBearings(int bearings)
-        {
-            this.bearings = bearings;
-        }
-
-        public int getWheels()
-        {
-            return wheels;
-        }
-
-        public void setWheels(int wheels)
-        {
-            this.wheels = wheels;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-    }
-
     void writeBoardToXML(Skateboard skateboard)
     {
         try
         {
             FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("saves.xml", Context.MODE_PRIVATE);
-
             XmlSerializer serializer = Xml.newSerializer();
             serializer.setOutput(fileOutputStream, "UTF-8");
             serializer.startDocument("UTF-8", true);
+            serializer.startTag("", "saves");
             serializer.startTag("", "skateboard");
             serializer.attribute("", "deck", Integer.toString(skateboard.getDeck()));
             serializer.attribute("", "grip", Integer.toString(skateboard.getGrip()));
             serializer.attribute("", "trucks", Integer.toString(skateboard.getTrucks()));
             serializer.attribute("", "bearings", Integer.toString(skateboard.getBearings()));
             serializer.attribute("", "wheels", Integer.toString(skateboard.getWheels()));
-            serializer.startTag("", "name");
-            serializer.text(skateboard.getName());
-            serializer.endTag("", "name");
+            serializer.attribute("", "name", skateboard.getName());
             serializer.endTag("", "skateboard");
+            serializer.endTag("", "saves");
+            serializer.endDocument();
+            serializer.flush();
+            fileOutputStream.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    void writeSave()
+    {
+        try
+        {
+            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("saves.xml", Context.MODE_PRIVATE);
+            XmlSerializer serializer = Xml.newSerializer();
+            serializer.setOutput(fileOutputStream, "UTF-8");
+            serializer.startDocument("UTF-8", true);
+            serializer.startTag("", "saves");
+
+            // Write skateboard XML
+            for(Skateboard s : skateboards)
+            {
+                serializer.startTag("", "skateboard");
+                serializer.attribute("", "deck", Integer.toString(s.getDeck()));
+                serializer.attribute("", "grip", Integer.toString(s.getGrip()));
+                serializer.attribute("", "trucks", Integer.toString(s.getTrucks()));
+                serializer.attribute("", "bearings", Integer.toString(s.getBearings()));
+                serializer.attribute("", "wheels", Integer.toString(s.getWheels()));
+                serializer.attribute("", "name", s.getName());
+                serializer.endTag("", "skateboard");
+            }
+
+            serializer.endTag("", "saves");
             serializer.endDocument();
             serializer.flush();
             fileOutputStream.close();
@@ -218,6 +176,21 @@ public class TestScene extends Scene {
         }
     }
 
+    List<Skateboard> skateboards = null;
+    private boolean loadSaves()
+    {
+        try
+        {
+            skateboards = SaveReader.parse(Crispin.getApplicationContext().openFileInput("saves.xml"));
+            return true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public TestScene(View view)
     {
         Crispin.setBackgroundColour(new Colour(0.4f, 0.78f, 0.843f));
@@ -232,26 +205,35 @@ public class TestScene extends Scene {
         preferencesEditor.putFloat("fps", 60.0f);
         preferencesEditor.commit();
 
-        writeBoardToXML(new Skateboard());
+
+/*
+     //   writeBoardToXML(new Skateboard());
         readBoardFromXML("saves.xml");
-        /**
-         * <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-         * <skateboard deck="0" grip="0" trucks="0" bearings="0" wheels="0">
-         *     </skateboard><name>Skateboard</name>
-         * </skateboard>
-         * <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-         * <skateboard deck="0" grip="0" trucks="0" bearings="0" wheels="0">
-         *     <name>Skateboard</name>
-         * </skateboard>
-         */
 
+        if(loadSaves())
+        {
+            for(Skateboard s : skateboards)
+            {
+                System.out.println(s.getName() + " {");
+                System.out.println("\tDeck: " + s.getDeck());
+                System.out.println("\tGrip: " + s.getGrip());
+                System.out.println("\tTrucks: " + s.getTrucks());
+                System.out.println("\tBearings: " + s.getBearings());
+                System.out.println("\tWheels: " + s.getWheels());
+                System.out.println("}");
+            }
+        }
 
-        /**
-         * <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-         * <skateboard deck="0" grip="0" trucks="0" bearings="0" wheels="0">
-         *     <name>Skateboard</name>
-         * </skateboard>
-         */
+        // Add some example boards
+        skateboards.clear();
+        skateboards.add(new Skateboard("Cool", 2, 5, 1, 6, 9));
+        skateboards.add(new Skateboard("Wow", 6, 4, 2, 4, 2));
+        skateboards.add(new Skateboard("Epic", 3, 8, 4, 1, 8));
+        skateboards.add(new Skateboard("Mean", 1, 3, 3, 7, 4));
+
+        writeSave();
+*/
+
 
         deckMaterials = new ArrayList<>();
         addDeckToList(R.drawable.jart_new_wave);
