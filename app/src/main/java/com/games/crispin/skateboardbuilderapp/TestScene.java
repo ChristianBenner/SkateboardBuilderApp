@@ -75,6 +75,10 @@ public class TestScene extends Scene {
         }
 
         Material m = deckMaterials.get(deckMaterialIndex);
+
+        skateboards.get(0).setDeck(deckMaterialIndex);
+        writeSave();
+
         deckMaterialIndex++;
         return m;
     }
@@ -87,6 +91,10 @@ public class TestScene extends Scene {
         }
 
         Material m = gripMaterials.get(gripMaterialIndex);
+
+        skateboards.get(0).setGrip(gripMaterialIndex);
+        writeSave();
+
         gripMaterialIndex++;
         return m;
     }
@@ -233,7 +241,15 @@ public class TestScene extends Scene {
 
         writeSave();
 */
-
+      /*  skateboards = new ArrayList<>();
+        skateboards.clear();
+        skateboards.add(new Skateboard("Cool", 0, 0, 1, 6, 9));
+        writeSave();*/
+        if(loadSaves())
+        {
+            deckMaterialIndex = skateboards.get(0).getDeck();
+            gripMaterialIndex = skateboards.get(0).getGrip();
+        }
 
         deckMaterials = new ArrayList<>();
         addDeckToList(R.drawable.jart_new_wave);
@@ -257,12 +273,12 @@ public class TestScene extends Scene {
         palaceDeck = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
         palaceDeck.setScale(0.15f, 0.15f, 0.15f);
         palaceDeck.setMaterial(nextDeckMaterial());
-        palaceDeck.setPosition(new Point3D(0.0f, -3f, 0.0f));
+        palaceDeck.setPosition(new Point3D(0.0f, -5f, 0.0f));
 
         palaceGrip = OBJModelLoader.readObjFile(R.raw.grip8_125_4);
         palaceGrip.setScale(0.15f, 0.15f, 0.15f);
         palaceGrip.setMaterial(nextGripMaterial());
-        palaceGrip.setPosition(new Point3D(0.0f, -3f, 0.0f));
+        palaceGrip.setPosition(new Point3D(0.0f, -5f, 0.0f));
 
         Button b1 = view.findViewById(R.id.button);
         b1.setOnClickListener(v ->
