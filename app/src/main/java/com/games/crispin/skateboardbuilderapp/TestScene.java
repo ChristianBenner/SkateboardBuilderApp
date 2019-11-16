@@ -4,39 +4,38 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Xml;
 import android.view.View;
-import android.widget.Button;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
+import com.games.crispin.crispinmobile.Rendering.UserInterface.Button;
+import com.games.crispin.crispinmobile.Rendering.UserInterface.Image;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestScene extends Scene {
     private Camera3D camera3D;
+    private Camera2D camera2D;
+
     private RenderObject palaceDeck;
     private RenderObject palaceGrip;
+
+    private Image image;
+    private Button button;
 
     private boolean renderGrip;
 
@@ -76,7 +75,11 @@ public class TestScene extends Scene {
 
         Material m = deckMaterials.get(deckMaterialIndex);
 
-        skateboards.get(0).setDeck(deckMaterialIndex);
+        if(skateboards != null && skateboards.isEmpty() == false)
+        {
+            skateboards.get(0).setDeck(deckMaterialIndex);
+        }
+
         writeSave();
 
         deckMaterialIndex++;
@@ -92,7 +95,11 @@ public class TestScene extends Scene {
 
         Material m = gripMaterials.get(gripMaterialIndex);
 
-        skateboards.get(0).setGrip(gripMaterialIndex);
+        if(skateboards != null && skateboards.isEmpty() == false)
+        {
+            skateboards.get(0).setGrip(gripMaterialIndex);
+        }
+
         writeSave();
 
         gripMaterialIndex++;
@@ -199,7 +206,7 @@ public class TestScene extends Scene {
         }
     }
 
-    public TestScene(View view)
+    public TestScene()
     {
         Crispin.setBackgroundColour(new Colour(0.4f, 0.78f, 0.843f));
 
@@ -212,6 +219,17 @@ public class TestScene extends Scene {
         System.out.println("FPS: " + fps);
         preferencesEditor.putFloat("fps", 60.0f);
         preferencesEditor.commit();
+
+        Font f = new Font(R.raw.aileron_regular, 64);
+
+        Texture t = new Texture(R.drawable.logo);
+        float ratio = t.getHeight()/t.getWidth();
+        float targetWidth = Crispin.getSurfaceWidth() - (Crispin.getSurfaceWidth() / 10.0f);
+        image = new Image(R.drawable.logo, (int)targetWidth, (int)(targetWidth * ratio));
+        image.setPosition((Crispin.getSurfaceWidth()/2.0f) - (targetWidth/2.0f), Crispin.getSurfaceHeight() - (targetWidth * ratio) - 40.0f);
+
+        button = new Button(R.drawable.bank_card_icon);
+        button.setPosition(100.0f, 100.0f);
 
 
 /*
@@ -261,61 +279,26 @@ public class TestScene extends Scene {
         gripMaterials = new ArrayList<>();
         addGripToList(R.drawable.grip);
         addGripToList(R.drawable.grip2);
-        addGripToList(R.drawable.grip3);
+      /*  addGripToList(R.drawable.grip3);
         addGripToList(R.drawable.grip4);
-        addGripToList(R.drawable.grip5);
+        addGripToList(R.drawable.grip5);*/
 
         renderGrip = true;
 
         camera3D = new Camera3D();
         camera3D.setPosition(new Point3D(0.0f, 0.0f, 7.0f));
 
+        camera2D = new Camera2D(0.0f, 0.0f, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
+
         palaceDeck = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
         palaceDeck.setScale(0.15f, 0.15f, 0.15f);
-        palaceDeck.setMaterial(nextDeckMaterial());
-        palaceDeck.setPosition(new Point3D(0.0f, -5f, 0.0f));
+        palaceDeck.setMaterial(deckMaterials.get(0));
+        palaceDeck.setPosition(new Point3D(0.0f, -1f, 0.0f));
 
         palaceGrip = OBJModelLoader.readObjFile(R.raw.grip8_125_4);
         palaceGrip.setScale(0.15f, 0.15f, 0.15f);
-        palaceGrip.setMaterial(nextGripMaterial());
-        palaceGrip.setPosition(new Point3D(0.0f, -5f, 0.0f));
-
-        Button b1 = view.findViewById(R.id.button);
-        b1.setOnClickListener(v ->
-        {
-            if(!spinning)
-            {
-                // Toggle grip tape
-                spinning = true;
-                spinAdd = 0.0f;
-                increaseSpin = true;
-
-                if(!renderGrip)
-                {
-                    renderGrip = true;
-                }
-            }
-        });
-
-        Button b2 = view.findViewById(R.id.button2);
-        b2.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                palaceGrip.setMaterial(nextGripMaterial());
-            }
-        });
-
-        Button b3 = view.findViewById(R.id.button3);
-        b3.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                palaceDeck.setMaterial(nextDeckMaterial());
-            }
-        });
+        palaceGrip.setMaterial(gripMaterials.get(0));
+        palaceGrip.setPosition(new Point3D(0.0f, -1f, 0.0f));
     }
 
     float angle = 0.0f;
@@ -402,5 +385,8 @@ public class TestScene extends Scene {
         {
             palaceGrip.render(camera3D);
         }
+
+        button.draw(camera2D);
+        image.draw(camera2D);
     }
 }
