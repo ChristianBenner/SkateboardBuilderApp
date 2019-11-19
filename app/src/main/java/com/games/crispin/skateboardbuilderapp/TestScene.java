@@ -294,15 +294,15 @@ public class TestScene extends Scene {
         }
 
         deckMaterials = new ArrayList<>();
-        addDeckToList(R.drawable.jart_new_wave);
         addDeckToList(R.drawable.palacedeck);
+        addDeckToList(R.drawable.jart_new_wave);
         addDeckToList(R.drawable.primitive_rodriquez_thorns);
         addDeckToList(R.drawable.primitive_x_rick_and_morty);
         addDeckToList(R.drawable.real_wair_flooded);
 
         gripMaterials = new ArrayList<>();
-        addGripToList(R.drawable.grip);
         addGripToList(R.drawable.grip2);
+        addGripToList(R.drawable.grip);
 
         renderGrip = true;
 
@@ -314,7 +314,7 @@ public class TestScene extends Scene {
         palaceDeck = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
         palaceDeck.setScale(0.15f, 0.15f, 0.15f);
         palaceDeck.setMaterial(deckMaterials.get(0));
-        palaceDeck.setPosition(new Point3D(0.0f, -1f, 0.0f));
+        palaceDeck.setPosition(new Point3D(0.0f, -4f, 0.0f));
 
         palaceGrip = OBJModelLoader.readObjFile(R.raw.grip8_125_4);
         palaceGrip.setScale(0.15f, 0.15f, 0.15f);
@@ -357,35 +357,38 @@ public class TestScene extends Scene {
     float rotationY = 0.0f;
 
     float[] invertedRotation = new float[16];
+    float[] rotationModelMatrix = new float[16];
 
     void applyRotation(Vector3D rotationAxis, float angle)
     {
         float[] calcAxis = new float[4];
         float[] axisOfRotation = { rotationAxis.x, rotationAxis.y, rotationAxis.z, 1.0f };
-        Matrix.invertM(invertedRotation, 0, modelMatrix, 0);
+        Matrix.invertM(invertedRotation, 0, rotationModelMatrix, 0);
         Matrix.multiplyMV(calcAxis, 0, invertedRotation, 0, axisOfRotation, 0);
-        Matrix.rotateM(modelMatrix, 0, angle, calcAxis[0], calcAxis[1], calcAxis[2]);
+        Matrix.rotateM(rotationModelMatrix, 0, angle, calcAxis[0], calcAxis[1], calcAxis[2]);
     }
 
     @Override
     public void render()
     {
         Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix,
+                0, palaceDeck.getPosition().x, palaceDeck.getPosition().y, palaceDeck.getPosition().z);
         Matrix.scaleM(modelMatrix, 0, palaceDeck.getScale().x, palaceDeck.getScale().y, palaceDeck.getScale().z);
 
+        Matrix.setIdentityM(rotationModelMatrix, 0);
         applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), rotationX + 45.0f);
         applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), rotationY + 270.0f);
 
-        Matrix.translateM(modelMatrix,
-                0, palaceDeck.getPosition().x, palaceDeck.getPosition().y, palaceDeck.getPosition().z);
+        float[] finalMatrix = new float[16];
+        Matrix.multiplyMM(finalMatrix, 0, modelMatrix, 0, rotationModelMatrix, 0);
 
+        palaceDeck.renderTestModelMatrix(camera3D, finalMatrix);
+        palaceGrip.renderTestModelMatrix(camera3D, finalMatrix);
 
-        palaceDeck.renderTestModelMatrix(camera3D, modelMatrix);
-        palaceGrip.renderTestModelMatrix(camera3D, modelMatrix);
-
-        button.draw(camera2D);
-        image.draw(camera2D);
-        dropdown.draw(camera2D);
+        //button.draw(camera2D);
+       image.draw(camera2D);
+       // dropdown.draw(camera2D);
     }
 
     float dragAngleY = 0.0f;
