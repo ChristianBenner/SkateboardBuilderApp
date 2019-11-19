@@ -2,10 +2,8 @@ package com.games.crispin.skateboardbuilderapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.opengl.Matrix;
 import android.util.Xml;
-import android.view.View;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Geometry;
@@ -14,17 +12,18 @@ import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Geometry.Vector2D;
 import com.games.crispin.crispinmobile.Geometry.Vector3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
-import com.games.crispin.crispinmobile.Rendering.UserInterface.Border;
-import com.games.crispin.crispinmobile.Rendering.UserInterface.Button;
-import com.games.crispin.crispinmobile.Rendering.UserInterface.Dropdown;
-import com.games.crispin.crispinmobile.Rendering.UserInterface.Image;
+import com.games.crispin.crispinmobile.UserInterface.Border;
+import com.games.crispin.crispinmobile.UserInterface.Button;
+import com.games.crispin.crispinmobile.UserInterface.Dropdown;
+import com.games.crispin.crispinmobile.UserInterface.Image;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
-import com.games.crispin.crispinmobile.Rendering.Utilities.TextureOptions;
+import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
+import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
@@ -35,10 +34,6 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.opengl.GLES20.GL_LINEAR;
-import static android.opengl.GLES20.GL_LINEAR_MIPMAP_LINEAR;
-import static android.opengl.GLES20.GL_NEAREST;
 
 public class TestScene extends Scene {
     private Camera3D camera3D;
@@ -220,6 +215,7 @@ public class TestScene extends Scene {
         }
     }
 
+    boolean colourNormal = true;
     public TestScene()
     {
 
@@ -243,12 +239,23 @@ public class TestScene extends Scene {
         image = new Image(R.drawable.logo, (int)targetWidth, (int)(targetWidth * ratio));
         image.setPosition((Crispin.getSurfaceWidth()/2.0f) - (targetWidth/2.0f), Crispin.getSurfaceHeight() - (targetWidth * ratio) - 40.0f);
 
-        Border border = new Border(Colour.RED, 50);
+        Border border = new Border(Colour.BLACK, 4);
 
-        button = new Button(R.drawable.bank_card_icon);
+        button = new Button(R.drawable.pencil_icon);
         button.setBorder(border);
         button.setPosition(100.0f, 100.0f);
-        button.setOpacity(0.5f);
+        button.addButtonListener(new TouchListener() {
+            @Override
+            public void touchEvent(TouchEvent e) {
+                switch (e.getEvent())
+                {
+                    case CLICK:
+                        palaceDeck.setMaterial(nextDeckMaterial());
+                        palaceGrip.setMaterial(nextGripMaterial());
+                        break;
+                }
+            }
+        });
 
         dropdown = new Dropdown();
         dropdown.addItem("Test Item");
@@ -314,12 +321,12 @@ public class TestScene extends Scene {
         palaceDeck = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
         palaceDeck.setScale(0.15f, 0.15f, 0.15f);
         palaceDeck.setMaterial(deckMaterials.get(0));
-        palaceDeck.setPosition(new Point3D(0.0f, -4f, 0.0f));
+        palaceDeck.setPosition(new Point3D(0.0f, -3f, 0.0f));
 
         palaceGrip = OBJModelLoader.readObjFile(R.raw.grip8_125_4);
         palaceGrip.setScale(0.15f, 0.15f, 0.15f);
         palaceGrip.setMaterial(gripMaterials.get(0));
-        palaceGrip.setPosition(new Point3D(0.0f, -1f, 0.0f));
+        palaceGrip.setPosition(new Point3D(0.0f, -3f, 0.0f));
 
      //   palaceDeck.setRotation(0.0f, 90.0f, 90.0f);
      //   palaceGrip.setRotation(0.0f, 90.0f, 90.0f);
@@ -347,6 +354,27 @@ public class TestScene extends Scene {
                 dropdown.expand();
             }
             time = 0.0f;
+        }
+
+        if(dragging == false)
+        {
+            if(averageVelocity.x != 0 && averageVelocity.y != 0)
+            {
+                if(Math.abs(averageVelocity.x) <= 0.01f)
+                {
+                    averageVelocity.x = 0.0f;
+                }
+
+                if(Math.abs(averageVelocity.y) <= 0.01f)
+                {
+                    averageVelocity.y = 0.0f;
+                }
+
+                averageVelocity.x -= averageVelocity.x * 0.05f;
+                averageVelocity.y -= averageVelocity.y * 0.05f;
+                rotationX += averageVelocity.x;
+                rotationY += averageVelocity.y;
+            }
         }
     }
 
@@ -386,7 +414,7 @@ public class TestScene extends Scene {
         palaceDeck.renderTestModelMatrix(camera3D, finalMatrix);
         palaceGrip.renderTestModelMatrix(camera3D, finalMatrix);
 
-        //button.draw(camera2D);
+        button.draw(camera2D);
        image.draw(camera2D);
        // dropdown.draw(camera2D);
     }
@@ -394,32 +422,82 @@ public class TestScene extends Scene {
     float dragAngleY = 0.0f;
     float dragAngleX = 0.0f;
     Point2D lastPos;
+    boolean dragging = false;
+    Point2D difference = new Point2D();
+
+    final int MAX_SAMPLES = 5;
+    float[] velocitySamplesX = new float[MAX_SAMPLES];
+    float[] velocitySamplesY = new float[MAX_SAMPLES];
+    Point2D averageVelocity = new Point2D();
+    int velocitySampleIndex = 0;
 
     @Override
     public void touch(int type, Point2D position)
     {
         if(type == 1)
         {
-            lastPos = position;
-        }
+            if(button.interacts(position))
+            {
+                button.sendClickEvent(position);
+            }
+            else
+            {
+                lastPos = position;
+                dragging = true;
+            }
 
+            for(int i = 0; i < MAX_SAMPLES; i++)
+            {
+                velocitySamplesX[i] = 0.0f;
+                velocitySamplesY[i] = 0.0f;
+            }
+            velocitySampleIndex = 0;
+        }
+        if(type == 2)
+        {
+            dragging = false;
+
+            // Calculate mean velocity
+            averageVelocity.x = 0.0f;
+            averageVelocity.y = 0.0f;
+            for(int i = 0; i < MAX_SAMPLES; i++)
+            {
+                averageVelocity.x += velocitySamplesX[i];
+                averageVelocity.y += velocitySamplesY[i];
+            }
+            averageVelocity.x /= MAX_SAMPLES;
+            averageVelocity.y /= MAX_SAMPLES;
+        }
         if(type == 3)
         {
             // Dragging
-            System.out.println("DRAGGING");
+           // System.out.println("DRAGGING");
 
-            boolean inv;
-
-            if(lastPos == null)
+            if(dragging)
             {
+                if(lastPos == null)
+                {
+                    lastPos = position;
+                }
+
+                // Calculate the velocity vector
+                difference.x = (position.x - lastPos.x) * 0.2f;
+                difference.y = (position.y - lastPos.y) * 0.2f;
+
+                if(velocitySampleIndex >= MAX_SAMPLES)
+                {
+                    velocitySampleIndex = 0;
+                }
+                velocitySamplesX[velocitySampleIndex] = difference.x;
+                velocitySamplesY[velocitySampleIndex] = difference.y;
+                velocitySampleIndex++;
+
+                rotationX += (position.x - lastPos.x) * 0.2f;
+                rotationY += (position.y - lastPos.y) * 0.2f;
+
                 lastPos = position;
             }
 
-            rotationX += (position.x - lastPos.x) * 0.2f;
-            rotationY += (position.y - lastPos.y) * 0.2f;
-
-
-            lastPos = position;
 
            // palaceDeck.setRotation(dragAngleY, 90.0f + dragAngleX, 0.0f);
            // palaceGrip.setRotation(dragAngleY, 90.0f + dragAngleX, 0.0f);
