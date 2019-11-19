@@ -2,13 +2,21 @@ package com.games.crispin.skateboardbuilderapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Point;
+import android.opengl.Matrix;
 import android.util.Xml;
 import android.view.View;
 
 import com.games.crispin.crispinmobile.Crispin;
+import com.games.crispin.crispinmobile.Geometry.Geometry;
+import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
+import com.games.crispin.crispinmobile.Geometry.Vector2D;
+import com.games.crispin.crispinmobile.Geometry.Vector3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
+import com.games.crispin.crispinmobile.Rendering.UserInterface.Border;
 import com.games.crispin.crispinmobile.Rendering.UserInterface.Button;
+import com.games.crispin.crispinmobile.Rendering.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.Rendering.UserInterface.Image;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
@@ -16,6 +24,7 @@ import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
+import com.games.crispin.crispinmobile.Rendering.Utilities.TextureOptions;
 import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
@@ -27,6 +36,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.opengl.GLES20.GL_LINEAR;
+import static android.opengl.GLES20.GL_LINEAR_MIPMAP_LINEAR;
+import static android.opengl.GLES20.GL_NEAREST;
+
 public class TestScene extends Scene {
     private Camera3D camera3D;
     private Camera2D camera2D;
@@ -36,6 +49,7 @@ public class TestScene extends Scene {
 
     private Image image;
     private Button button;
+    private Dropdown dropdown;
 
     private boolean renderGrip;
 
@@ -208,6 +222,7 @@ public class TestScene extends Scene {
 
     public TestScene()
     {
+
         Crispin.setBackgroundColour(new Colour(0.4f, 0.78f, 0.843f));
 
         // Get application preferences (contains settings)
@@ -228,10 +243,19 @@ public class TestScene extends Scene {
         image = new Image(R.drawable.logo, (int)targetWidth, (int)(targetWidth * ratio));
         image.setPosition((Crispin.getSurfaceWidth()/2.0f) - (targetWidth/2.0f), Crispin.getSurfaceHeight() - (targetWidth * ratio) - 40.0f);
 
+        Border border = new Border(Colour.RED, 50);
+
         button = new Button(R.drawable.bank_card_icon);
+        button.setBorder(border);
         button.setPosition(100.0f, 100.0f);
+        button.setOpacity(0.5f);
 
-
+        dropdown = new Dropdown();
+        dropdown.addItem("Test Item");
+        dropdown.addItem("Another Item");
+        dropdown.addItem("Third Item");
+        dropdown.addItem("Last Item");
+        //dropdown.expand();
 /*
      //   writeBoardToXML(new Skateboard());
         readBoardFromXML("saves.xml");
@@ -279,9 +303,6 @@ public class TestScene extends Scene {
         gripMaterials = new ArrayList<>();
         addGripToList(R.drawable.grip);
         addGripToList(R.drawable.grip2);
-      /*  addGripToList(R.drawable.grip3);
-        addGripToList(R.drawable.grip4);
-        addGripToList(R.drawable.grip5);*/
 
         renderGrip = true;
 
@@ -299,94 +320,106 @@ public class TestScene extends Scene {
         palaceGrip.setScale(0.15f, 0.15f, 0.15f);
         palaceGrip.setMaterial(gripMaterials.get(0));
         palaceGrip.setPosition(new Point3D(0.0f, -1f, 0.0f));
+
+     //   palaceDeck.setRotation(0.0f, 90.0f, 90.0f);
+     //   palaceGrip.setRotation(0.0f, 90.0f, 90.0f);
     }
 
     float angle = 0.0f;
 
-    float maxSpinAdd = 10.0f;
-    boolean fadingIn = false;
-
-    float changeMatTime = 0.0f;
-
-    float alphaGrip = 1.0f;
+    float time = 0.0f;
 
     @Override
     public void update(float deltaTime) {
         angle += 2.0f;
+       // palaceDeck.setRotation(angle, 90.0f, 90.0f);
+       // palaceGrip.setRotation(angle, 90.0f, 90.0f);
 
-/*        changeMatTime += 1f;
-        if(changeMatTime > 10.0f)
+        time += 1.0f;
+        if(time > 60.0f * 2.0f)
         {
-            changeMatTime = 0.0f;
-            palaceDeck.setMaterial(nextMaterial());
-        }*/
-
-
-        if(spinning)
-        {
-            if(spinAdd >= maxSpinAdd)
+            if(dropdown.isExpanded())
             {
-                increaseSpin = false;
-
-                if(!fadingIn)
-                {
-                    alphaGrip = 0.0f;
-                    renderGrip = false;
-                }
-                else
-                {
-                    alphaGrip = 1.0f;
-                }
-
-                fadingIn = !fadingIn;
-            }
-
-            if(increaseSpin)
-            {
-                spinAdd += 0.1f;
-
-                float val = ((spinAdd+1.0f) / 2.0f)/maxSpinAdd;
-
-                if(!fadingIn)
-                {
-                    alphaGrip = 1.0f - val;
-                }
-                else
-                {
-                    alphaGrip = val;
-                }
+                dropdown.collapse();
             }
             else
             {
-                spinAdd -= 0.1f;
+                dropdown.expand();
             }
-
-
-            if(spinAdd <= 0.0f)
-            {
-                spinAdd = 0.0f;
-                spinning = false;
-            }
-
-            angle += spinAdd;
+            time = 0.0f;
         }
+    }
 
-        palaceDeck.setRotation(angle, 90.0f, 90.0f);
-        palaceGrip.setRotation(angle, 90.0f, 90.0f);
-        palaceGrip.getMaterial().getColour().setAlpha(alphaGrip);
+    float[] modelMatrix = new float[16];
+    float[] resultMatrix = new float[16];
+    float[] rotationMatrix = new float[16];
+    float rotationX = 0.0f;
+    float rotationY = 0.0f;
+
+    float[] invertedRotation = new float[16];
+
+    void applyRotation(Vector3D rotationAxis, float angle)
+    {
+        float[] calcAxis = new float[4];
+        float[] axisOfRotation = { rotationAxis.x, rotationAxis.y, rotationAxis.z, 1.0f };
+        Matrix.invertM(invertedRotation, 0, modelMatrix, 0);
+        Matrix.multiplyMV(calcAxis, 0, invertedRotation, 0, axisOfRotation, 0);
+        Matrix.rotateM(modelMatrix, 0, angle, calcAxis[0], calcAxis[1], calcAxis[2]);
     }
 
     @Override
     public void render()
     {
-        palaceDeck.render(camera3D);
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.scaleM(modelMatrix, 0, palaceDeck.getScale().x, palaceDeck.getScale().y, palaceDeck.getScale().z);
 
-        if(renderGrip)
-        {
-            palaceGrip.render(camera3D);
-        }
+        applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), rotationX + 45.0f);
+        applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), rotationY + 270.0f);
+
+        Matrix.translateM(modelMatrix,
+                0, palaceDeck.getPosition().x, palaceDeck.getPosition().y, palaceDeck.getPosition().z);
+
+
+        palaceDeck.renderTestModelMatrix(camera3D, modelMatrix);
+        palaceGrip.renderTestModelMatrix(camera3D, modelMatrix);
 
         button.draw(camera2D);
         image.draw(camera2D);
+        dropdown.draw(camera2D);
+    }
+
+    float dragAngleY = 0.0f;
+    float dragAngleX = 0.0f;
+    Point2D lastPos;
+
+    @Override
+    public void touch(int type, Point2D position)
+    {
+        if(type == 1)
+        {
+            lastPos = position;
+        }
+
+        if(type == 3)
+        {
+            // Dragging
+            System.out.println("DRAGGING");
+
+            boolean inv;
+
+            if(lastPos == null)
+            {
+                lastPos = position;
+            }
+
+            rotationX += (position.x - lastPos.x) * 0.2f;
+            rotationY += (position.y - lastPos.y) * 0.2f;
+
+
+            lastPos = position;
+
+           // palaceDeck.setRotation(dragAngleY, 90.0f + dragAngleX, 0.0f);
+           // palaceGrip.setRotation(dragAngleY, 90.0f + dragAngleX, 0.0f);
+        }
     }
 }
