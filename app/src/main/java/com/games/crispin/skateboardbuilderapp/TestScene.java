@@ -10,6 +10,7 @@ import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Geometry;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
+import com.games.crispin.crispinmobile.Geometry.RotationMatrix;
 import com.games.crispin.crispinmobile.Geometry.Vector2D;
 import com.games.crispin.crispinmobile.Geometry.Vector3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
@@ -219,6 +220,7 @@ public class TestScene extends Scene {
         }
     }
 
+    RenderObject truck;
     boolean colourNormal = true;
     public TestScene()
     {
@@ -358,6 +360,12 @@ public class TestScene extends Scene {
         palaceGrip.setAlpha(0.0f);
      //   palaceDeck.setRotation(0.0f, 90.0f, 90.0f);
      //   palaceGrip.setRotation(0.0f, 90.0f, 90.0f);
+
+        Material grey = new Material(new Texture(R.drawable.grey));
+        truck = OBJModelLoader.readObjFile(R.raw.trucktest);
+        truck.setScale(0.6f, 0.6f, 0.6f);
+        truck.setMaterial(grey);
+
     }
 
     float angle = 0.0f;
@@ -433,43 +441,22 @@ public class TestScene extends Scene {
                 rotationY += averageVelocity.y;
             }
         }
+
+        rm.reset();
+        rm.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), rotationX + 45.0f);
+        rm.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), rotationY + 270.0f);
+        truck.setRotation(rm);
     }
 
-    float[] modelMatrix = new float[16];
-    float[] resultMatrix = new float[16];
-    float[] rotationMatrix = new float[16];
     float rotationX = 0.0f;
     float rotationY = 0.0f;
 
-    float[] invertedRotation = new float[16];
-    float[] rotationModelMatrix = new float[16];
-
-    void applyRotation(Vector3D rotationAxis, float angle)
-    {
-        float[] calcAxis = new float[4];
-        float[] axisOfRotation = { rotationAxis.x, rotationAxis.y, rotationAxis.z, 1.0f };
-        Matrix.invertM(invertedRotation, 0, rotationModelMatrix, 0);
-        Matrix.multiplyMV(calcAxis, 0, invertedRotation, 0, axisOfRotation, 0);
-        Matrix.rotateM(rotationModelMatrix, 0, angle, calcAxis[0], calcAxis[1], calcAxis[2]);
-    }
+    RotationMatrix rm = new RotationMatrix();
 
     @Override
     public void render()
     {
-        Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.translateM(modelMatrix,
-                0, palaceDeck.getPosition().x, palaceDeck.getPosition().y, palaceDeck.getPosition().z);
-        Matrix.scaleM(modelMatrix, 0, palaceDeck.getScale().x, palaceDeck.getScale().y, palaceDeck.getScale().z);
-
-        Matrix.setIdentityM(rotationModelMatrix, 0);
-        applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), rotationX + 45.0f);
-        applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), rotationY + 270.0f);
-
-        float[] finalMatrix = new float[16];
-        Matrix.multiplyMM(finalMatrix, 0, modelMatrix, 0, rotationModelMatrix, 0);
-
-        palaceDeck.renderTestModelMatrix(camera3D, finalMatrix);
-        palaceGrip.renderTestModelMatrix(camera3D, finalMatrix);
+        truck.newRender(camera3D);
 
         button.draw(camera2D);
         backButton.draw(camera2D);
