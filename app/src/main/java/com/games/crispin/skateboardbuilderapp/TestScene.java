@@ -255,7 +255,7 @@ public class TestScene extends Scene {
 
         backButton = new Button(R.drawable.back_icon);
         backButton.setPosition(100.0f, Crispin.getSurfaceHeight() - 100.0f - 200.0f);
-        backButton.addButtonListener(new TouchListener() {
+        backButton.addTouchListener(new TouchListener() {
             @Override
             public void touchEvent(TouchEvent e) {
                 switch (e.getEvent())
@@ -270,7 +270,7 @@ public class TestScene extends Scene {
         button = new Button(R.drawable.pencil_icon);
        // button.setBorder(border);
         button.setPosition(100.0f, 100.0f);
-        button.addButtonListener(new TouchListener() {
+        button.addTouchListener(new TouchListener() {
             @Override
             public void touchEvent(TouchEvent e) {
                 switch (e.getEvent())
@@ -482,7 +482,7 @@ public class TestScene extends Scene {
         switch (type)
         {
             case MotionEvent.ACTION_DOWN:
-                if(button.interacts(position))
+/*                if(button.interacts(position))
                 {
                     button.sendClickEvent(position);
                 }
@@ -490,7 +490,7 @@ public class TestScene extends Scene {
                 {
                     backButton.sendClickEvent(position);
                 }
-                else
+                else*/
                 {
                     lastPos = position;
                     dragging = true;

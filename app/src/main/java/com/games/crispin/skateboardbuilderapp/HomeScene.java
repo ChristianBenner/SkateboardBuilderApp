@@ -110,7 +110,7 @@ public class HomeScene extends Scene
         openText.setOpacity(uiAlpha);
         buyText.setOpacity(uiAlpha);
 
-        newButton.addButtonListener(e -> {
+        newButton.addTouchListener(e -> {
             switch (e.getEvent())
             {
                 case CLICK:
@@ -124,7 +124,7 @@ public class HomeScene extends Scene
             }
         });
 
-        openButton.addButtonListener(e -> {
+        openButton.addTouchListener(e -> {
             switch (e.getEvent())
             {
                 case CLICK:
@@ -139,7 +139,7 @@ public class HomeScene extends Scene
             }
         });
 
-        buyButton.addButtonListener(e -> {
+        buyButton.addTouchListener(e -> {
             switch (e.getEvent())
             {
                 case CLICK:
@@ -304,38 +304,6 @@ public class HomeScene extends Scene
 
     @Override
     public void touch(int type, Point2D position) {
-        switch (type)
-        {
-            case MotionEvent.ACTION_DOWN:
-                if(newButton.interacts(position))
-                {
-                    newButton.sendClickEvent(position);
-                }
-                if(openButton.interacts(position))
-                {
-                    openButton.sendClickEvent(position);
-                }
-                if(buyButton.interacts(position))
-                {
-                    buyButton.sendClickEvent(position);
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                if(newButton.isClicked())
-                {
-                    newButton.sendReleaseEvent(position);
-                }
 
-                if(openButton.isClicked())
-                {
-                    openButton.sendReleaseEvent(position);
-                }
-
-                if(buyButton.isClicked())
-                {
-                    buyButton.sendReleaseEvent(position);
-                }
-                break;
-        }
     }
 }
