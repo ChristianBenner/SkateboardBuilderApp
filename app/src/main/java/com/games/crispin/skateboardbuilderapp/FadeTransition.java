@@ -124,7 +124,6 @@ public class FadeTransition
     public void draw(Camera2D camera2D)
     {
         transitionOverlay.setAlpha(alpha);
-        System.out.println("ooo alpha: " +alpha);
         transitionOverlay.draw(camera2D);
     }
 }

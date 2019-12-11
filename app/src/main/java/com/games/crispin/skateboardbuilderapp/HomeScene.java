@@ -1,28 +1,29 @@
 package com.games.crispin.skateboardbuilderapp;
 
-import android.view.MotionEvent;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
-import com.games.crispin.crispinmobile.Rendering.Models.Square;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
-import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Image;
 import com.games.crispin.crispinmobile.UserInterface.LinearLayout;
 import com.games.crispin.crispinmobile.UserInterface.Text;
+import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
 public class HomeScene extends Scene
 {
+    private static final Scale2D BUTTON_SIZE = new Scale2D(200.0f, 200.0f);
+    private static final Scale2D BUTTON_PADDING = new Scale2D(40.0f, 0.0f);
+    private static final float TEXT_LINE_LENGTH = BUTTON_SIZE.x;
+    private static final Scale2D TEXT_PADDING = new Scale2D(40.0f, 0.0f);
+
     private Image logoImage;
-    private Button newButton;
-    private Button openButton;
-    private Button buyButton;
+    private CustomButton newButton;
+    private CustomButton openButton;
+    private CustomButton buyButton;
     private Text newText;
     private Text openText;
     private Text buyText;
@@ -33,10 +34,6 @@ public class HomeScene extends Scene
     private FadeTransition fadeTransition;
 
     private Camera2D uiCamera;
-
-    private float newUIColour = 1.0f;
-    private float openUIColour = 1.0f;
-    private float buyUIColour = 1.0f;
 
     private static final Colour BACKGROUND_COLOR = new Colour(57, 142, 178);
 
@@ -70,186 +67,60 @@ public class HomeScene extends Scene
         logoImage.setPosition((Crispin.getSurfaceWidth()/2.0f) - (logoTargetWidth/2.0f),
                 Crispin.getSurfaceHeight() - (logoTargetWidth * heightWidthRatio) - paddingLogo);
 
-        final float buttonSize = 200.0f;
-        final float buttonPadding = 40.0f;
         final float buttonLogoSpacing = 150.0f;
         final float buttonTextSpacing = 10.0f;
-        final float buttonPosY = logoImage.getPosition().y - buttonLogoSpacing - buttonSize;
-        final float textPosY = buttonPosY + buttonSize + buttonTextSpacing;
+        final float buttonPosY = logoImage.getPosition().y - buttonLogoSpacing - BUTTON_SIZE.y;
+        final float textPosY = buttonPosY + BUTTON_SIZE.y + buttonTextSpacing;
 
-        final Font buttonFont = new Font(R.raw.aileron_regular, 48);
+        final Font TEXT_FONT = new Font(R.raw.aileron_regular, 48);
 
-        newText = new Text(buttonFont, "NEW", false, true,
-                buttonSize);
-        openText = new Text(buttonFont, "OPEN", false, true,
-                buttonSize);
-        buyText = new Text(buttonFont, "BUY", false, true,
-                buttonSize);
-        newButton = new Button(new Texture(R.drawable.pencil_icon));
-        openButton = new Button(new Texture(R.drawable.folder_icon));
-        buyButton = new Button(new Texture(R.drawable.bank_card_icon));
-
+        // Create a linear layout for the text UI elements
+        textLayout = new LinearLayout(new Point2D((Crispin.getSurfaceWidth() / 2.0f) -
+                (TEXT_LINE_LENGTH / 2.0f) - TEXT_PADDING.x - TEXT_LINE_LENGTH, textPosY));
+        textLayout.setPadding(TEXT_PADDING);
+        newText = new Text(TEXT_FONT, "NEW", false, true,
+                TEXT_LINE_LENGTH);
+        openText = new Text(TEXT_FONT, "OPEN", false, true,
+                TEXT_LINE_LENGTH);
+        buyText = new Text(TEXT_FONT, "BUY", false, true,
+                TEXT_LINE_LENGTH);
         newText.setColour(Colour.WHITE);
         openText.setColour(Colour.WHITE);
         buyText.setColour(Colour.WHITE);
-        newButton.setSize(new Scale2D(buttonSize, buttonSize));
-        openButton.setSize(new Scale2D(buttonSize, buttonSize));
-        buyButton.setSize(new Scale2D(buttonSize, buttonSize));
-
-
-        buttonLayout = new LinearLayout(new Point2D((Crispin.getSurfaceWidth() / 2.0f) - (buttonSize / 2.0f) - buttonPadding - buttonSize, buttonPosY));
-        buttonLayout.setPadding(new Scale2D(buttonPadding, 0.0f));
-        buttonLayout.add(newButton);
-        buttonLayout.add(openButton);
-        buttonLayout.add(buyButton);
-
-        textLayout = new LinearLayout(new Point2D((Crispin.getSurfaceWidth() / 2.0f) - (buttonSize / 2.0f) - buttonPadding - buttonSize, textPosY));
-        textLayout.setPadding(new Scale2D(buttonPadding, 0.0f));
         textLayout.add(newText);
         textLayout.add(openText);
         textLayout.add(buyText);
 
-        newButton.addTouchListener(e -> {
-            switch (e.getEvent())
-            {
-                case CLICK:
-                    newText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                    fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
-                    break;
-                case RELEASE:
-                    newText.disableWiggle();
-                    break;
-            }
-        });
+        // Create a linear layout for the button UI elements
+        buttonLayout = new LinearLayout(new Point2D((Crispin.getSurfaceWidth() / 2.0f) -
+                (BUTTON_SIZE.x / 2.0f) - BUTTON_PADDING.x - BUTTON_SIZE.x, buttonPosY));
+        buttonLayout.setPadding(BUTTON_PADDING);
+        newButton = new CustomButton(new Texture(R.drawable.pencil_icon));
+        openButton = new CustomButton(new Texture(R.drawable.folder_icon));
+        buyButton = new CustomButton(new Texture(R.drawable.bank_card_icon));
+        newButton.setSize(BUTTON_SIZE);
+        openButton.setSize(BUTTON_SIZE);
+        buyButton.setSize(BUTTON_SIZE);
+        buttonLayout.add(newButton);
+        buttonLayout.add(openButton);
+        buttonLayout.add(buyButton);
 
-        openButton.addTouchListener(e -> {
-            switch (e.getEvent())
-            {
-                case CLICK:
-                    openText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                    fadeTransition.fadeOutToScence(TestScene::new);
-                    break;
-                case RELEASE:
-                    openText.disableWiggle();
-                    break;
-            }
-        });
-
-        buyButton.addTouchListener(e -> {
-            switch (e.getEvent())
-            {
-                case CLICK:
-                    buyText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                    break;
-                case RELEASE:
-                    buyText.disableWiggle();
-                    break;
-            }
-        });
-    }
-
-    void handleNewButtonColour()
-    {
-        if(newButton.isClicked())
-        {
-            if(newUIColour <= 0.0f)
-            {
-                newUIColour = 0.0f;
-            }
-            else
-            {
-                newUIColour -= 0.05f;
-            }
-
-            newButton.setColour(new Colour(1.0f, newUIColour, newUIColour));
-            newText.setColour(new Colour(1.0f, newUIColour, newUIColour));
-        }
-        else
-        {
-            if(newUIColour >= 1.0f)
-            {
-                newUIColour = 1.0f;
-            }
-            else
-            {
-                newUIColour += 0.05f;
-            }
-
-            newButton.setColour(new Colour(1.0f, newUIColour, newUIColour));
-            newText.setColour(new Colour(1.0f, newUIColour, newUIColour));
-        }
-    }
-
-    void handleOpenButtonColour()
-    {
-        if(openButton.isClicked())
-        {
-            if(openUIColour <= 0.0f)
-            {
-                openUIColour = 0.0f;
-            }
-            else
-            {
-                openUIColour -= 0.05f;
-            }
-
-            openButton.setColour(new Colour(1.0f, openUIColour, openUIColour));
-            openText.setColour(new Colour(1.0f, openUIColour, openUIColour));
-        }
-        else
-        {
-            if(openUIColour >= 1.0f)
-            {
-                openUIColour = 1.0f;
-            }
-            else
-            {
-                openUIColour += 0.05f;
-            }
-
-            openButton.setColour(new Colour(1.0f, openUIColour, openUIColour));
-            openText.setColour(new Colour(1.0f, openUIColour, openUIColour));
-        }
-    }
-
-    void handleBuyButtonColour()
-    {
-        if(buyButton.isClicked())
-        {
-            if(buyUIColour <= 0.0f)
-            {
-                buyUIColour = 0.0f;
-            }
-            else
-            {
-                buyUIColour -= 0.05f;
-            }
-
-            buyButton.setColour(new Colour(1.0f, buyUIColour, buyUIColour));
-            buyText.setColour(new Colour(1.0f, buyUIColour, buyUIColour));
-        }
-        else
-        {
-            if(buyUIColour >= 1.0f)
-            {
-                buyUIColour = 1.0f;
-            }
-            else
-            {
-                buyUIColour += 0.05f;
-            }
-
-            buyButton.setColour(new Colour(1.0f, buyUIColour, buyUIColour));
-            buyText.setColour(new Colour(1.0f, buyUIColour, buyUIColour));
-        }
+        // Add touch listeners to button
+        newButton.addTouchListener(buttonNewTouchListener);
+        openButton.addTouchListener(buttonOpenTouchListener);
+        buyButton.addTouchListener(buyButtonTouchListener);
     }
 
     @Override
     public void update(float deltaTime)
     {
-        handleNewButtonColour();
-        handleOpenButtonColour();
-        handleBuyButtonColour();
+        newButton.update(deltaTime);
+        openButton.update(deltaTime);
+        buyButton.update(deltaTime);
+
+        newText.setColour(newButton.getColour());
+        openText.setColour(openButton.getColour());
+        buyButton.setColour(buyButton.getColour());
 
         fadeTransition.update(deltaTime);
     }
@@ -266,6 +137,49 @@ public class HomeScene extends Scene
     @Override
     public void touch(int type, Point2D position)
     {
-
+        // Nothing to do here (no touch controls on this scene)
     }
+
+    // The 'new' button touch listener
+    private final TouchListener buttonNewTouchListener = e ->
+    {
+        switch (e.getEvent())
+        {
+            case CLICK:
+                newText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
+                fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
+                break;
+            case RELEASE:
+                newText.disableWiggle();
+                break;
+        }
+    };
+
+    // The 'open' button touch listener
+    private final TouchListener buttonOpenTouchListener = e ->
+    {
+        switch (e.getEvent())
+        {
+            case CLICK:
+                openText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
+                fadeTransition.fadeOutToScence(TestScene::new);
+                break;
+            case RELEASE:
+                openText.disableWiggle();
+                break;
+        }
+    };
+
+    // The 'buy' button touch listener
+    private final TouchListener buyButtonTouchListener = e -> {
+        switch (e.getEvent())
+        {
+            case CLICK:
+                buyText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
+                break;
+            case RELEASE:
+                buyText.disableWiggle();
+                break;
+        }
+    };
 }
