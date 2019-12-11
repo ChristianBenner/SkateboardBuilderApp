@@ -26,10 +26,11 @@ public class HomeScene extends Scene
     private Text newText;
     private Text openText;
     private Text buyText;
-    private Square transitionSquare;
 
     private LinearLayout buttonLayout;
     private LinearLayout textLayout;
+
+    private FadeTransition fadeTransition;
 
     private Camera2D uiCamera;
 
@@ -37,17 +38,20 @@ public class HomeScene extends Scene
     private float openUIColour = 1.0f;
     private float buyUIColour = 1.0f;
 
+    private static final Colour BACKGROUND_COLOR = new Colour(57, 142, 178);
+
     public HomeScene()
     {
         // Set the background to a blue colour
-        Crispin.setBackgroundColour(new Colour(57, 142, 178));
+        Crispin.setBackgroundColour(BACKGROUND_COLOR);
+
+        // Create a fade transition for fading in
+        fadeTransition = new FadeTransition();
+        fadeTransition.setFadeColour(BACKGROUND_COLOR);
+        fadeTransition.fadeIn();
 
         // Create a 2D camera for the UI rendering
         uiCamera = new Camera2D();
-
-        transitionSquare = new Square(new Material(new Colour(57, 142, 178)), false);
-        transitionSquare.setPosition(0.0f, 0.0f);
-        transitionSquare.setScale(Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
 
         // Load the logo texture
         final Texture logoTexture = new Texture(R.drawable.logo);
@@ -110,7 +114,7 @@ public class HomeScene extends Scene
             {
                 case CLICK:
                     newText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                    transitionToScene(SelectDeckWidthScene::new);
+                    fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
                     break;
                 case RELEASE:
                     newText.disableWiggle();
@@ -123,7 +127,7 @@ public class HomeScene extends Scene
             {
                 case CLICK:
                     openText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                    transitionToScene(TestScene::new);
+                    fadeTransition.fadeOutToScence(TestScene::new);
                     break;
                 case RELEASE:
                     openText.disableWiggle();
@@ -240,73 +244,6 @@ public class HomeScene extends Scene
         }
     }
 
-    public void handleTransition()
-    {
-/*        if(fadeIn)
-        {
-            if(transitionSquare.getAlpha() > 0.0f)
-            {
-                transitionSquare.setAlpha(transitionSquare.getAlpha() - 0.05f);
-            }
-            else
-            {
-                transitionSquare.setAlpha(0.0f);
-            }
-        }
-        else
-        {
-            if(transitionSquare.getAlpha() < 1.0f)
-            {
-                transitionSquare.setAlpha(transitionSquare.getAlpha() + 0.05f);
-            }
-            else
-            {
-                transitionSquare.setAlpha(1.0f);
-            }
-        }*/
-
-        if(fadeIn)
-        {
-            if(transitionAlpha <= 0.0f)
-            {
-                transitionAlpha = 0.0f;
-                transitioning = false;
-            }
-            else
-            {
-                transitionAlpha -= 0.05f;
-            }
-        }
-        else
-        {
-            if(transitionAlpha >= 1.0f)
-            {
-                transitionAlpha = 1.0f;
-                transitioning = false;
-                Crispin.setScene(transitionScene);
-            }
-            else
-            {
-                transitionAlpha += 0.05f;
-            }
-        }
-
-        transitionSquare.setAlpha(transitionAlpha);
-    }
-
-    boolean fadeIn = true;
-    boolean transitioning = true;
-    float transitionAlpha = 1.0f;
-    Scene.Constructor transitionScene;
-    private void transitionToScene(Scene.Constructor scene)
-    {
-        transitionScene = scene;
-        transitioning = true;
-        transitionAlpha = 0.0f;
-        transitionSquare.setAlpha(0.0f);
-        fadeIn = false;
-    }
-
     @Override
     public void update(float deltaTime)
     {
@@ -314,27 +251,21 @@ public class HomeScene extends Scene
         handleOpenButtonColour();
         handleBuyButtonColour();
 
-        if(transitioning)
-        {
-            handleTransition();
-        }
-
+        fadeTransition.update(deltaTime);
     }
 
     @Override
-    public void render() {
+    public void render()
+    {
         logoImage.draw(uiCamera);
         buttonLayout.draw(uiCamera);
         textLayout.draw(uiCamera);
-
-        if(transitioning)
-        {
-            transitionSquare.render(uiCamera);
-        }
+        fadeTransition.draw(uiCamera);
     }
 
     @Override
-    public void touch(int type, Point2D position) {
+    public void touch(int type, Point2D position)
+    {
 
     }
 }
