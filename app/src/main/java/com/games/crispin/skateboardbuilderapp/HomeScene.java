@@ -15,6 +15,8 @@ import com.games.crispin.crispinmobile.Utilities.Scene;
 
 public class HomeScene extends Scene
 {
+    public static final Colour BACKGROUND_COLOR = new Colour(57, 142, 178);
+
     private static final Scale2D BUTTON_SIZE = new Scale2D(200.0f, 200.0f);
     private static final Scale2D BUTTON_PADDING = new Scale2D(40.0f, 0.0f);
     private static final float TEXT_LINE_LENGTH = BUTTON_SIZE.x;
@@ -34,8 +36,6 @@ public class HomeScene extends Scene
     private FadeTransition fadeTransition;
 
     private Camera2D uiCamera;
-
-    private static final Colour BACKGROUND_COLOR = new Colour(57, 142, 178);
 
     public HomeScene()
     {
