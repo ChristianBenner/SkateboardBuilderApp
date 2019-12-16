@@ -14,7 +14,7 @@ import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.UserInterface.TouchListener;
-import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
+import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
 public class SelectDeckWidthScene extends Scene
@@ -30,6 +30,8 @@ public class SelectDeckWidthScene extends Scene
     private CustomButton backButton;
 
     private RenderObject model;
+    private RotationMatrix rotationMatrix;
+
 
     public SelectDeckWidthScene()
     {
@@ -41,6 +43,8 @@ public class SelectDeckWidthScene extends Scene
         fadeTransition.fadeIn();
 
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
+
+        rotationMatrix = new RotationMatrix();
 
 /*        widthSelectDropdown = new Dropdown("Select a deck width");
         widthSelectDropdown.setPosition(Crispin.getSurfaceWidth() * 0.05f, Crispin.getSurfaceHeight() * 0.7f);
@@ -90,36 +94,35 @@ public class SelectDeckWidthScene extends Scene
 
                         if(selectedId == trucks)
                         {
-                            model = OBJModelLoader.readObjFile(R.raw.trucktest);
-                            model.setScale(0.6f, 0.6f, 0.6f);
-                            model.setMaterial(grey);
+                            ThreadedOBJLoader.loadModel(R.raw.trucktest, renderObject ->
+                            {
+                                model = renderObject;
+                                model.setScale(0.6f, 0.6f, 0.6f);
+                                model.setMaterial(grey);
+                                model.setRotation(rotationMatrix);
+                            });
                         }
                         else if(selectedId == deckOne)
                         {
-                            model = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
-                            model.setMaterial(palace);
-                            model.setScale(0.2f, 0.2f, 0.2f);
+                            ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test, renderObject ->
+                            {
+                                model = renderObject;
+                                model.setMaterial(palace);
+                                model.setScale(0.2f, 0.2f, 0.2f);
+                                model.setRotation(rotationMatrix);
+                            });
                         }
                         else if(selectedId == deckTwo)
                         {
-                            model = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
-                            model.setMaterial(jart);
-                            model.setScale(0.2f, 0.2f, 0.2f);
-                        }
-                        else
-                        {
-                            System.out.println("ooo No selection");
+                            ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test, renderObject ->
+                            {
+                                model = renderObject;
+                                model.setMaterial(jart);
+                                model.setScale(0.2f, 0.2f, 0.2f);
+                                model.setRotation(rotationMatrix);
+                            });
                         }
                         break;
-                }
-
-                if(model != null)
-                {
-                    RotationMatrix rm = new RotationMatrix();
-                    rm.reset();
-                    rm.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), 45.0f + 45.0f);
-                    rm.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), 45.0f + 270.0f);
-                    model.setRotation(rm);
                 }
             }
         });
@@ -142,24 +145,35 @@ public class SelectDeckWidthScene extends Scene
         });
     }
 
+    float yAngle = 45.0f;
     @Override
     public void update(float deltaTime)
     {
         backButton.update(deltaTime);
         fadeTransition.update(deltaTime);
+
+        yAngle += 0.5f;
+        rotationMatrix.reset();
+        rotationMatrix.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), yAngle + 45.0f);
+        rotationMatrix.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), 45.0f + 270.0f);
+
+        if(model != null)
+        {
+            model.setRotation(rotationMatrix);
+        }
     }
 
     @Override
     public void render()
     {
-        backButton.draw(uiCamera);
-        widthSelectDropdown.draw(uiCamera);
-        fadeTransition.draw(uiCamera);
-
         if(model != null)
         {
             model.newRender(camera3D);
         }
+
+        backButton.draw(uiCamera);
+        widthSelectDropdown.draw(uiCamera);
+        fadeTransition.draw(uiCamera);
     }
 
     @Override
