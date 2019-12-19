@@ -3,7 +3,8 @@ package com.games.crispin.skateboardbuilderapp;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
-import com.games.crispin.crispinmobile.Geometry.RotationMatrix;
+import com.games.crispin.crispinmobile.Rendering.Utilities.RotationMatrix;
+import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Geometry.Vector3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
@@ -32,6 +33,7 @@ public class SelectDeckWidthScene extends Scene
     private RenderObject model;
     private RotationMatrix rotationMatrix;
 
+    private LoadingIcon loadingIcon;
 
     public SelectDeckWidthScene()
     {
@@ -43,6 +45,13 @@ public class SelectDeckWidthScene extends Scene
         fadeTransition.fadeIn();
 
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
+
+        loadingIcon = new LoadingIcon();
+
+        Scale2D loadIconSize = new Scale2D(240.0f, 240.0f);
+        loadingIcon.setPosition(new Point2D((Crispin.getSurfaceWidth() / 2.0f) - (loadIconSize.x / 2.0f),
+                (Crispin.getSurfaceHeight() / 2.0f) - (loadIconSize.y / 2.0f)));
+        loadingIcon.setSize(loadIconSize);
 
         rotationMatrix = new RotationMatrix();
 
@@ -157,6 +166,7 @@ public class SelectDeckWidthScene extends Scene
         rotationMatrix.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), yAngle + 45.0f);
         rotationMatrix.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), 45.0f + 270.0f);
 
+        loadingIcon.update(deltaTime);
         if(model != null)
         {
             model.setRotation(rotationMatrix);
@@ -174,6 +184,8 @@ public class SelectDeckWidthScene extends Scene
         backButton.draw(uiCamera);
         widthSelectDropdown.draw(uiCamera);
         fadeTransition.draw(uiCamera);
+
+        loadingIcon.draw(uiCamera);
     }
 
     @Override

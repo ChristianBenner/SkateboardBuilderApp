@@ -2,16 +2,13 @@ package com.games.crispin.skateboardbuilderapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.opengl.Matrix;
 import android.util.Xml;
 import android.view.MotionEvent;
 
 import com.games.crispin.crispinmobile.Crispin;
-import com.games.crispin.crispinmobile.Geometry.Geometry;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
-import com.games.crispin.crispinmobile.Geometry.RotationMatrix;
-import com.games.crispin.crispinmobile.Geometry.Vector2D;
+import com.games.crispin.crispinmobile.Rendering.Utilities.RotationMatrix;
 import com.games.crispin.crispinmobile.Geometry.Vector3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.UserInterface.Border;
