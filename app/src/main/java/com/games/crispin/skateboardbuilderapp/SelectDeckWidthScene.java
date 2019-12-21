@@ -34,6 +34,7 @@ public class SelectDeckWidthScene extends Scene
     private RotationMatrix rotationMatrix;
 
     private LoadingIcon loadingIcon;
+    private boolean showLoadingIcon;
 
     public SelectDeckWidthScene()
     {
@@ -54,6 +55,7 @@ public class SelectDeckWidthScene extends Scene
         loadingIcon.setSize(loadIconSize);
 
         rotationMatrix = new RotationMatrix();
+        showLoadingIcon = false;
 
 /*        widthSelectDropdown = new Dropdown("Select a deck width");
         widthSelectDropdown.setPosition(Crispin.getSurfaceWidth() * 0.05f, Crispin.getSurfaceHeight() * 0.7f);
@@ -86,7 +88,8 @@ public class SelectDeckWidthScene extends Scene
         final int deckOne = widthSelectDropdown.addItem("Deck One");
         final int deckTwo = widthSelectDropdown.addItem("Deck Two");
 
-        Material grey = new Material(new Texture(R.drawable.grey));
+        Material dark = new Material();
+        dark.setColour(Colour.DARK_GREY);
         Material palace = new Material(new Texture(R.drawable.palacedeck));
         Material jart = new Material(new Texture(R.drawable.jart_new_wave));
 
@@ -103,32 +106,41 @@ public class SelectDeckWidthScene extends Scene
 
                         if(selectedId == trucks)
                         {
+                            System.out.println("Selected: trucks");
+                            showLoadingIcon = true;
                             ThreadedOBJLoader.loadModel(R.raw.trucktest, renderObject ->
                             {
                                 model = renderObject;
                                 model.setScale(0.6f, 0.6f, 0.6f);
-                                model.setMaterial(grey);
+                                model.setMaterial(dark);
                                 model.setRotation(rotationMatrix);
+                                showLoadingIcon = false;
                             });
                         }
                         else if(selectedId == deckOne)
                         {
+                            System.out.println("Selected: deckOne");
+                            showLoadingIcon = true;
                             ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test, renderObject ->
                             {
                                 model = renderObject;
                                 model.setMaterial(palace);
                                 model.setScale(0.2f, 0.2f, 0.2f);
                                 model.setRotation(rotationMatrix);
+                                showLoadingIcon = false;
                             });
                         }
                         else if(selectedId == deckTwo)
                         {
+                            System.out.println("Selected: deckTwo");
+                            showLoadingIcon = true;
                             ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test, renderObject ->
                             {
                                 model = renderObject;
                                 model.setMaterial(jart);
                                 model.setScale(0.2f, 0.2f, 0.2f);
                                 model.setRotation(rotationMatrix);
+                                showLoadingIcon = false;
                             });
                         }
                         break;
@@ -166,7 +178,11 @@ public class SelectDeckWidthScene extends Scene
         rotationMatrix.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), yAngle + 45.0f);
         rotationMatrix.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), 45.0f + 270.0f);
 
-        loadingIcon.update(deltaTime);
+        if(showLoadingIcon)
+        {
+            loadingIcon.update(deltaTime);
+        }
+
         if(model != null)
         {
             model.setRotation(rotationMatrix);
@@ -176,7 +192,7 @@ public class SelectDeckWidthScene extends Scene
     @Override
     public void render()
     {
-        if(model != null)
+        if(model != null && !showLoadingIcon)
         {
             model.newRender(camera3D);
         }
@@ -185,7 +201,10 @@ public class SelectDeckWidthScene extends Scene
         widthSelectDropdown.draw(uiCamera);
         fadeTransition.draw(uiCamera);
 
-        loadingIcon.draw(uiCamera);
+        if(showLoadingIcon)
+        {
+            loadingIcon.draw(uiCamera);
+        }
     }
 
     @Override
