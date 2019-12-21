@@ -64,15 +64,15 @@ public class RenderTest extends Scene
 
       //  matrix.translate(new Point3D(1.0f, 0.0f, 0.0f));
         matrix.rotateAroundPoint(new Point3D(1.0f, 1.0f, 1.0f), angle, 0.0f, 0.0f, 1.0f);
+        renderObject.render(camera3D, matrix);
 
         matrix2d.reset();
         matrix2d.translate(new Point3D((Crispin.getSurfaceWidth() / 2.0f) - 100.0f, (Crispin.getSurfaceHeight() / 2.0f) - 100.0f, 0.0f));
         matrix2d.rotateAroundPoint(new Point3D(100.0f, 100.0f, 0.0f), angle2, 0.0f, 0.0f, 1.0f);
         matrix2d.scale(new Scale3D(200.0f, 200.0f, 1.0f));
-
-
-        renderObject.render(camera3D, matrix);
         renderObject2d.render(camera2D, matrix2d);
+
+
     }
 
 

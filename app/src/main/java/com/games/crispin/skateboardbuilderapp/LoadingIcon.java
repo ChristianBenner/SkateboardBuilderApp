@@ -3,7 +3,9 @@ package com.games.crispin.skateboardbuilderapp;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
+import com.games.crispin.crispinmobile.Geometry.Scale3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
+import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RotationMatrix;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Geometry.Vector3D;
@@ -16,14 +18,17 @@ import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 public class LoadingIcon
 {
     private Square square;
-    private RotationMatrix rotationMatrix;
+    private ModelMatrix modelMatrix;
     private float rotationAngle;
+    private float rotationTime;
+    private static final float DEFAULT_ROT_SPEED = 3.5f;
 
     public LoadingIcon()
     {
         square = new Square(new Material(new Texture(R.drawable.load_icon)), true);
-        rotationMatrix = new RotationMatrix();
+        modelMatrix = new ModelMatrix();
         rotationAngle = 0.0f;
+        rotationTime = 0.0f;
     }
 
     public void setColour(Colour colour)
@@ -58,19 +63,17 @@ public class LoadingIcon
 
     public void update(float deltaTime)
     {
-     //   rotationMatrix.reset();
-       // rotationMatrix.applyRotation(new Vector3D(0.0f, 0.0f, 1.0f), rotationAngle);
-    //   square.setRotation(rotationMatrix);
-       // square.setRotationAroundPoint(new Point3D(120.0f / Crispin.getSurfaceWidth(), 120.0f / Crispin.getSurfaceHeight(), 0.0f), rotationAngle, 0.0f, 0.0f, 1.0f);
+        modelMatrix.reset();
+        modelMatrix.translate(new Point3D((Crispin.getSurfaceWidth() / 2.0f) - 100.0f, (Crispin.getSurfaceHeight() / 2.0f) - 100.0f, 0.0f));
+        modelMatrix.rotateAroundPoint(new Point3D(100.0f, 100.0f, 0.0f), rotationAngle, 0.0f, 0.0f, 1.0f);
+        modelMatrix.scale(new Scale3D(200.0f, 200.0f, 1.0f));
 
-
-        rotationAngle += 5f;
+        rotationTime += 0.07f * deltaTime;
+        rotationAngle += DEFAULT_ROT_SPEED + (((Math.sin(rotationTime) + 1) / 2.0f) * 5.0f);
     }
 
     public void draw(Camera2D camera2D)
     {
-        // Disable depth
-        square.render(camera2D);
-        // Re-enable depth
+        square.render(camera2D, modelMatrix);
     }
 }
