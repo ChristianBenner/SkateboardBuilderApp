@@ -5,82 +5,201 @@ import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Rendering.Models.Cube;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
-import com.games.crispin.crispinmobile.Rendering.Utilities.RotationMatrix;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
-import com.games.crispin.crispinmobile.Geometry.Vector3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
-import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
+import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
 import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.UserInterface.TouchListener;
-import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 
 public class SelectDeckWidthScene extends Scene
 {
+    // Padding for the back button
+    private static final Point2D BACK_BUTTON_PADDING = new Point2D(50.0f, 50.0f);
+
+    // Size of the back button
+    private static final Scale2D BACK_BUTTON_SIZE = new Scale2D(150.0f, 150.0f);
+
+    // Position of the back button
+    private static final Point2D BACK_BUTTON_POSITION = new Point2D(BACK_BUTTON_PADDING.x,
+            Crispin.getSurfaceHeight() - BACK_BUTTON_PADDING.y - BACK_BUTTON_SIZE.y);
+
+    // Padding for the select deck width dropdown
+    private static final Point2D SELECT_DECK_WIDTH_DROPDOWN_PADDING = new Point2D(50.0f,
+            50.0f);
+
+    // Size for the select deck width dropdown
+    private static final Scale2D SELECT_DECK_WIDTH_DROPDOWN_SIZE = new Scale2D(
+            Crispin.getSurfaceWidth() - (SELECT_DECK_WIDTH_DROPDOWN_PADDING.x * 2.0f),
+            100.0f);
+
+    // The font for text on the scene
+    private static final Font AILERON_REGULAR_FONT = new Font(R.raw.aileron_regular, 76);
+
+    // Title of the scene
+    private static final String SCENE_TITLE_TEXT = "Select Deck Width";
+
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
-    private Camera3D camera3D;
 
-    private Dropdown widthSelectDropdown;
+    // Camera for 3D model rendering
+    private Camera3D modelCamera;
 
+    // Render object model
+    private Model model;
+
+    // Render object model matrix
+    private ModelMatrix modelMatrix;
+
+    // Transition object that allows us to fade the scene in and out
     private FadeTransition fadeTransition;
 
+    // The loading icon UI
+    private LoadingIcon loadingIcon;
+
+    // Back button UI (return to home screen)
     private CustomButton backButton;
 
-    private RenderObject model;
-    private RotationMatrix rotationMatrix;
-
-    private LoadingIcon loadingIcon;
-    private boolean showLoadingIcon;
-
-    private Text selectDeckWidthText;
+    // Next button UI
     private Button nextButton;
+
+    // Width select dropdown UI
+    private Dropdown widthSelectDropdown;
+
+    // Select deck width text UI
+    private Text titleText;
+
+    // Rotation angle
+    private float rotationAngle = 0.0f;
 
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
         Crispin.setBackgroundColour(HomeScene.BACKGROUND_COLOR);
 
+        // Create the user interface camera
+        uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
+
+        // Create the model camera and move it forward in-front of the origin
+        modelCamera = new Camera3D();
+        modelCamera.setPosition(new Point3D(0.0f, 0.0f, 7.0f));
+
+        // Create the model matrix for transforming the model
+        modelMatrix = new ModelMatrix();
+
+        // Create the fade transition object and set it to fade in
         fadeTransition = new FadeTransition();
         fadeTransition.setFadeColour(HomeScene.BACKGROUND_COLOR);
         fadeTransition.fadeIn();
 
-        uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
-
+        // Create the loading icon
         loadingIcon = new LoadingIcon();
 
-        Scale2D loadIconSize = new Scale2D(240.0f, 240.0f);
-        loadingIcon.setPosition(new Point2D((Crispin.getSurfaceWidth() / 2.0f) - (loadIconSize.x / 2.0f),
-                (Crispin.getSurfaceHeight() / 2.0f) - (loadIconSize.y / 2.0f)));
-        loadingIcon.setSize(loadIconSize);
-
-        rotationMatrix = new RotationMatrix();
-        showLoadingIcon = false;
-
-        camera3D = new Camera3D();
-        camera3D.setPosition(new Point3D(0.0f, 0.0f, 7.0f));
-
-        Font font = new Font(com.games.crispin.crispinmobile.R.raw.aileron_regular, 76);
-        selectDeckWidthText = new Text(font, "Select Deck Width", false,
+        // Create the back button
+        backButton = new CustomButton(R.drawable.back_icon);
+        nextButton = new Button(AILERON_REGULAR_FONT, "Next");
+        titleText = new Text(AILERON_REGULAR_FONT, SCENE_TITLE_TEXT, false,
                 true, Crispin.getSurfaceWidth());
-        selectDeckWidthText.setColour(Colour.WHITE);
-        selectDeckWidthText.setPosition(0.0f, (Crispin.getSurfaceHeight() * 0.7f) + 150.0f);
+        widthSelectDropdown = new Dropdown("Select Width");
 
-        nextButton = new Button(font, "Next");
+        // Position, re-size, colour and add touch listeners to the UI
+        setupUI();
+    }
+
+    @Override
+    public void update(float deltaTime)
+    {
+        backButton.update(deltaTime);
+        fadeTransition.update(deltaTime);
+
+        rotationAngle += 0.5f;
+
+        modelMatrix.reset();
+        modelMatrix.rotate(315.0f, 1.0f, 0.0f, 0.0f);
+        modelMatrix.rotate(rotationAngle, 0.0f, 1.0f, 0.0f);
+
+        loadingIcon.update(deltaTime);
+    }
+
+    @Override
+    public void render()
+    {
+        if(model != null && !loadingIcon.isShown())
+        {
+            model.render(modelCamera, modelMatrix);
+        }
+
+        backButton.draw(uiCamera);
+        widthSelectDropdown.draw(uiCamera);
+        titleText.draw(uiCamera);
+        nextButton.draw(uiCamera);
+        loadingIcon.draw(uiCamera);
+        fadeTransition.draw(uiCamera);
+    }
+
+    @Override
+    public void touch(int type, Point2D position)
+    {
+
+    }
+
+    private void setupUI()
+    {
+        backButton.setPosition(BACK_BUTTON_POSITION);
+        backButton.setSize(BACK_BUTTON_SIZE);
+
         nextButton.setSize(600.0f, 200.0f);
         nextButton.setPosition((Crispin.getSurfaceWidth() / 2.0f) - 300.0f, 50.0f);
         nextButton.setColour(HomeScene.BACKGROUND_COLOR);
         nextButton.setBorder(new Border(Colour.WHITE, 8));
         nextButton.setTextColour(Colour.WHITE);
         nextButton.setEnabled(false);
+
+        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, BACK_BUTTON_POSITION.y -
+                BACK_BUTTON_PADDING.y - titleText.getHeight());
+
+        titleText.setColour(Colour.WHITE);
+        titleText.setPosition(TITLE_TEXT_POSITION);
+
+        final Point2D SELECT_DECK_WIDTH_DROPDOWN_POSITION = new Point2D(
+                SELECT_DECK_WIDTH_DROPDOWN_PADDING.x, TITLE_TEXT_POSITION.y -
+                SELECT_DECK_WIDTH_DROPDOWN_SIZE.y - SELECT_DECK_WIDTH_DROPDOWN_PADDING.y);
+
+
+        widthSelectDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
+        widthSelectDropdown.setSize(SELECT_DECK_WIDTH_DROPDOWN_SIZE);
+        widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
+        widthSelectDropdown.setColour(HomeScene.BACKGROUND_COLOR);
+        widthSelectDropdown.setTextColour(Colour.WHITE);
+        widthSelectDropdown.setBorderColour(Colour.WHITE);
+        widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
+
+        final int WIDTH_8 = widthSelectDropdown.addItem("8.0\"");
+        final int WIDTH_8_1 = widthSelectDropdown.addItem("8.1\"");
+        final int WIDTH_8_25 = widthSelectDropdown.addItem("8.25\"");
+        final int WIDTH_8_375 = widthSelectDropdown.addItem("8.375\"");
+        final int WIDTH_8_5 = widthSelectDropdown.addItem("8.5\"");
+
+        // Add touch listener to back button
+        backButton.addTouchListener(e ->
+        {
+            switch (e.getEvent())
+            {
+                case RELEASE:
+                    fadeTransition.fadeOutToScence(HomeScene::new);
+                    break;
+            }
+        });
+
+        // Add touch listener to next button
         nextButton.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -91,143 +210,54 @@ public class SelectDeckWidthScene extends Scene
             }
         });
 
-        widthSelectDropdown = new Dropdown("Select Width");
-        widthSelectDropdown.setPosition(Crispin.getSurfaceWidth() * 0.05f,
-                Crispin.getSurfaceHeight() * 0.7f);
-        widthSelectDropdown.setSize(Crispin.getSurfaceWidth() * 0.9f, 100.0f);
-        widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
-        widthSelectDropdown.setColour(HomeScene.BACKGROUND_COLOR);
-        widthSelectDropdown.setTextColour(Colour.WHITE);
-        widthSelectDropdown.setBorderColour(Colour.WHITE);
-        widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
+        // Add touch listener to dropdown
+        widthSelectDropdown.addTouchListener(e ->
+        {
+            switch (e.getEvent())
+            {
+                case CLICK:
 
-        final int width8 = widthSelectDropdown.addItem("8.0\"");
-        final int width81 = widthSelectDropdown.addItem("8.1\"");
-        final int width825 = widthSelectDropdown.addItem("8.25\"");
-        final int width8375 = widthSelectDropdown.addItem("8.375\"");
-        final int width85 = widthSelectDropdown.addItem("8.5\"");
+                    break;
+                case RELEASE:
+                    int selectedId = widthSelectDropdown.getSelectedId();
 
-        Material dark = new Material();
-        dark.setColour(Colour.DARK_GREY);
+                    if(selectedId == WIDTH_8)
+                    {
+                        model = new Cube();
+                        model.setColour(Colour.GREEN);
+                    }
 
-        widthSelectDropdown.addTouchListener(new TouchListener() {
-            @Override
-            public void touchEvent(TouchEvent e) {
-                switch (e.getEvent())
-                {
-                    case CLICK:
+                    if(selectedId == WIDTH_8_1)
+                    {
+                        model = new Cube();
+                        model.setColour(Colour.RED);
+                    }
 
-                        break;
-                    case RELEASE:
-                        int selectedId = widthSelectDropdown.getSelectedId();
+                    if(selectedId == WIDTH_8_25)
+                    {
+                        model = new Cube();
+                        model.setColour(Colour.BLUE);
+                    }
 
-                        if(selectedId == width8)
-                        {
-                            model = new Cube();
-                            model.setColour(Colour.GREEN);
-                        }
+                    if(selectedId == WIDTH_8_375)
+                    {
+                        model = new Cube();
+                        model.setColour(Colour.MAGENTA);
+                    }
 
-                        if(selectedId == width81)
-                        {
-                            model = new Cube();
-                            model.setColour(Colour.RED);
-                        }
+                    if(selectedId == WIDTH_8_5)
+                    {
+                        model = new Cube();
+                        model.setColour(Colour.YELLOW);
+                    }
 
-                        if(selectedId == width825)
-                        {
-                            model = new Cube();
-                            model.setColour(Colour.BLUE);
-                        }
+                    if(model != null)
+                    {
+                        nextButton.setEnabled(true);
+                    }
 
-                        if(selectedId == width8375)
-                        {
-                            model = new Cube();
-                            model.setColour(Colour.MAGENTA);
-                        }
-
-                        if(selectedId == width85)
-                        {
-                            model = new Cube();
-                            model.setColour(Colour.YELLOW);
-                        }
-
-                        if(model != null)
-                        {
-                            nextButton.setEnabled(true);
-                        }
-
-                        model.setRotation(rotationMatrix);
-
-                        break;
-                }
+                    break;
             }
         });
-
-        backButton = new CustomButton(R.drawable.back_icon);
-        backButton.setPosition(100.0f, Crispin.getSurfaceHeight() - 100.0f - 200.0f);
-        backButton.addTouchListener(new TouchListener() {
-            @Override
-            public void touchEvent(TouchEvent e) {
-                switch (e.getEvent())
-                {
-                    case CLICK:
-
-                        break;
-                    case RELEASE:
-                        fadeTransition.fadeOutToScence(HomeScene::new);
-                        break;
-                }
-            }
-        });
-    }
-
-    float yAngle = 45.0f;
-    @Override
-    public void update(float deltaTime)
-    {
-        backButton.update(deltaTime);
-        fadeTransition.update(deltaTime);
-
-        yAngle += 0.5f;
-        rotationMatrix.reset();
-        rotationMatrix.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), yAngle + 45.0f);
-        rotationMatrix.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), 45.0f + 270.0f);
-
-        if(showLoadingIcon)
-        {
-            loadingIcon.update(deltaTime);
-        }
-
-        if(model != null)
-        {
-            model.setRotation(rotationMatrix);
-        }
-    }
-
-    @Override
-    public void render()
-    {
-        if(model != null && !showLoadingIcon)
-        {
-            model.newRender(camera3D);
-        }
-
-        backButton.draw(uiCamera);
-        widthSelectDropdown.draw(uiCamera);
-        selectDeckWidthText.draw(uiCamera);
-        nextButton.draw(uiCamera);
-
-        if(showLoadingIcon)
-        {
-            loadingIcon.draw(uiCamera);
-        }
-
-        fadeTransition.draw(uiCamera);
-    }
-
-    @Override
-    public void touch(int type, Point2D position)
-    {
-
     }
 }

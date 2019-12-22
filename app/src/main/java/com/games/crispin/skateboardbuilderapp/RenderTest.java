@@ -10,6 +10,7 @@ import com.games.crispin.crispinmobile.Rendering.Models.Square;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
@@ -17,12 +18,12 @@ import com.games.crispin.crispinmobile.Utilities.Scene;
 
 public class RenderTest extends Scene
 {
-    private RenderObject renderObject;
+    private Model renderObject;
     private ModelMatrix matrix;
     private Camera3D camera3D;
 
     private Camera2D camera2D;
-    private RenderObject renderObject2d;
+    private Model renderObject2d;
 
     private ModelMatrix matrix2d;
 

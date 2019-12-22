@@ -342,14 +342,14 @@ public class TestScene extends Scene {
         camera2D = new Camera2D(0.0f, 0.0f, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
 
         palaceDeck = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test);
-        palaceDeck.setScale(0.2f, 0.2f, 0.2f);
+     //   palaceDeck.setScale(0.2f, 0.2f, 0.2f);
         palaceDeck.setMaterial(deckMaterials.get(0));
-        palaceDeck.setPosition(new Point3D(0.0f, 0f, 0.0f));
+      //  palaceDeck.setPosition(new Point3D(0.0f, 0f, 0.0f));
 
         palaceGrip = OBJModelLoader.readObjFile(R.raw.grip8_125_4);
-        palaceGrip.setScale(0.2f, 0.2f, 0.2f);
+     //   palaceGrip.setScale(0.2f, 0.2f, 0.2f);
         palaceGrip.setMaterial(gripMaterials.get(0));
-        palaceGrip.setPosition(new Point3D(0.0f, 0f, 0.0f));
+      //  palaceGrip.setPosition(new Point3D(0.0f, 0f, 0.0f));
 
         backButton.setAlpha(0.0f);
         button.setAlpha(0.0f);
@@ -360,7 +360,7 @@ public class TestScene extends Scene {
 
         Material grey = new Material(new Texture(R.drawable.grey));
         truck = OBJModelLoader.readObjFile(R.raw.trucktest);
-        truck.setScale(0.6f, 0.6f, 0.6f);
+      //  truck.setScale(0.6f, 0.6f, 0.6f);
         truck.setMaterial(grey);
 
     }
@@ -442,7 +442,7 @@ public class TestScene extends Scene {
         rm.reset();
         rm.applyRotation(new Vector3D(0.0f, 1.0f, 0.0f), rotationX + 45.0f);
         rm.applyRotation(new Vector3D(1.0f, 0.0f, 0.0f), rotationY + 270.0f);
-        truck.setRotation(rm);
+     //   truck.setRotation(rm);
     }
 
     float rotationX = 0.0f;
@@ -453,7 +453,7 @@ public class TestScene extends Scene {
     @Override
     public void render()
     {
-        truck.newRender(camera3D);
+  //      truck.newRender(camera3D);
 
         button.draw(camera2D);
         backButton.draw(camera2D);
