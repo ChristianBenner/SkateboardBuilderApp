@@ -3,6 +3,8 @@ package com.games.crispin.skateboardbuilderapp;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
+import com.games.crispin.crispinmobile.Rendering.Models.Cube;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RotationMatrix;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Geometry.Vector3D;
@@ -12,7 +14,10 @@ import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
+import com.games.crispin.crispinmobile.UserInterface.Border;
+import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
+import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
@@ -36,6 +41,9 @@ public class SelectDeckWidthScene extends Scene
     private LoadingIcon loadingIcon;
     private boolean showLoadingIcon;
 
+    private Text selectDeckWidthText;
+    private Button nextButton;
+
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
@@ -57,26 +65,35 @@ public class SelectDeckWidthScene extends Scene
         rotationMatrix = new RotationMatrix();
         showLoadingIcon = false;
 
-/*        widthSelectDropdown = new Dropdown("Select a deck width");
-        widthSelectDropdown.setPosition(Crispin.getSurfaceWidth() * 0.05f, Crispin.getSurfaceHeight() * 0.7f);
-        widthSelectDropdown.setSize(Crispin.getSurfaceWidth() * 0.9f, 100.0f);
-        widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
-        widthSelectDropdown.setColour(HomeScene.BACKGROUND_COLOR);
-        widthSelectDropdown.setTextColour(Colour.WHITE);
-        widthSelectDropdown.setBorderColour(Colour.WHITE);
-        widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
-
-        final int id8125 = widthSelectDropdown.addItem("8.125");
-        final int id825 = widthSelectDropdown.addItem("8.25");
-        final int id8375 = widthSelectDropdown.addItem("8.375");
-        final int id85 = widthSelectDropdown.addItem("8.5");
-        final int id86 = widthSelectDropdown.addItem("8.6");*/
-
         camera3D = new Camera3D();
         camera3D.setPosition(new Point3D(0.0f, 0.0f, 7.0f));
 
-        widthSelectDropdown = new Dropdown("Select an object to view");
-        widthSelectDropdown.setPosition(Crispin.getSurfaceWidth() * 0.05f, Crispin.getSurfaceHeight() * 0.7f);
+        Font font = new Font(com.games.crispin.crispinmobile.R.raw.aileron_regular, 76);
+        selectDeckWidthText = new Text(font, "Select Deck Width", false,
+                true, Crispin.getSurfaceWidth());
+        selectDeckWidthText.setColour(Colour.WHITE);
+        selectDeckWidthText.setPosition(0.0f, (Crispin.getSurfaceHeight() * 0.7f) + 150.0f);
+
+        nextButton = new Button(font, "Next");
+        nextButton.setSize(600.0f, 200.0f);
+        nextButton.setPosition((Crispin.getSurfaceWidth() / 2.0f) - 300.0f, 50.0f);
+        nextButton.setColour(HomeScene.BACKGROUND_COLOR);
+        nextButton.setBorder(new Border(Colour.WHITE, 8));
+        nextButton.setTextColour(Colour.WHITE);
+        nextButton.setEnabled(false);
+        nextButton.addTouchListener(e ->
+        {
+            switch (e.getEvent())
+            {
+                case RELEASE:
+                    fadeTransition.fadeOutToScence(HomeScene::new);
+                    break;
+            }
+        });
+
+        widthSelectDropdown = new Dropdown("Select Width");
+        widthSelectDropdown.setPosition(Crispin.getSurfaceWidth() * 0.05f,
+                Crispin.getSurfaceHeight() * 0.7f);
         widthSelectDropdown.setSize(Crispin.getSurfaceWidth() * 0.9f, 100.0f);
         widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
         widthSelectDropdown.setColour(HomeScene.BACKGROUND_COLOR);
@@ -84,14 +101,14 @@ public class SelectDeckWidthScene extends Scene
         widthSelectDropdown.setBorderColour(Colour.WHITE);
         widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
 
-        final int trucks = widthSelectDropdown.addItem("Trucks");
-        final int deckOne = widthSelectDropdown.addItem("Deck One");
-        final int deckTwo = widthSelectDropdown.addItem("Deck Two");
+        final int width8 = widthSelectDropdown.addItem("8.0\"");
+        final int width81 = widthSelectDropdown.addItem("8.1\"");
+        final int width825 = widthSelectDropdown.addItem("8.25\"");
+        final int width8375 = widthSelectDropdown.addItem("8.375\"");
+        final int width85 = widthSelectDropdown.addItem("8.5\"");
 
         Material dark = new Material();
         dark.setColour(Colour.DARK_GREY);
-        Material palace = new Material(new Texture(R.drawable.palacedeck));
-        Material jart = new Material(new Texture(R.drawable.jart_new_wave));
 
         widthSelectDropdown.addTouchListener(new TouchListener() {
             @Override
@@ -104,45 +121,43 @@ public class SelectDeckWidthScene extends Scene
                     case RELEASE:
                         int selectedId = widthSelectDropdown.getSelectedId();
 
-                        if(selectedId == trucks)
+                        if(selectedId == width8)
                         {
-                            System.out.println("Selected: trucks");
-                            showLoadingIcon = true;
-                            ThreadedOBJLoader.loadModel(R.raw.trucktest, renderObject ->
-                            {
-                                model = renderObject;
-                                model.setScale(0.6f, 0.6f, 0.6f);
-                                model.setMaterial(dark);
-                                model.setRotation(rotationMatrix);
-                                showLoadingIcon = false;
-                            });
+                            model = new Cube();
+                            model.setColour(Colour.GREEN);
                         }
-                        else if(selectedId == deckOne)
+
+                        if(selectedId == width81)
                         {
-                            System.out.println("Selected: deckOne");
-                            showLoadingIcon = true;
-                            ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test, renderObject ->
-                            {
-                                model = renderObject;
-                                model.setMaterial(palace);
-                                model.setScale(0.2f, 0.2f, 0.2f);
-                                model.setRotation(rotationMatrix);
-                                showLoadingIcon = false;
-                            });
+                            model = new Cube();
+                            model.setColour(Colour.RED);
                         }
-                        else if(selectedId == deckTwo)
+
+                        if(selectedId == width825)
                         {
-                            System.out.println("Selected: deckTwo");
-                            showLoadingIcon = true;
-                            ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test, renderObject ->
-                            {
-                                model = renderObject;
-                                model.setMaterial(jart);
-                                model.setScale(0.2f, 0.2f, 0.2f);
-                                model.setRotation(rotationMatrix);
-                                showLoadingIcon = false;
-                            });
+                            model = new Cube();
+                            model.setColour(Colour.BLUE);
                         }
+
+                        if(selectedId == width8375)
+                        {
+                            model = new Cube();
+                            model.setColour(Colour.MAGENTA);
+                        }
+
+                        if(selectedId == width85)
+                        {
+                            model = new Cube();
+                            model.setColour(Colour.YELLOW);
+                        }
+
+                        if(model != null)
+                        {
+                            nextButton.setEnabled(true);
+                        }
+
+                        model.setRotation(rotationMatrix);
+
                         break;
                 }
             }
@@ -199,12 +214,15 @@ public class SelectDeckWidthScene extends Scene
 
         backButton.draw(uiCamera);
         widthSelectDropdown.draw(uiCamera);
-        fadeTransition.draw(uiCamera);
+        selectDeckWidthText.draw(uiCamera);
+        nextButton.draw(uiCamera);
 
         if(showLoadingIcon)
         {
             loadingIcon.draw(uiCamera);
         }
+
+        fadeTransition.draw(uiCamera);
     }
 
     @Override
