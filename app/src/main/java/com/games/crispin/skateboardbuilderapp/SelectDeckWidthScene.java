@@ -1,24 +1,30 @@
 package com.games.crispin.skateboardbuilderapp;
 
+import android.opengl.Matrix;
+
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
+import com.games.crispin.crispinmobile.Geometry.Scale3D;
 import com.games.crispin.crispinmobile.Rendering.Models.Cube;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
+import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
-import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
-import com.games.crispin.crispinmobile.UserInterface.TouchListener;
+import com.games.crispin.crispinmobile.Utilities.LoadListener;
+import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
+import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 
 public class SelectDeckWidthScene extends Scene
 {
@@ -47,6 +53,9 @@ public class SelectDeckWidthScene extends Scene
     // Title of the scene
     private static final String SCENE_TITLE_TEXT = "Select Deck Width";
 
+    private static final Material BOARD_PALACE_DECK = new Material(new Texture(R.drawable.palacedeck));
+    private static final Material BOARD_REAL_WAIR_FLOODED = new Material(new Texture(R.drawable.real_wair_flooded));
+
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
 
@@ -58,6 +67,11 @@ public class SelectDeckWidthScene extends Scene
 
     // Render object model matrix
     private ModelMatrix modelMatrix;
+
+    private float modelScale;
+
+    // Touch rotation object calculates the rotation of the interactable model
+    private TouchRotation touchRotation;
 
     // Transition object that allows us to fade the scene in and out
     private FadeTransition fadeTransition;
@@ -77,9 +91,6 @@ public class SelectDeckWidthScene extends Scene
     // Select deck width text UI
     private Text titleText;
 
-    // Rotation angle
-    private float rotationAngle = 0.0f;
-
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
@@ -94,6 +105,10 @@ public class SelectDeckWidthScene extends Scene
 
         // Create the model matrix for transforming the model
         modelMatrix = new ModelMatrix();
+
+        modelScale = 1.0f;
+
+        touchRotation = new TouchRotation();
 
         // Create the fade transition object and set it to fade in
         fadeTransition = new FadeTransition();
@@ -120,11 +135,13 @@ public class SelectDeckWidthScene extends Scene
         backButton.update(deltaTime);
         fadeTransition.update(deltaTime);
 
-        rotationAngle += 0.5f;
+        touchRotation.update(deltaTime);
 
         modelMatrix.reset();
-        modelMatrix.rotate(315.0f, 1.0f, 0.0f, 0.0f);
-        modelMatrix.rotate(rotationAngle, 0.0f, 1.0f, 0.0f);
+        modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+        modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+     //   modelMatrix.rotate(90.0f, 0.0f, 0.0f, 0.0f);
+        modelMatrix.scale(new Scale3D(modelScale, modelScale, modelScale));
 
         loadingIcon.update(deltaTime);
     }
@@ -148,7 +165,7 @@ public class SelectDeckWidthScene extends Scene
     @Override
     public void touch(int type, Point2D position)
     {
-
+        touchRotation.touch(type, position);
     }
 
     private void setupUI()
@@ -225,30 +242,45 @@ public class SelectDeckWidthScene extends Scene
                     {
                         model = new Cube();
                         model.setColour(Colour.GREEN);
+                        modelScale = 1.0f;
                     }
 
                     if(selectedId == WIDTH_8_1)
                     {
                         model = new Cube();
                         model.setColour(Colour.RED);
+                        modelScale = 1.0f;
                     }
 
                     if(selectedId == WIDTH_8_25)
                     {
                         model = new Cube();
                         model.setColour(Colour.BLUE);
+                        modelScale = 1.0f;
                     }
 
                     if(selectedId == WIDTH_8_375)
                     {
-                        model = new Cube();
-                        model.setColour(Colour.MAGENTA);
+                        loadingIcon.show();
+                        ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test_2, model ->
+                        {
+                            this.model = model;
+                            this.model.setMaterial(BOARD_PALACE_DECK);
+                            modelScale = 0.2f;
+                            loadingIcon.hide();
+                        });
                     }
 
                     if(selectedId == WIDTH_8_5)
                     {
-                        model = new Cube();
-                        model.setColour(Colour.YELLOW);
+                        loadingIcon.show();
+                        ThreadedOBJLoader.loadModel(R.raw.board_8_5_test_2, model ->
+                        {
+                            this.model = model;
+                            this.model.setMaterial(BOARD_REAL_WAIR_FLOODED);
+                            modelScale = 0.2f;
+                            loadingIcon.hide();
+                        });
                     }
 
                     if(model != null)
