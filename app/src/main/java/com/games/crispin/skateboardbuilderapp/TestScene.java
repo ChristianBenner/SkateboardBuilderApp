@@ -72,6 +72,11 @@ public class TestScene extends Scene {
 
     private TouchRotation touchRotation;
 
+    private Model truckOne;
+    private Model truckTwo;
+    private Model board;
+    private Model griptape;
+
     void addDeckToList(int resourceId)
     {
         Material m = new Material(new Texture(resourceId));
@@ -366,11 +371,28 @@ public class TestScene extends Scene {
         palaceGrip.setAlpha(0.0f);
         palaceDeck.setRotation(0.0f, 90.0f, 90.0f);
         palaceGrip.setRotation(0.0f, 90.0f, 90.0f);
-
         Material grey = new Material(new Texture(R.drawable.grey));
         truck = OBJModelLoader.readObjFile(R.raw.trucktest);
       //  truck.setScale(0.6f, 0.6f, 0.6f);
         truck.setMaterial(grey);
+
+
+        Material matTruckOne = new Material(new Texture(R.drawable.grey));
+        Material matTruckTwo = new Material(new Texture(R.drawable.grey));
+
+        truckOne = OBJModelLoader.readObjFile(R.raw.trucktest);
+        truckTwo = OBJModelLoader.readObjFile(R.raw.trucktest);
+        board = OBJModelLoader.readObjFile(R.raw.deck8_125_uv_test_2);
+        griptape = OBJModelLoader.readObjFile(R.raw.grip8_125_4);
+        truckOne.setMaterial(matTruckOne);
+        truckTwo.setMaterial(matTruckTwo);
+        board.setMaterial(new Material(new Texture(R.drawable.real_wair_flooded)));
+
+        Material gripMat = new Material(new Texture(R.drawable.grip2));
+      //  gripMat.setSpecularMap(new Texture(R.drawable.gripspecularmap));
+        griptape.setMaterial(gripMat);
+        truckOne.setColour(Colour.GREEN);
+        truckTwo.setColour(Colour.ORANGE);
 
     }
 
@@ -448,7 +470,38 @@ public class TestScene extends Scene {
     //    truckModelMatrix.rotateAroundPoint(0.0f, 0.0f, 0.0f, rotationY + 270.0f, 1.0f, 0.0f, 0.0f);
         System.out.println("ooo rotx: " + touchRotation.getRotationX());
         System.out.println("ooo roty: " + touchRotation.getRotationY());
+
+
+        float yAngle = 90.0f;
+
+        // Update board pos
+        truckOneModelMatrix.reset();
+        truckOneModelMatrix.translate(0.0f, 0.0f, -1.5f);
+        truckOneModelMatrix.rotateAroundPoint(0.0f, 0.0f, 1.5f, touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+        truckOneModelMatrix.rotateAroundPoint(0.0f, 0.0f, 1.5f, touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+        truckOneModelMatrix.scale(0.2f);
+
+        truckTwoModelMatrix.reset();
+        truckTwoModelMatrix.translate(0.0f, 0.0f, 1.5f);
+        truckTwoModelMatrix.rotateAroundPoint(0.0f, 0.0f, -1.5f, touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+        truckTwoModelMatrix.rotateAroundPoint(0.0f, 0.0f, -1.5f, touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+        truckTwoModelMatrix.scale(0.2f);
+
+        boardModelMatrix.reset();
+        boardModelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+        boardModelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+        boardModelMatrix.scale(0.2f);
+
+        griptapeModelMatrix.reset();
+        griptapeModelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+        griptapeModelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+        griptapeModelMatrix.scale(0.2f);
     }
+
+    private ModelMatrix truckOneModelMatrix = new ModelMatrix();
+    private ModelMatrix truckTwoModelMatrix = new ModelMatrix();
+    private ModelMatrix boardModelMatrix = new ModelMatrix();
+    private ModelMatrix griptapeModelMatrix = new ModelMatrix();
 
     RotationMatrix rm = new RotationMatrix();
 
@@ -467,7 +520,12 @@ public class TestScene extends Scene {
         Matrix.multiplyMM(tempMatrix, 0, mm, 0, rm, 0);
 
 
-        truck.render(camera3D, new ModelMatrix(tempMatrix));
+   //     truck.render(camera3D, new ModelMatrix(tempMatrix));
+
+        truckOne.render(camera3D, truckOneModelMatrix);
+        truckTwo.render(camera3D, truckTwoModelMatrix);
+        board.render(camera3D, boardModelMatrix);
+        griptape.render(camera3D, griptapeModelMatrix);
 
         button.draw(camera2D);
         backButton.draw(camera2D);

@@ -1,11 +1,8 @@
 package com.games.crispin.skateboardbuilderapp;
 
-import android.opengl.Matrix;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
-import com.games.crispin.crispinmobile.Geometry.Scale3D;
 import com.games.crispin.crispinmobile.Rendering.Models.Cube;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
@@ -15,14 +12,11 @@ import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
-import com.games.crispin.crispinmobile.Rendering.Utilities.RenderObject;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
-import com.games.crispin.crispinmobile.Utilities.LoadListener;
-import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 
@@ -53,8 +47,7 @@ public class SelectDeckWidthScene extends Scene
     // Title of the scene
     private static final String SCENE_TITLE_TEXT = "Select Deck Width";
 
-    private static final Material BOARD_PALACE_DECK = new Material(new Texture(R.drawable.palacedeck));
-    private static final Material BOARD_REAL_WAIR_FLOODED = new Material(new Texture(R.drawable.real_wair_flooded));
+    private static final Material BOARD_GREY = new Material(new Texture(R.drawable.grey));
 
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
@@ -68,6 +61,7 @@ public class SelectDeckWidthScene extends Scene
     // Render object model matrix
     private ModelMatrix modelMatrix;
 
+    // Scale of the model
     private float modelScale;
 
     // Touch rotation object calculates the rotation of the interactable model
@@ -140,8 +134,7 @@ public class SelectDeckWidthScene extends Scene
         modelMatrix.reset();
         modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
         modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-     //   modelMatrix.rotate(90.0f, 0.0f, 0.0f, 0.0f);
-        modelMatrix.scale(new Scale3D(modelScale, modelScale, modelScale));
+        modelMatrix.scale(modelScale);
 
         loadingIcon.update(deltaTime);
     }
@@ -265,7 +258,7 @@ public class SelectDeckWidthScene extends Scene
                         ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test_2, model ->
                         {
                             this.model = model;
-                            this.model.setMaterial(BOARD_PALACE_DECK);
+                            this.model.setMaterial(BOARD_GREY);
                             modelScale = 0.2f;
                             loadingIcon.hide();
                         });
@@ -277,7 +270,7 @@ public class SelectDeckWidthScene extends Scene
                         ThreadedOBJLoader.loadModel(R.raw.board_8_5_test_2, model ->
                         {
                             this.model = model;
-                            this.model.setMaterial(BOARD_REAL_WAIR_FLOODED);
+                            this.model.setMaterial(BOARD_GREY);
                             modelScale = 0.2f;
                             loadingIcon.hide();
                         });
