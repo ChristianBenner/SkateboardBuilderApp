@@ -221,7 +221,8 @@ public class TestScene extends Scene {
     {
         try
         {
-            skateboards = SaveReader.parse(Crispin.getApplicationContext().openFileInput("saves.xml"));
+            skateboards = SaveReader.parse(Crispin.getApplicationContext().
+                    openFileInput("saves.xml"));
             return true;
         }
         catch (Exception e)
@@ -230,6 +231,8 @@ public class TestScene extends Scene {
             return false;
         }
     }
+
+    //load currently
 
     boolean colourNormal = true;
     public TestScene()

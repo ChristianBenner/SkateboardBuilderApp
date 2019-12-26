@@ -9,6 +9,8 @@ public class Skateboard
     private int bearings;
     private int wheels;
 
+    public static final int NO_PART = -1;
+
     public Skateboard(String name, int deck, int grip, int trucks, int bearings, int wheels)
     {
         this.name = name;
@@ -21,12 +23,7 @@ public class Skateboard
 
     public Skateboard()
     {
-        name = "Skateboard";
-        deck = 0;
-        grip = 0;
-        trucks = 0;
-        bearings = 0;
-        wheels = 0;
+        this("Skateboard", NO_PART, NO_PART, NO_PART, NO_PART, NO_PART);
     }
 
     public int getDeck()

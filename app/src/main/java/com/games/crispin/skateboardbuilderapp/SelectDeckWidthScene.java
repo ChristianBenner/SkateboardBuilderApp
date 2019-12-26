@@ -17,6 +17,8 @@ import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
+import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
+import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 
@@ -32,6 +34,16 @@ public class SelectDeckWidthScene extends Scene
     private static final Point2D BACK_BUTTON_POSITION = new Point2D(BACK_BUTTON_PADDING.x,
             Crispin.getSurfaceHeight() - BACK_BUTTON_PADDING.y - BACK_BUTTON_SIZE.y);
 
+    // Padding for the next button
+    private static final Point2D NEXT_BUTTON_PADDING = new Point2D(0.0f, 50.0f);
+
+    // Size of the next button
+    private static final Scale2D NEXT_BUTTON_SIZE = new Scale2D(600.0f, 200.0f);
+
+    // Next button position
+    private static final Point2D NEXT_BUTTON_POSITION = new Point2D((Crispin.getSurfaceWidth() /
+            2.0f) - (NEXT_BUTTON_SIZE.x / 2.0f) + NEXT_BUTTON_PADDING.x, NEXT_BUTTON_PADDING.y);
+
     // Padding for the select deck width dropdown
     private static final Point2D SELECT_DECK_WIDTH_DROPDOWN_PADDING = new Point2D(50.0f,
             50.0f);
@@ -41,13 +53,10 @@ public class SelectDeckWidthScene extends Scene
             Crispin.getSurfaceWidth() - (SELECT_DECK_WIDTH_DROPDOWN_PADDING.x * 2.0f),
             100.0f);
 
-    // The font for text on the scene
-    private static final Font AILERON_REGULAR_FONT = new Font(R.raw.aileron_regular, 76);
-
     // Title of the scene
     private static final String SCENE_TITLE_TEXT = "Select Deck Width";
 
-    private static final Material BOARD_GREY = new Material(new Texture(R.drawable.grey));
+    private final Material BOARD_GREY = new Material(new Texture(R.drawable.grey));
 
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
@@ -112,10 +121,13 @@ public class SelectDeckWidthScene extends Scene
         // Create the loading icon
         loadingIcon = new LoadingIcon();
 
+        // The font for text on the scene
+        Font aileronRegularFont = new Font(R.raw.aileron_regular, 76);
+
         // Create the back button
         backButton = new CustomButton(R.drawable.back_icon);
-        nextButton = new Button(AILERON_REGULAR_FONT, "Next");
-        titleText = new Text(AILERON_REGULAR_FONT, SCENE_TITLE_TEXT, false,
+        nextButton = new Button(aileronRegularFont, "Next");
+        titleText = new Text(aileronRegularFont, SCENE_TITLE_TEXT, false,
                 true, Crispin.getSurfaceWidth());
         widthSelectDropdown = new Dropdown("Select Width");
 
@@ -166,8 +178,8 @@ public class SelectDeckWidthScene extends Scene
         backButton.setPosition(BACK_BUTTON_POSITION);
         backButton.setSize(BACK_BUTTON_SIZE);
 
-        nextButton.setSize(600.0f, 200.0f);
-        nextButton.setPosition((Crispin.getSurfaceWidth() / 2.0f) - 300.0f, 50.0f);
+        nextButton.setSize(NEXT_BUTTON_SIZE);
+        nextButton.setPosition(NEXT_BUTTON_POSITION);
         nextButton.setColour(HomeScene.BACKGROUND_COLOR);
         nextButton.setBorder(new Border(Colour.WHITE, 8));
         nextButton.setTextColour(Colour.WHITE);
@@ -215,7 +227,7 @@ public class SelectDeckWidthScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    fadeTransition.fadeOutToScence(HomeScene::new);
+                    fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
                     break;
             }
         });
@@ -240,9 +252,14 @@ public class SelectDeckWidthScene extends Scene
 
                     if(selectedId == WIDTH_8_1)
                     {
-                        model = new Cube();
-                        model.setColour(Colour.RED);
-                        modelScale = 1.0f;
+                        loadingIcon.show();
+                        ThreadedOBJLoader.loadModel(ModelFiles.SIZE_8_125, model ->
+                        {
+                            this.model = model;
+                            this.model.setMaterial(BOARD_GREY);
+                            modelScale = 0.2f;
+                            loadingIcon.hide();
+                        });
                     }
 
                     if(selectedId == WIDTH_8_25)
@@ -254,20 +271,15 @@ public class SelectDeckWidthScene extends Scene
 
                     if(selectedId == WIDTH_8_375)
                     {
-                        loadingIcon.show();
-                        ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test_2, model ->
-                        {
-                            this.model = model;
-                            this.model.setMaterial(BOARD_GREY);
-                            modelScale = 0.2f;
-                            loadingIcon.hide();
-                        });
+                        model = new Cube();
+                        model.setColour(Colour.RED);
+                        modelScale = 1.0f;
                     }
 
                     if(selectedId == WIDTH_8_5)
                     {
                         loadingIcon.show();
-                        ThreadedOBJLoader.loadModel(R.raw.board_8_5_test_2, model ->
+                        ThreadedOBJLoader.loadModel(ModelFiles.SIZE_8_5, model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);

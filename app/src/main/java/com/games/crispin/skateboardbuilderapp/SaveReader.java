@@ -1,10 +1,15 @@
 package com.games.crispin.skateboardbuilderapp;
 
+import android.content.Context;
 import android.util.Xml;
+
+import com.games.crispin.crispinmobile.Crispin;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,6 +18,53 @@ import java.util.List;
 public class SaveReader
 {
     private static final String ns = null;
+
+    void writeCurrentSave(Skateboard currentSkateboard)
+    {
+        try
+        {
+            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("currentsave.xml", Context.MODE_PRIVATE);
+            XmlSerializer serializer = Xml.newSerializer();
+            serializer.setOutput(fileOutputStream, "UTF-8");
+            serializer.startDocument("UTF-8", true);
+            serializer.startTag("", "currentsave");
+
+            // Write skateboard XML
+            serializer.startTag("", "skateboard");
+            serializer.attribute("", "deck", Integer.toString(currentSkateboard.getDeck()));
+            serializer.attribute("", "grip", Integer.toString(currentSkateboard.getGrip()));
+            serializer.attribute("", "trucks", Integer.toString(currentSkateboard.getTrucks()));
+            serializer.attribute("", "bearings", Integer.toString(currentSkateboard.getBearings()));
+            serializer.attribute("", "wheels", Integer.toString(currentSkateboard.getWheels()));
+            serializer.attribute("", "name", currentSkateboard.getName());
+            serializer.endTag("", "skateboard");
+
+            serializer.endTag("", "saves");
+            serializer.endDocument();
+            serializer.flush();
+            fileOutputStream.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Skateboard> loadSaves()
+    {
+        try
+        {
+            List<Skateboard> skateboards = SaveReader.parse(Crispin.getApplicationContext().
+                    openFileInput("saves.xml"));
+            return skateboards;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static List parse(InputStream in) throws XmlPullParserException, IOException
     {
         try
