@@ -2,16 +2,23 @@ package com.games.crispin.skateboardbuilderapp;
 
 public class Skateboard
 {
+    public static final int NO_PART = -1;
+
     private String name;
     private int deck;
     private int grip;
     private int trucks;
     private int bearings;
     private int wheels;
+    private int design;
 
-    public static final int NO_PART = -1;
-
-    public Skateboard(String name, int deck, int grip, int trucks, int bearings, int wheels)
+    public Skateboard(String name,
+                      int deck,
+                      int grip,
+                      int trucks,
+                      int bearings,
+                      int wheels,
+                      int design)
     {
         this.name = name;
         this.deck = deck;
@@ -19,11 +26,22 @@ public class Skateboard
         this.trucks = trucks;
         this.bearings = bearings;
         this.wheels = wheels;
+        this.design = design;
     }
 
     public Skateboard()
     {
-        this("Skateboard", NO_PART, NO_PART, NO_PART, NO_PART, NO_PART);
+        this("Skateboard", NO_PART, NO_PART, NO_PART, NO_PART, NO_PART, NO_PART);
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public int getDeck()
@@ -76,13 +94,13 @@ public class Skateboard
         this.wheels = wheels;
     }
 
-    public String getName()
+    public void setDesign(int design)
     {
-        return name;
+        this.design = design;
     }
 
-    public void setName(String name)
+    public int getDesign()
     {
-        this.name = name;
+        return design;
     }
 }

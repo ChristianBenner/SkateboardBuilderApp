@@ -1,14 +1,10 @@
 package com.games.crispin.skateboardbuilderapp;
 
-import android.content.Context;
-import android.util.Xml;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
-import com.games.crispin.crispinmobile.Rendering.Models.Cube;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
@@ -21,14 +17,9 @@ import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
-import com.games.crispin.crispinmobile.UserInterface.TouchListener;
-import com.games.crispin.crispinmobile.Utilities.LoadListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 
-import org.xmlpull.v1.XmlSerializer;
-
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,49 +89,29 @@ public class SelectDeckDesignScene extends Scene
 
     private List<Skateboard> skateboards;
 
-    void writeSave()
-    {
-        try
-        {
-            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("saves.xml", Context.MODE_PRIVATE);
-            XmlSerializer serializer = Xml.newSerializer();
-            serializer.setOutput(fileOutputStream, "UTF-8");
-            serializer.startDocument("UTF-8", true);
-            serializer.startTag("", "saves");
-
-            // Write skateboard XML
-            for(Skateboard s : skateboards)
-            {
-                serializer.startTag("", "skateboard");
-                serializer.attribute("", "deck", Integer.toString(s.getDeck()));
-                serializer.attribute("", "grip", Integer.toString(s.getGrip()));
-                serializer.attribute("", "trucks", Integer.toString(s.getTrucks()));
-                serializer.attribute("", "bearings", Integer.toString(s.getBearings()));
-                serializer.attribute("", "wheels", Integer.toString(s.getWheels()));
-                serializer.attribute("", "name", s.getName());
-                serializer.endTag("", "skateboard");
-            }
-
-            serializer.endTag("", "saves");
-            serializer.endDocument();
-            serializer.flush();
-            fileOutputStream.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
+    private Skateboard subject;
 
     public SelectDeckDesignScene()
     {
         skateboards = new ArrayList<>();
-        skateboards.add(new Skateboard("Board1", 1, 1, 1, 1, 1));
 
-        writeSave();
+        // Try to load the skateboard that is currently being worked on
+        subject = SaveManager.loadCurrentSave();
+
+        if(subject == null)
+        {
+            subject = new Skateboard();
+            System.err.println("ERROR: Failed to load subject skateboard");
+        }
+        else
+        {
+            System.out.println("Skateboard deck width: " + subject.getDeck());
+        }
+
+       // SaveManager.writeSave(skateboards);
 
         // Load the config that is storing the currently selected model parts
-        skateboards = SaveReader.loadSaves();
+        skateboards = SaveManager.loadSaves();
 
         // Set the background to a blue colour
         Crispin.setBackgroundColour(HomeScene.BACKGROUND_COLOR);
@@ -172,8 +143,19 @@ public class SelectDeckDesignScene extends Scene
         // Create the back button
         backButton = new CustomButton(R.drawable.back_icon);
         nextButton = new Button(aileronRegularFont, "Next");
-        titleText = new Text(aileronRegularFont, "Select Deck Design", false,
-                true, Crispin.getSurfaceWidth());
+
+        if(subject.getDeck() == SkateboardComponent.DECK_8_125_ID)
+        {
+            titleText = new Text(aileronRegularFont, "Select Skateboard 8125", false,
+                    true, Crispin.getSurfaceWidth());
+        }
+        else if(subject.getDeck() == SkateboardComponent.DECK_8_5_ID)
+        {
+            titleText = new Text(aileronRegularFont, "Select Skateboard 85", false,
+                    true, Crispin.getSurfaceWidth());
+        }
+
+
 
         leftButton = new CustomButton(R.drawable.arrow_left);
         rightButton = new CustomButton(R.drawable.arrow_right);
@@ -187,14 +169,23 @@ public class SelectDeckDesignScene extends Scene
 
         materialIndex = 0;
 
+        System.out.println("ooooooooo Save");
+        System.out.println("ooooooooo Deck ID: " + subject.getDeck());
+        if(subject != null)
+        {
+            ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(subject.getDeck()), model ->
+            {
+                this.model = model;
+                this.model.setMaterial(nextMaterial());
+            });
+        }
+        else
+        {
+            System.err.println("ERROR!");
+        }
+
         touchRotation = new TouchRotation();
         modelMatrix = new ModelMatrix();
-
-        ThreadedOBJLoader.loadModel(R.raw.deck8_125_uv_test_2, model ->
-        {
-            this.model = model;
-            this.model.setMaterial(nextMaterial());
-        });
 
         setupUI();
     }

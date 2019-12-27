@@ -17,8 +17,6 @@ import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
-import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
-import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 
@@ -54,7 +52,7 @@ public class SelectDeckWidthScene extends Scene
             100.0f);
 
     // Title of the scene
-    private static final String SCENE_TITLE_TEXT = "Select Deck Width";
+    private static final String SCENE_TITLE_TEXT = "Select Skateboard Width";
 
     private final Material BOARD_GREY = new Material(new Texture(R.drawable.grey));
 
@@ -94,10 +92,22 @@ public class SelectDeckWidthScene extends Scene
     // Select deck width text UI
     private Text titleText;
 
+    // The skateboard that is being worked on
+    private Skateboard subject;
+
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
         Crispin.setBackgroundColour(HomeScene.BACKGROUND_COLOR);
+
+        // Read the current save if there is one
+        subject = SaveManager.loadCurrentSave();
+
+        // If the current save doesn't exist then create a new skateboard subject
+        if(subject == null)
+        {
+            subject = new Skateboard();
+        }
 
         // Create the user interface camera
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
@@ -227,6 +237,9 @@ public class SelectDeckWidthScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
+                    // Save the currently selected board
+                    SaveManager.writeCurrentSave(subject);
+
                     fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
                     break;
             }
@@ -253,7 +266,8 @@ public class SelectDeckWidthScene extends Scene
                     if(selectedId == WIDTH_8_1)
                     {
                         loadingIcon.show();
-                        ThreadedOBJLoader.loadModel(ModelFiles.SIZE_8_125, model ->
+                        subject.setDeck(SkateboardComponent.DECK_8_125_ID);
+                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_125_ID), model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
@@ -279,7 +293,8 @@ public class SelectDeckWidthScene extends Scene
                     if(selectedId == WIDTH_8_5)
                     {
                         loadingIcon.show();
-                        ThreadedOBJLoader.loadModel(ModelFiles.SIZE_8_5, model ->
+                        subject.setDeck(SkateboardComponent.DECK_8_5_ID);
+                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_5_ID), model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
