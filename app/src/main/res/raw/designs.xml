@@ -4,6 +4,9 @@
 	<design id="1" deckId="0" texture="design_palace" name="Palace" info="A deck by Palace"/>
 	<design id="2" deckId="0" texture="design_primitive_rodriquez_thorns" name="Primitive Rodriquez Thorns" info="A deck by Primitive called Rodriquez Thorns"/>
 	<design id="3" deckId="0" texture="design_primitive_x_rick_and_morty" name="Primitive X Rick and Morty" info="A deck by Primitive called Rick and Morty"/>
-	<design id="4" deckId="0" texture="design_real_wair_flooded" name="Real Wair Flooded" info="A deck by Real Wair called Flooded"/>
-	<design id="5" deckId="2" texture="temp_8_375" name="Test Design" info="Test design for an 8.375 inch wide board"/>
+	<design id="4" deckId="0" texture="design_real_wair_flooded" name="Real Wair Flooded" info="A deck by Real called Wair Flooded"/>
+	<design id="5" deckId="2" texture="real_busenitz_flooded_full" name="Real Busenitz Flooded Full" info="A deck by Real called Busenitz Flooded"/>
+	<design id="6" deckId="2" texture="primitive_x_naruto_rodriguez_combat" name="Primitive X Naruto Rodriguez Combat" info="An 8.38 inch wide Naruto inspired deck"/>
+	<design id="7" deckId="2" texture="girl_mccrank_skull_of_fame" name="Girl McCrank Skull of Fame" info="An 8.375 inch wide deck by Girl"/>
+	<design id="8" deckId="1" texture="temp_8_5" name="Temp Test Design" info="Test Design"/>
 </designs>

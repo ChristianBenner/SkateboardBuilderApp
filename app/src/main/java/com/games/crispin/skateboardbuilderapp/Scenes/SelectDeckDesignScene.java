@@ -89,9 +89,6 @@ public class SelectDeckDesignScene extends Scene
     // Next button UI
     private Button nextButton;
 
-    // Width select dropdown UI
-    private Dropdown widthSelectDropdown;
-
     // Select deck width text UI
     private Text titleText;
 
@@ -101,16 +98,12 @@ public class SelectDeckDesignScene extends Scene
     private ArrayList<Material> materials;
     private int materialIndex;
 
-    private List<Skateboard> skateboards;
-
     private Skateboard subject;
 
     private Material materialNoDesign;
 
     public SelectDeckDesignScene()
     {
-        skateboards = new ArrayList<>();
-
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
 
@@ -125,9 +118,6 @@ public class SelectDeckDesignScene extends Scene
         {
             System.out.println("Skateboard deck width: " + subject.getDeck());
         }
-
-        // Load the config that is storing the currently selected model parts
-        skateboards = SaveManager.loadSaves();
 
         // Set the background to a blue colour
         Crispin.setBackgroundColour(HomeScene.BACKGROUND_COLOR);
