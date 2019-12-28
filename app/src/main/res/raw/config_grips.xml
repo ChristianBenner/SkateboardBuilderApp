@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<grips>
+	<grip id="0" price="10.0" texture="grip_mob_basic" name="Mob Basic Griptape" info="A basic griptape with the Mob logo."/>
+	<grip id="1" price="12.0" texture="grip_mob_x_independent_four_cross" name="Mob x Independent 4 Cross" info="A griptape by Mob that has been laser cut to reveal the deck through the four crosses."/>
+</grips>

@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<decks>
-	<deck id="0" model="deck_8_125" name="8.125 inches" info="A deck that has a width of 8.125 inches"/>
-	<deck id="1" model="deck_8_5" name="8.5 inches" info="A deck that has a width of 8.5 inches"/>
-	<deck id="2" model="deck_8_375" name="8.375 inches" info="A deck that has a width of 8.375 inches"/>
-</decks>

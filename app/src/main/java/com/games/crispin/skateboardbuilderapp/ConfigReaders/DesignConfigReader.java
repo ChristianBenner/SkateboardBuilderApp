@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Singleton class to read in an store the data in the designs.xml configuration file.
+ * Singleton class to read in an store the data in the config_designs.xml configuration file.
  *
  * @author      Christian Benner
  * @version     %I%, %G%
@@ -33,7 +33,7 @@ public class DesignConfigReader extends ComponentConfigReaderBase
     private List<Design> designs;
 
     /**
-     * Creates the design configuration reader and loads the designs.xml configuration file. This
+     * Creates the design configuration reader and loads the config_designs.xml configuration file. This
      * will obtain and store all of the data for designs. The constructor is private because it is
      * a singleton and therefore only one instance of the object can be created.
      *
@@ -41,13 +41,13 @@ public class DesignConfigReader extends ComponentConfigReaderBase
      */
     private DesignConfigReader()
     {
-        Logger.info("Reading designs.xml configuration file");
+        Logger.info("Reading config_designs.xml configuration file");
 
         try
         {
             // Get the design config resource file
             InputStream designConfig = Crispin.getApplicationContext().getResources().
-                    openRawResource(R.raw.designs);
+                    openRawResource(R.raw.config_designs);
             designs = super.parse(designConfig);
         }
         catch (Exception e)
@@ -76,6 +76,19 @@ public class DesignConfigReader extends ComponentConfigReaderBase
         return singletonInstance;
     }
 
+    public Design getDesign(int id)
+    {
+        for(int i = 0; i < designs.size(); i++)
+        {
+            if(designs.get(i).id == id)
+            {
+                return designs.get(i);
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Get the designs that have been read in from the configuration file
      *
@@ -85,6 +98,33 @@ public class DesignConfigReader extends ComponentConfigReaderBase
     public List<Design> getDesigns()
     {
         return designs;
+    }
+
+    /**
+     * Get the designs that have been read in from the configuration file that match the
+     * compatibility of the specified deck ID. This means that only designs that fit the deck ID
+     * provided will be returned.
+     *
+     * @param deckId    The ID of the deck to restrict designs to only those compatible.
+     * @return          A list of the designs read in from the configuration file that are
+     *                  compatible with the specified deck ID
+     * @since           1.0
+     */
+    public List<Design> getDesigns(int deckId)
+    {
+        // Create a new list of designs
+        List<Design> tempDesigns = new ArrayList<>();
+
+        // Iterate through the list of designs only adding those with a compatible deck ID
+        for(Design design : designs)
+        {
+            if(design.deckId == deckId)
+            {
+                tempDesigns.add(design);
+            }
+        }
+
+        return tempDesigns;
     }
 
     /**
@@ -101,6 +141,7 @@ public class DesignConfigReader extends ComponentConfigReaderBase
             // Print information on design
             System.out.println("Design[" + i + "]:\n{");
             System.out.println("\tID: " + designs.get(i).id);
+            System.out.println("\tPrice: " + designs.get(i).price);
             System.out.println("\tWidth: " + designs.get(i).deckId);
             System.out.println("\tTextureID: " + designs.get(i).resourceId);
             System.out.println("\tName: " + designs.get(i).name);
@@ -166,6 +207,10 @@ public class DesignConfigReader extends ComponentConfigReaderBase
         // Read and set the ID data
         tempDesign.id = Integer.parseInt(parser.getAttributeValue(null, "id"));
 
+        // Read the price
+        tempDesign.price = Float.parseFloat(parser.getAttributeValue(null,
+                "price"));
+
         // Read and set the deck ID data
         tempDesign.deckId = Integer.parseInt(parser.getAttributeValue(null,
                 "deckId"));
@@ -188,7 +233,8 @@ public class DesignConfigReader extends ComponentConfigReaderBase
             if(parser.getEventType() == XmlPullParser.START_TAG)
             {
                 String elementName = parser.getName();
-                Logger.error(TAG, "Unsupported element found in designs.xml configuration: " +
+                Logger.error(TAG,
+                        "Unsupported element found in config_designs.xml configuration: " +
                         elementName);
                 super.skip(parser);
             }

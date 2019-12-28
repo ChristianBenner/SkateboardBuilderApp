@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Singleton class to read in an store the data in the decks.xml configuration file.
+ * Singleton class to read in an store the data in the config_decks.xml configuration file.
  *
  * @author      Christian Benner
  * @version     %I%, %G%
@@ -33,7 +33,7 @@ public class DeckConfigReader extends ComponentConfigReaderBase
     private List<Deck> decks;
 
     /**
-     * Creates the deck configuration reader and loads the decks.xml configuration file. This will
+     * Creates the deck configuration reader and loads the config_decks.xml configuration file. This will
      * obtain and store all of the data for decks. The constructor is private because it is a
      * singleton and therefore only one instance of the object can be created.
      *
@@ -41,13 +41,13 @@ public class DeckConfigReader extends ComponentConfigReaderBase
      */
     private DeckConfigReader()
     {
-        Logger.info("Reading decks.xml configuration file");
+        Logger.info("Reading config_decks.xml configuration file");
 
         try
         {
             // Get the deck config resource file
             InputStream deckConfig = Crispin.getApplicationContext().getResources().
-                    openRawResource(R.raw.decks);
+                    openRawResource(R.raw.config_decks);
             decks = super.parse(deckConfig);
         }
         catch (Exception e)
@@ -123,6 +123,7 @@ public class DeckConfigReader extends ComponentConfigReaderBase
             System.out.println("Deck[" + i + "]:\n{");
             System.out.println("\tID: " + decks.get(i).id);
             System.out.println("\tModelID: " + decks.get(i).modelId);
+            System.out.println("\tGripModelID: " + decks.get(i).gripModelId);
             System.out.println("\tName: " + decks.get(i).name);
             System.out.println("\tInfo: " + decks.get(i).info);
             System.out.println("}");
@@ -190,6 +191,10 @@ public class DeckConfigReader extends ComponentConfigReaderBase
         tempDeck.modelId = ResourceUtilities.getRawResource(parser.getAttributeValue(
                 null, "model"));
 
+        // Read and set the grip model resource ID
+        tempDeck.gripModelId = ResourceUtilities.getRawResource(parser.getAttributeValue(
+                null, "gripmodel"));
+
         // Read and set the name of the deck
         tempDeck.name = parser.getAttributeValue(null, "name");
 
@@ -204,7 +209,8 @@ public class DeckConfigReader extends ComponentConfigReaderBase
             if(parser.getEventType() == XmlPullParser.START_TAG)
             {
                 String elementName = parser.getName();
-                Logger.error(TAG, "Unsupported element found in decks.xml configuration: " +
+                Logger.error(TAG,
+                        "Unsupported element found in config_decks.xml configuration: " +
                         elementName);
                 super.skip(parser);
             }
