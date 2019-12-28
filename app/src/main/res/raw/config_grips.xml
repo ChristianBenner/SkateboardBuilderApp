@@ -2,4 +2,11 @@
 <grips>
 	<grip id="0" price="10.0" texture="grip_mob_basic" name="Mob Basic Griptape" info="A basic griptape with the Mob logo."/>
 	<grip id="1" price="12.0" texture="grip_mob_x_independent_four_cross" name="Mob x Independent 4 Cross" info="A griptape by Mob that has been laser cut to reveal the deck through the four crosses."/>
+	<grip id="2" price="12.0" texture="grip_polar_skateboards_smile" name="Polar Skateboards Smile" info="A griptape by Polar Skateboards called Smile."/>
+	<grip id="3" price="6.0" texture="grip_mob_plain" name="Mob Plain Griptape" info="A plain griptape by Mob."/>
+	<grip id="4" price="14.0" texture="grip_santa_crus_x_spongebob_squarepants" name="Santa Cruz and Spongebob Squarepants" info="A griptape by Santa Cruz that pictures characters from the popular show Spongebob Squarepants."/>
+	<grip id="5" price="12.0" texture="grip_mob_x_thrasher_flame" name="Mob X Thrasher Flame" info="A griptape by Mob with some flaming Thrasher branding."/>
+	<grip id="6" price="8.0" texture="grip_grizzly_clear_stamp" name="Grizzly Clear Stamp" info="A clear griptape by Grizzly."/>
+	<grip id="7" price="6.0" texture="grip_diamond_brilliant" name="Diamond Brilliant" info="A griptape by Diamond with the logo printed on it."/>
+	<grip id="8" price="13.0" texture="grip_primitive_x_dragon_ball_z_goku_glow" name="Primitive X Dragon Ball Z Goku Glow" info="A partially clear griptape with Dragon Ball Z character Goku inprinted on it."/>
 </grips>
