@@ -1,5 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
+import android.widget.Toast;
+
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
@@ -17,6 +19,7 @@ import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
+import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
@@ -26,6 +29,7 @@ import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
@@ -101,12 +105,16 @@ public class SelectDeckDesignScene extends Scene
 
     private Skateboard subject;
 
+    private Material materialNoDesign;
+
     public SelectDeckDesignScene()
     {
         skateboards = new ArrayList<>();
 
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
+
+        materialNoDesign = new Material(R.drawable.grey);
 
         if(subject == null)
         {
@@ -163,24 +171,30 @@ public class SelectDeckDesignScene extends Scene
         designConfigReader.printInfo();
         materials = new ArrayList<>();
         List<Design> designs = designConfigReader.getDesigns();
+
+        DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
+        Deck selectedDeck = deckConfigReader.getDeck(subject.getDeck());
+
         for(Design design : designs)
         {
-            materials.add(new Material(design.resourceId));
+            // Only add the design if it is compatible with the deck
+            if(design.deckId == selectedDeck.id)
+            {
+                materials.add(new Material(design.resourceId));
+            }
         }
 
         materialIndex = 0;
 
-        DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
-
         if(subject != null)
         {
-            int id = deckConfigReader.getDeck(subject.getDeck()).modelId;
-            String name = deckConfigReader.getDeck(subject.getDeck()).name;
+            int id = selectedDeck.modelId;
+            String name = selectedDeck.name;
             System.out.println("Loading deck id: " + id + ", name: " + name);
             ThreadedOBJLoader.loadModel(id, model ->
             {
                 this.model = model;
-                this.model.setMaterial(nextMaterial());
+                this.model.setMaterial(nextDesign());
             });
         }
         else
@@ -194,8 +208,15 @@ public class SelectDeckDesignScene extends Scene
         setupUI();
     }
 
-    private Material nextMaterial()
+    private Material nextDesign()
     {
+        if(materials.isEmpty())
+        {
+            Logger.error("SelectDeckDesignScene",
+                    "There are no designs for the selected board");
+            return materialNoDesign;
+        }
+
         materialIndex++;
         if(materialIndex >= materials.size())
         {
@@ -205,8 +226,15 @@ public class SelectDeckDesignScene extends Scene
         return materials.get(materialIndex);
     }
 
-    private Material previousMaterial()
+    private Material previousDesign()
     {
+        if(materials.isEmpty())
+        {
+            Logger.error("SelectDeckDesignScene",
+                    "There are no designs for the selected board");
+            return materialNoDesign;
+        }
+
         materialIndex--;
         if(materialIndex < 0)
         {
@@ -236,7 +264,10 @@ public class SelectDeckDesignScene extends Scene
         nextButton.draw(uiCamera);
         backButton.draw(uiCamera);
 
-        model.render(modelCamera, modelMatrix);
+        if(model != null)
+        {
+            model.render(modelCamera, modelMatrix);
+        }
 
         leftButton.draw(uiCamera);
         rightButton.draw(uiCamera);
@@ -269,7 +300,7 @@ public class SelectDeckDesignScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                model.setMaterial(previousMaterial());
+                model.setMaterial(previousDesign());
             }
         });
 
@@ -281,7 +312,7 @@ public class SelectDeckDesignScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                model.setMaterial(nextMaterial());
+                model.setMaterial(nextDesign());
             }
         });
 

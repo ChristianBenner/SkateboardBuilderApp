@@ -301,7 +301,14 @@ public class SelectDeckWidthScene extends Scene
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
+
                             modelScale = 0.2f;
+
+                            modelMatrix.reset();
+                            modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+                            modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+                            modelMatrix.scale(modelScale);
+
                             loadingIcon.hide();
                             nextButton.setEnabled(true);
                             subject.setDeck(deck.id);
