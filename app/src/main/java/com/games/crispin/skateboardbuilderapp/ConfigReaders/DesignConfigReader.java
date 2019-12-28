@@ -1,7 +1,5 @@
 package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 
-import android.util.Xml;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
@@ -17,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Singleton class to read in an store the data in the design.xml configuration file.
+ * Singleton class to read in an store the data in the designs.xml configuration file.
  *
  * @author      Christian Benner
  * @version     %I%, %G%
@@ -139,7 +137,7 @@ public class DesignConfigReader extends ComponentConfigReaderBase
                 // If the entry is a design, read it using the design parser, otherwise ignore it
                 if(name.equals("design"))
                 {
-                    entries.add(readDesignSave(parser));
+                    entries.add(readDesignData(parser));
                 }
                 else
                 {
@@ -157,7 +155,7 @@ public class DesignConfigReader extends ComponentConfigReaderBase
      * @return  The design
      * @since   1.0
      */
-    private Design readDesignSave(XmlPullParser parser) throws XmlPullParserException, IOException
+    private Design readDesignData(XmlPullParser parser) throws XmlPullParserException, IOException
     {
         // Require the design tag to continue
         parser.require(XmlPullParser.START_TAG, null, "design");
@@ -190,7 +188,7 @@ public class DesignConfigReader extends ComponentConfigReaderBase
             if(parser.getEventType() == XmlPullParser.START_TAG)
             {
                 String elementName = parser.getName();
-                Logger.error(TAG, "Unsupported element found in design.xml configuration: " +
+                Logger.error(TAG, "Unsupported element found in designs.xml configuration: " +
                         elementName);
                 super.skip(parser);
             }

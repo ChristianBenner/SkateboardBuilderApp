@@ -19,7 +19,7 @@ import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
-import com.games.crispin.skateboardbuilderapp.ConfigReaders.ComponentConfigReaderBase;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DesignConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
@@ -28,7 +28,6 @@ import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.SkateboardComponent;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
 import java.util.ArrayList;
@@ -171,9 +170,14 @@ public class SelectDeckDesignScene extends Scene
 
         materialIndex = 0;
 
+        DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
+
         if(subject != null)
         {
-            ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(subject.getDeck()).getModelResourceId(), model ->
+            int id = deckConfigReader.getDeck(subject.getDeck()).modelId;
+            String name = deckConfigReader.getDeck(subject.getDeck()).name;
+            System.out.println("Loading deck id: " + id + ", name: " + name);
+            ThreadedOBJLoader.loadModel(id, model ->
             {
                 this.model = model;
                 this.model.setMaterial(nextMaterial());

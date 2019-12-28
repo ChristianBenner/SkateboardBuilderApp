@@ -20,14 +20,18 @@ import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.SkateboardComponent;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class SelectDeckWidthScene extends Scene
 {
@@ -104,6 +108,12 @@ public class SelectDeckWidthScene extends Scene
     // The skateboard that is being worked on
     private Skateboard subject;
 
+    // Decks loaded from configuration file
+    private List<Deck> decks;
+
+    // Decks with associated IDs in the dropdown user interface
+    private HashMap<Integer, Deck> dropdownUIDecks;
+
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
@@ -149,6 +159,11 @@ public class SelectDeckWidthScene extends Scene
         titleText = new Text(aileronRegularFont, SCENE_TITLE_TEXT, false,
                 true, Crispin.getSurfaceWidth());
         widthSelectDropdown = new Dropdown("Select Width");
+
+        DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
+        deckConfigReader.printInfo();
+        decks = deckConfigReader.getDecks();
+        dropdownUIDecks = new HashMap<>();
 
         // Position, re-size, colour and add touch listeners to the UI
         setupUI();
@@ -223,11 +238,12 @@ public class SelectDeckWidthScene extends Scene
         widthSelectDropdown.setBorderColour(Colour.WHITE);
         widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
 
-        final int WIDTH_8 = widthSelectDropdown.addItem("8.0\"");
-        final int WIDTH_8_1 = widthSelectDropdown.addItem("8.1\"");
-        final int WIDTH_8_25 = widthSelectDropdown.addItem("8.25\"");
-        final int WIDTH_8_375 = widthSelectDropdown.addItem("8.375\"");
-        final int WIDTH_8_5 = widthSelectDropdown.addItem("8.5\"");
+        // Add the decks that have been loaded from the configuration file
+        for(Deck deck : decks)
+        {
+            final int tempId = widthSelectDropdown.addItem(deck.name);
+            dropdownUIDecks.put(tempId, deck);
+        }
 
         // Add touch listener to back button
         backButton.addTouchListener(e ->
@@ -246,6 +262,7 @@ public class SelectDeckWidthScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
+
                     if(subject.getDeck() != Skateboard.NO_PART)
                     {
                         // Save the currently selected board
@@ -273,58 +290,21 @@ public class SelectDeckWidthScene extends Scene
                 case RELEASE:
                     int selectedId = widthSelectDropdown.getSelectedId();
 
-                    if(selectedId == WIDTH_8)
+                    if(dropdownUIDecks.containsKey(selectedId))
                     {
-                        Toast.makeText(Crispin.getApplicationContext(),
-                                "That option is currently unavailable",
-                                Toast.LENGTH_SHORT).show();
-                        nextButton.setEnabled(false);
                         model = null;
-                    }
-
-                    if(selectedId == WIDTH_8_1)
-                    {
                         loadingIcon.show();
-                        subject.setDeck(SkateboardComponent.DECK_8_125_ID);
-                        nextButton.setEnabled(true);
-                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_125_ID).getModelResourceId(), model ->
+
+                        // Load the deck associated to the selected ID
+                        Deck deck = dropdownUIDecks.get(selectedId);
+                        ThreadedOBJLoader.loadModel(deck.modelId, model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
                             modelScale = 0.2f;
                             loadingIcon.hide();
-                        });
-                    }
-
-                    if(selectedId == WIDTH_8_25)
-                    {
-                        Toast.makeText(Crispin.getApplicationContext(),
-                                "That option is currently unavailable",
-                                Toast.LENGTH_SHORT).show();
-                        nextButton.setEnabled(false);
-                        model = null;
-                    }
-
-                    if(selectedId == WIDTH_8_375)
-                    {
-                        Toast.makeText(Crispin.getApplicationContext(),
-                                "That option is currently unavailable",
-                                Toast.LENGTH_SHORT).show();
-                        nextButton.setEnabled(false);
-                        model = null;
-                    }
-
-                    if(selectedId == WIDTH_8_5)
-                    {
-                        loadingIcon.show();
-                        subject.setDeck(SkateboardComponent.DECK_8_5_ID);
-                        nextButton.setEnabled(true);
-                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_5_ID).getModelResourceId(), model ->
-                        {
-                            this.model = model;
-                            this.model.setMaterial(BOARD_GREY);
-                            modelScale = 0.2f;
-                            loadingIcon.hide();
+                            nextButton.setEnabled(true);
+                            subject.setDeck(deck.id);
                         });
                     }
 
