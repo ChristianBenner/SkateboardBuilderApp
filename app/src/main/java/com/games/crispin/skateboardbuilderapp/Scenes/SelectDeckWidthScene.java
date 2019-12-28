@@ -1,11 +1,10 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.Scenes;
 
 import android.widget.Toast;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
-import com.games.crispin.crispinmobile.Rendering.Models.Cube;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
@@ -21,6 +20,14 @@ import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
+import com.games.crispin.skateboardbuilderapp.CustomButton;
+import com.games.crispin.skateboardbuilderapp.FadeTransition;
+import com.games.crispin.skateboardbuilderapp.LoadingIcon;
+import com.games.crispin.skateboardbuilderapp.R;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.SkateboardComponent;
+import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
 public class SelectDeckWidthScene extends Scene
 {

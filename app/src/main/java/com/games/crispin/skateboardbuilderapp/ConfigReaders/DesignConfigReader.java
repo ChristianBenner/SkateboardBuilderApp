@@ -1,9 +1,12 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 
 import android.util.Xml;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Utilities.Logger;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
+import com.games.crispin.skateboardbuilderapp.R;
+import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -20,7 +23,7 @@ import java.util.List;
  * @version     %I%, %G%
  * @since       1.0
  */
-public class DesignConfigReader
+public class DesignConfigReader extends ComponentConfigReaderBase
 {
     // Tag for logging
     private static final String TAG = "DesignConfigReader";
@@ -47,7 +50,7 @@ public class DesignConfigReader
             // Get the design config resource file
             InputStream designConfig = Crispin.getApplicationContext().getResources().
                     openRawResource(R.raw.designs);
-            designs = parse(designConfig);
+            designs = super.parse(designConfig);
         }
         catch (Exception e)
         {
@@ -91,6 +94,7 @@ public class DesignConfigReader
      *
      * @since   1.0
      */
+    @Override
     public void printInfo()
     {
         // Iterate through the different design data
@@ -108,38 +112,14 @@ public class DesignConfigReader
     }
 
     /**
-     * Parse the configuration file
-     *
-     * @param inputStream   The config file input stream
-     * @return  The list of designs
-     * @since   1.0
-     */
-    private List parse(InputStream inputStream) throws XmlPullParserException, IOException
-    {
-        // Attempt to parse the XML file
-        try
-        {
-            XmlPullParser parser = Xml.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_DOCDECL, false);
-            parser.setInput(inputStream, null);
-            parser.nextTag();
-            return readSaves(parser);
-        }
-        finally
-        {
-            // Close the input stream because we are finished with it
-            inputStream.close();
-        }
-    }
-
-    /**
      * Read the saves data from the XML parser
      *
      * @param parser    The XML pull parser
      * @return  The list of designs
      * @since   1.0
      */
-    private List readSaves(XmlPullParser parser) throws XmlPullParserException, IOException
+    @Override
+    protected List readComponents(XmlPullParser parser) throws XmlPullParserException, IOException
     {
         // Create a list for the entries that we will discover
         List entries = new ArrayList();
@@ -163,7 +143,7 @@ public class DesignConfigReader
                 }
                 else
                 {
-                    skip(parser);
+                    super.skip(parser);
                 }
             }
         }
@@ -193,7 +173,7 @@ public class DesignConfigReader
                 "deckId"));
 
         // Read and set the texture resource ID data
-        tempDesign.resourceId = ResourceUtilities.getResourceIdFromName(
+        tempDesign.resourceId = ResourceUtilities.getDrawableResource(
                 parser.getAttributeValue(null, "texture"));
 
         // Read and set the name of the design
@@ -212,42 +192,10 @@ public class DesignConfigReader
                 String elementName = parser.getName();
                 Logger.error(TAG, "Unsupported element found in design.xml configuration: " +
                         elementName);
-                skip(parser);
+                super.skip(parser);
             }
         }
 
         return tempDesign;
-    }
-
-    /**
-     * Skip the current XML entry
-     *
-     * @param parser    The XML pull parser
-     * @since 1.0
-     */
-    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException
-    {
-        // If it isn't a start tag we are skipping then throw an error
-        if(parser.getEventType() != XmlPullParser.START_TAG)
-        {
-            throw new IllegalStateException();
-        }
-
-        int levels = 1;
-
-        // Count how many levels (entries) we are inside so we can make sure we skip the entry and
-        // all of its sub entries without skipping anything else.
-        while(levels != 0)
-        {
-            switch (parser.next())
-            {
-                case XmlPullParser.END_TAG:
-                    levels--;
-                    break;
-                case XmlPullParser.START_TAG:
-                    levels++;
-                    break;
-            }
-        }
     }
 }

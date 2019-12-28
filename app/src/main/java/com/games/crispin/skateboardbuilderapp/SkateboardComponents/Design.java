@@ -1,4 +1,4 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
 /**
  * A data only class that is used to store valuable information on designs.

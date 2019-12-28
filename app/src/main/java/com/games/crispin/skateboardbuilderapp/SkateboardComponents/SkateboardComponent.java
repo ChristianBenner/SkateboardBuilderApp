@@ -1,4 +1,6 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
+
+import com.games.crispin.skateboardbuilderapp.R;
 
 import java.util.HashMap;
 

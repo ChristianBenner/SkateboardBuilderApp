@@ -1,4 +1,4 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.Scenes;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
@@ -12,6 +12,9 @@ import com.games.crispin.crispinmobile.UserInterface.LinearLayout;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
+import com.games.crispin.skateboardbuilderapp.CustomButton;
+import com.games.crispin.skateboardbuilderapp.FadeTransition;
+import com.games.crispin.skateboardbuilderapp.R;
 
 public class HomeScene extends Scene
 {

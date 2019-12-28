@@ -1,4 +1,4 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
 public class Skateboard
 {

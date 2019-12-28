@@ -1,10 +1,11 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 
 import android.content.Context;
 import android.util.Xml;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Utilities.Logger;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
