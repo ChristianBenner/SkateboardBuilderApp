@@ -149,10 +149,11 @@ public class SelectDeckDesignScene extends Scene
         rightButton = new CustomButton(R.drawable.arrow_right);
 
         // Read all the designs from the config file and then create materials from them
-        DesignConfigReader designConfigReader = new DesignConfigReader();
+        DesignConfigReader designConfigReader = DesignConfigReader.getInstance();
+        designConfigReader.printInfo();
         materials = new ArrayList<>();
-        List<DesignConfigReader.Design> designs = designConfigReader.getDesigns();
-        for(DesignConfigReader.Design design : designs)
+        List<Design> designs = designConfigReader.getDesigns();
+        for(Design design : designs)
         {
             materials.add(new Material(design.resourceId));
         }

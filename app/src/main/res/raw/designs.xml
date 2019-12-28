@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <designs>
-	<design id="0" width="1" texture="design_jart_new_wave" name="Jart New Wave" info="A deck by Jart called New Wave"/>
-	<design id="1" width="1" texture="design_palace" name="Palace" info="A deck by Palace"/>
-	<design id="2" width="1" texture="design_primitive_rodriquez_thorns" name="Primitive Rodriquez Thorns" info="A deck by Primitive called Rodriquez Thorns"/>
-	<design id="3" width="1" texture="design_primitive_x_rick_and_morty" name="Primitive X Rick and Morty" info="A deck by Primitive called Rick and Morty"/>
-	<design id="4" width="1" texture="design_real_wair_flooded" name="Real Wair Flooded" info="A deck by Real Wair called Flooded"/>
+	<design id="0" deckId="1" texture="design_jart_new_wave" name="Jart New Wave" info="A deck by Jart called New Wave"/>
+	<design id="1" deckId="1" texture="design_palace" name="Palace" info="A deck by Palace"/>
+	<design id="2" deckId="1" texture="design_primitive_rodriquez_thorns" name="Primitive Rodriquez Thorns" info="A deck by Primitive called Rodriquez Thorns"/>
+	<design id="3" deckId="1" texture="design_primitive_x_rick_and_morty" name="Primitive X Rick and Morty" info="A deck by Primitive called Rick and Morty"/>
+	<design id="4" deckId="1" texture="design_real_wair_flooded" name="Real Wair Flooded" info="A deck by Real Wair called Flooded"/>
 </designs>
