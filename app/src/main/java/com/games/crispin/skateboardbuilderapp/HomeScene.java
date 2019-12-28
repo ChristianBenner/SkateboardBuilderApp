@@ -162,7 +162,6 @@ public class HomeScene extends Scene
         {
             case CLICK:
                 openText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                fadeTransition.fadeOutToScence(TestScene::new);
                 break;
             case RELEASE:
                 openText.disableWiggle();

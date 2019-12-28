@@ -25,8 +25,8 @@ import java.util.List;
 
 public class SelectDeckDesignScene extends Scene
 {
-    private static final Material BOARD_PALACE_DECK = new Material(new Texture(R.drawable.palacedeck));
-    private static final Material BOARD_REAL_WAIR_FLOODED = new Material(new Texture(R.drawable.real_wair_flooded));
+    private static final Material BOARD_PALACE_DECK = new Material(new Texture(R.drawable.design_palace));
+    private static final Material BOARD_REAL_WAIR_FLOODED = new Material(new Texture(R.drawable.design_real_wair_flooded));
 
     // Padding for the back button
     private static final Point2D BACK_BUTTON_PADDING = new Point2D(50.0f, 50.0f);
@@ -108,8 +108,6 @@ public class SelectDeckDesignScene extends Scene
             System.out.println("Skateboard deck width: " + subject.getDeck());
         }
 
-       // SaveManager.writeSave(skateboards);
-
         // Load the config that is storing the currently selected model parts
         skateboards = SaveManager.loadSaves();
 
@@ -144,36 +142,26 @@ public class SelectDeckDesignScene extends Scene
         backButton = new CustomButton(R.drawable.back_icon);
         nextButton = new Button(aileronRegularFont, "Next");
 
-        if(subject.getDeck() == SkateboardComponent.DECK_8_125_ID)
-        {
-            titleText = new Text(aileronRegularFont, "Select Skateboard 8125", false,
-                    true, Crispin.getSurfaceWidth());
-        }
-        else if(subject.getDeck() == SkateboardComponent.DECK_8_5_ID)
-        {
-            titleText = new Text(aileronRegularFont, "Select Skateboard 85", false,
-                    true, Crispin.getSurfaceWidth());
-        }
-
-
+        titleText = new Text(aileronRegularFont, "Select Design", false,
+                true, Crispin.getSurfaceWidth());
 
         leftButton = new CustomButton(R.drawable.arrow_left);
         rightButton = new CustomButton(R.drawable.arrow_right);
 
+        // Read all the designs from the config file and then create materials from them
+        DesignConfigReader designConfigReader = new DesignConfigReader();
         materials = new ArrayList<>();
-        materials.add(new Material(R.drawable.jart_new_wave));
-        materials.add(new Material(R.drawable.palacedeck));
-        materials.add(new Material(R.drawable.primitive_rodriquez_thorns));
-        materials.add(new Material(R.drawable.primitive_x_rick_and_morty));
-        materials.add(new Material(R.drawable.real_wair_flooded));
+        List<DesignConfigReader.Design> designs = designConfigReader.getDesigns();
+        for(DesignConfigReader.Design design : designs)
+        {
+            materials.add(new Material(design.resourceId));
+        }
 
         materialIndex = 0;
 
-        System.out.println("ooooooooo Save");
-        System.out.println("ooooooooo Deck ID: " + subject.getDeck());
         if(subject != null)
         {
-            ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(subject.getDeck()), model ->
+            ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(subject.getDeck()).getModelResourceId(), model ->
             {
                 this.model = model;
                 this.model.setMaterial(nextMaterial());

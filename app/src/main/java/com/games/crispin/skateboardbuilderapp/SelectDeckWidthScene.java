@@ -1,5 +1,7 @@
 package com.games.crispin.skateboardbuilderapp;
 
+import android.widget.Toast;
+
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
@@ -237,10 +239,18 @@ public class SelectDeckWidthScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    // Save the currently selected board
-                    SaveManager.writeCurrentSave(subject);
-
-                    fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
+                    if(subject.getDeck() != Skateboard.NO_PART)
+                    {
+                        // Save the currently selected board
+                        SaveManager.writeCurrentSave(subject);
+                        fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
+                    }
+                    else
+                    {
+                        Toast.makeText(Crispin.getApplicationContext(),
+                                "Selected part invalid",
+                                Toast.LENGTH_LONG);
+                    }
                     break;
             }
         });
@@ -258,16 +268,19 @@ public class SelectDeckWidthScene extends Scene
 
                     if(selectedId == WIDTH_8)
                     {
-                        model = new Cube();
-                        model.setColour(Colour.GREEN);
-                        modelScale = 1.0f;
+                        Toast.makeText(Crispin.getApplicationContext(),
+                                "That option is currently unavailable",
+                                Toast.LENGTH_SHORT).show();
+                        nextButton.setEnabled(false);
+                        model = null;
                     }
 
                     if(selectedId == WIDTH_8_1)
                     {
                         loadingIcon.show();
                         subject.setDeck(SkateboardComponent.DECK_8_125_ID);
-                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_125_ID), model ->
+                        nextButton.setEnabled(true);
+                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_125_ID).getModelResourceId(), model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
@@ -278,34 +291,34 @@ public class SelectDeckWidthScene extends Scene
 
                     if(selectedId == WIDTH_8_25)
                     {
-                        model = new Cube();
-                        model.setColour(Colour.BLUE);
-                        modelScale = 1.0f;
+                        Toast.makeText(Crispin.getApplicationContext(),
+                                "That option is currently unavailable",
+                                Toast.LENGTH_SHORT).show();
+                        nextButton.setEnabled(false);
+                        model = null;
                     }
 
                     if(selectedId == WIDTH_8_375)
                     {
-                        model = new Cube();
-                        model.setColour(Colour.RED);
-                        modelScale = 1.0f;
+                        Toast.makeText(Crispin.getApplicationContext(),
+                                "That option is currently unavailable",
+                                Toast.LENGTH_SHORT).show();
+                        nextButton.setEnabled(false);
+                        model = null;
                     }
 
                     if(selectedId == WIDTH_8_5)
                     {
                         loadingIcon.show();
                         subject.setDeck(SkateboardComponent.DECK_8_5_ID);
-                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_5_ID), model ->
+                        nextButton.setEnabled(true);
+                        ThreadedOBJLoader.loadModel(SkateboardComponent.getComponent(SkateboardComponent.DECK_8_5_ID).getModelResourceId(), model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
                             modelScale = 0.2f;
                             loadingIcon.hide();
                         });
-                    }
-
-                    if(model != null)
-                    {
-                        nextButton.setEnabled(true);
                     }
 
                     break;
