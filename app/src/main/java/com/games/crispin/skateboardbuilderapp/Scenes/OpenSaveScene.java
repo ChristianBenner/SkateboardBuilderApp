@@ -11,6 +11,7 @@ import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
+import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.R;
@@ -24,17 +25,10 @@ import java.util.Map;
 
 public class OpenSaveScene extends Scene
 {
-    public static final Colour BACKGROUND_COLOR = new Colour(57, 142, 178);
-
-    // Padding for the back button
-    private static final Point2D BACK_BUTTON_PADDING = new Point2D(50.0f, 50.0f);
-
-    // Size of the back button
-    private static final Scale2D BACK_BUTTON_SIZE = new Scale2D(150.0f, 150.0f);
-
     // Position of the back button
-    private static final Point2D BACK_BUTTON_POSITION = new Point2D(BACK_BUTTON_PADDING.x,
-            Crispin.getSurfaceHeight() - BACK_BUTTON_PADDING.y - BACK_BUTTON_SIZE.y);
+    private static final Point2D BACK_BUTTON_POSITION = new Point2D(Constants.BACK_BUTTON_PADDING.x,
+            Crispin.getSurfaceHeight() - Constants.BACK_BUTTON_PADDING.y -
+                    Constants.BACK_BUTTON_SIZE.y);
 
     // Padding for the select deck width dropdown
     private static final Point2D SELECT_SAVE_DROPDOWN_PADDING = new Point2D(50.0f,
@@ -60,11 +54,11 @@ public class OpenSaveScene extends Scene
     public OpenSaveScene()
     {
         // Set the background to a blue colour
-        Crispin.setBackgroundColour(BACKGROUND_COLOR);
+        Crispin.setBackgroundColour(Constants.BACKGROUND_COLOR);
 
         // Create a fade transition for fading in
         fadeTransition = new FadeTransition();
-        fadeTransition.setFadeColour(BACKGROUND_COLOR);
+        fadeTransition.setFadeColour(Constants.BACKGROUND_COLOR);
         fadeTransition.fadeIn();
 
         // Create a 2D camera for the UI rendering
@@ -74,13 +68,13 @@ public class OpenSaveScene extends Scene
         title = new Text(titleFont, "Open Save", true, true,
                 Crispin.getSurfaceWidth());
         final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, BACK_BUTTON_POSITION.y -
-                BACK_BUTTON_PADDING.y - title.getHeight());
+                Constants.BACK_BUTTON_PADDING.y - title.getHeight());
         title.setPosition(TITLE_TEXT_POSITION);
         title.setColour(Colour.WHITE);
 
         backButton = new CustomButton(R.drawable.back_icon);
         backButton.setPosition(BACK_BUTTON_POSITION);
-        backButton.setSize(BACK_BUTTON_SIZE);
+        backButton.setSize(Constants.BACK_BUTTON_SIZE);
 
         // Add touch listener to back button
         backButton.addTouchListener(e ->
@@ -102,7 +96,7 @@ public class OpenSaveScene extends Scene
         saveDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
         saveDropdown.setSize(SELECT_SAVE_DROPDOWN_SIZE);
         saveDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
-        saveDropdown.setColour(HomeScene.BACKGROUND_COLOR);
+        saveDropdown.setColour(Constants.BACKGROUND_COLOR);
         saveDropdown.setTextColour(Colour.WHITE);
         saveDropdown.setBorderColour(Colour.WHITE);
         saveDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);

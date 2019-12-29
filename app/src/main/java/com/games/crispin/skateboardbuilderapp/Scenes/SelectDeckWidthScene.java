@@ -22,6 +22,7 @@ import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
+import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
@@ -35,25 +36,15 @@ import java.util.List;
 
 public class SelectDeckWidthScene extends Scene
 {
-    // Padding for the back button
-    private static final Point2D BACK_BUTTON_PADDING = new Point2D(50.0f, 50.0f);
-
-    // Size of the back button
-    private static final Scale2D BACK_BUTTON_SIZE = new Scale2D(150.0f, 150.0f);
-
     // Position of the back button
-    private static final Point2D BACK_BUTTON_POSITION = new Point2D(BACK_BUTTON_PADDING.x,
-            Crispin.getSurfaceHeight() - BACK_BUTTON_PADDING.y - BACK_BUTTON_SIZE.y);
-
-    // Padding for the next button
-    private static final Point2D NEXT_BUTTON_PADDING = new Point2D(0.0f, 50.0f);
-
-    // Size of the next button
-    private static final Scale2D NEXT_BUTTON_SIZE = new Scale2D(600.0f, 200.0f);
+    private static final Point2D BACK_BUTTON_POSITION = new Point2D(Constants.BACK_BUTTON_PADDING.x,
+            Crispin.getSurfaceHeight() - Constants.BACK_BUTTON_PADDING.y -
+                    Constants.BACK_BUTTON_SIZE.y);
 
     // Next button position
     private static final Point2D NEXT_BUTTON_POSITION = new Point2D((Crispin.getSurfaceWidth() /
-            2.0f) - (NEXT_BUTTON_SIZE.x / 2.0f) + NEXT_BUTTON_PADDING.x, NEXT_BUTTON_PADDING.y);
+            2.0f) - (Constants.NEXT_BUTTON_SIZE.x / 2.0f) + Constants.NEXT_BUTTON_PADDING.x,
+            Constants.NEXT_BUTTON_PADDING.y);
 
     // Padding for the select deck width dropdown
     private static final Point2D SELECT_DECK_WIDTH_DROPDOWN_PADDING = new Point2D(50.0f,
@@ -117,7 +108,7 @@ public class SelectDeckWidthScene extends Scene
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
-        Crispin.setBackgroundColour(HomeScene.BACKGROUND_COLOR);
+        Crispin.setBackgroundColour(Constants.BACKGROUND_COLOR);
 
         // Read the current save if there is one
         subject = SaveManager.loadCurrentSave();
@@ -144,7 +135,7 @@ public class SelectDeckWidthScene extends Scene
 
         // Create the fade transition object and set it to fade in
         fadeTransition = new FadeTransition();
-        fadeTransition.setFadeColour(HomeScene.BACKGROUND_COLOR);
+        fadeTransition.setFadeColour(Constants.BACKGROUND_COLOR);
         fadeTransition.fadeIn();
 
         // Create the loading icon
@@ -210,17 +201,17 @@ public class SelectDeckWidthScene extends Scene
     private void setupUI()
     {
         backButton.setPosition(BACK_BUTTON_POSITION);
-        backButton.setSize(BACK_BUTTON_SIZE);
+        backButton.setSize(Constants.BACK_BUTTON_SIZE);
 
-        nextButton.setSize(NEXT_BUTTON_SIZE);
+        nextButton.setSize(Constants.NEXT_BUTTON_SIZE);
         nextButton.setPosition(NEXT_BUTTON_POSITION);
-        nextButton.setColour(HomeScene.BACKGROUND_COLOR);
+        nextButton.setColour(Constants.BACKGROUND_COLOR);
         nextButton.setBorder(new Border(Colour.WHITE, 8));
         nextButton.setTextColour(Colour.WHITE);
         nextButton.setEnabled(false);
 
         final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, BACK_BUTTON_POSITION.y -
-                BACK_BUTTON_PADDING.y - titleText.getHeight());
+                Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
 
         titleText.setColour(Colour.WHITE);
         titleText.setPosition(TITLE_TEXT_POSITION);
@@ -233,7 +224,7 @@ public class SelectDeckWidthScene extends Scene
         widthSelectDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
         widthSelectDropdown.setSize(SELECT_DECK_WIDTH_DROPDOWN_SIZE);
         widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
-        widthSelectDropdown.setColour(HomeScene.BACKGROUND_COLOR);
+        widthSelectDropdown.setColour(Constants.BACKGROUND_COLOR);
         widthSelectDropdown.setTextColour(Colour.WHITE);
         widthSelectDropdown.setBorderColour(Colour.WHITE);
         widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
