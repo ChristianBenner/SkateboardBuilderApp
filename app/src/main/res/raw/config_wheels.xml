@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<wheels>
+	<wheel id="0" price="0.0" texture="wheel_test3" name="Test" info="Test"/>
+	<wheel id="1" price="50.0" texture="spitfire_x_neckface_spanky_formula_four" name="Spitfire X Neckface Spanky Formula Four" info="Spitfire wheels 52MM F4 99"/>
+</wheels>

@@ -19,17 +19,14 @@ import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
-import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
-import com.games.crispin.skateboardbuilderapp.ConfigReaders.DesignConfigReader;
-import com.games.crispin.skateboardbuilderapp.ConfigReaders.GripConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
 import java.util.ArrayList;
@@ -99,10 +96,18 @@ public class SelectWheelsScene extends Scene
     // The skateboard that is being worked on
     private Skateboard subject;
 
+    private List<Material> materials;
+    private List<Wheel> wheels;
     private int gripIndex;
+
+    private Material materialNoDesign;
+    private int wheelIndex;
 
     public SelectWheelsScene()
     {
+        materialNoDesign = new Material(R.drawable.grey);
+        wheelIndex = 0;
+
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
 
@@ -132,6 +137,16 @@ public class SelectWheelsScene extends Scene
         modelMatrix = new ModelMatrix();
 
         touchRotation = new TouchRotation();
+
+        WheelConfigReader wheelConfigReader = WheelConfigReader.getInstance();
+        wheels = wheelConfigReader.getWheels();
+
+        materials = new ArrayList<>();
+        // Load the wheel materials
+        for(int i = 0; i < wheels.size(); i++)
+        {
+            materials.add(new Material(wheels.get(i).resourceId));
+        }
 
         ThreadedOBJLoader.loadModel(R.raw.wheels_export_3, model ->
         {
@@ -179,6 +194,40 @@ public class SelectWheelsScene extends Scene
         touchRotation.touch(type, position);
     }
 
+    private Material nextWheel()
+    {
+        if(wheels.isEmpty())
+        {
+            Logger.error(TAG, "There are no wheels");
+            return materialNoDesign;
+        }
+
+        wheelIndex++;
+        if(wheelIndex >= materials.size())
+        {
+            wheelIndex = 0;
+        }
+
+        return materials.get(wheelIndex);
+    }
+
+    private Material previousWheel()
+    {
+        if(materials.isEmpty())
+        {
+            Logger.error(TAG, "There are no wheels");
+            return materialNoDesign;
+        }
+
+        wheelIndex--;
+        if(wheelIndex < 0)
+        {
+            wheelIndex = materials.size() - 1;
+        }
+
+        return materials.get(wheelIndex);
+    }
+
     private void setupUI()
     {
         // Create the fade transition object and set it to fade in
@@ -218,8 +267,8 @@ public class SelectWheelsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                /*subject.setGrip(grips.get(gripIndex).id);
-                grip.setMaterial(previousGrip());*/
+                //subject.setGrip(grips.get(gripIndex).id);
+                model.setMaterial(previousWheel());
             }
         });
 
@@ -231,8 +280,8 @@ public class SelectWheelsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                /*subject.setDesign(grips.get(gripIndex).id);
-                grip.setMaterial(nextGrip());*/
+               // subject.setDesign(grips.get(gripIndex).id);
+                model.setMaterial(nextWheel());
             }
         });
 
