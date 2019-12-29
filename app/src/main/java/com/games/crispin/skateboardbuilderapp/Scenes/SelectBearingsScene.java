@@ -32,10 +32,10 @@ import com.games.crispin.skateboardbuilderapp.TouchRotation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectWheelsScene extends Scene
+public class SelectBearingsScene extends Scene
 {
     // Tag used for logging
-    private static final String TAG = "SelectWheelsScene";
+    private static final String TAG = "SelectBearingsScene";
 
     // Padding for the back button
     private static final Point2D BACK_BUTTON_PADDING = new Point2D(50.0f, 50.0f);
@@ -103,7 +103,7 @@ public class SelectWheelsScene extends Scene
     private Material materialNoDesign;
     private int wheelIndex;
 
-    public SelectWheelsScene()
+    public SelectBearingsScene()
     {
         materialNoDesign = new Material(R.drawable.grey);
         wheelIndex = 0;
@@ -148,10 +148,10 @@ public class SelectWheelsScene extends Scene
             materials.add(new Material(wheels.get(i).resourceId));
         }
 
-        ThreadedOBJLoader.loadModel(R.raw.wheels_export_3, model ->
+        ThreadedOBJLoader.loadModel(R.raw.bearings_export_7, model ->
         {
             this.model = model;
-            this.model.setMaterial(nextWheel());
+            this.model.setMaterial(new Material(R.drawable.bearing_test_2));
         });
 
         setupUI();
@@ -194,7 +194,7 @@ public class SelectWheelsScene extends Scene
         touchRotation.touch(type, position);
     }
 
-    private Material nextWheel()
+   /* private Material nextWheel()
     {
         if(wheels.isEmpty())
         {
@@ -226,7 +226,7 @@ public class SelectWheelsScene extends Scene
         }
 
         return materials.get(wheelIndex);
-    }
+    }*/
 
     private void setupUI()
     {
@@ -245,7 +245,7 @@ public class SelectWheelsScene extends Scene
         backButton = new CustomButton(R.drawable.back_icon);
         nextButton = new Button(aileronRegularFont, "Next");
 
-        titleText = new Text(aileronRegularFont, "Select Wheels", false,
+        titleText = new Text(aileronRegularFont, "Select Bearings", false,
                 true, Crispin.getSurfaceWidth());
 
         leftButton = new CustomButton(R.drawable.arrow_left);
@@ -268,7 +268,7 @@ public class SelectWheelsScene extends Scene
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
                 //subject.setGrip(grips.get(gripIndex).id);
-                model.setMaterial(previousWheel());
+                //model.setMaterial(previousWheel());
             }
         });
 
@@ -280,8 +280,8 @@ public class SelectWheelsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-               // subject.setDesign(grips.get(gripIndex).id);
-                model.setMaterial(nextWheel());
+                // subject.setDesign(grips.get(gripIndex).id);
+                //model.setMaterial(nextWheel());
             }
         });
 
@@ -297,7 +297,7 @@ public class SelectWheelsScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    fadeTransition.fadeOutToScence(SelectGripScene::new);
+                    fadeTransition.fadeOutToScence(SelectWheelsScene::new);
                     break;
             }
         });
@@ -311,7 +311,7 @@ public class SelectWheelsScene extends Scene
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 
-                    fadeTransition.fadeOutToScence(SelectBearingsScene::new);
+                    fadeTransition.fadeOutToScence(HomeScene::new);
                     break;
             }
         });
