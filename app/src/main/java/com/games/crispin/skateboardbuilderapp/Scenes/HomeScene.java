@@ -150,10 +150,10 @@ public class HomeScene extends Scene
         {
             case CLICK:
                 newText.enableWiggle(40.0f, Text.WiggleSpeed_E.FAST);
-                fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
                 break;
             case RELEASE:
                 newText.disableWiggle();
+                fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
                 break;
         }
     };
@@ -168,6 +168,7 @@ public class HomeScene extends Scene
                 break;
             case RELEASE:
                 openText.disableWiggle();
+                fadeTransition.fadeOutToScence(OpenSaveScene::new);
                 break;
         }
     };

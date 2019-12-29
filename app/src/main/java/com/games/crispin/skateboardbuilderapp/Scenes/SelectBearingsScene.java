@@ -19,12 +19,14 @@ import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.BearingConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Bearing;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
@@ -97,16 +99,15 @@ public class SelectBearingsScene extends Scene
     private Skateboard subject;
 
     private List<Material> materials;
-    private List<Wheel> wheels;
-    private int gripIndex;
+    private List<Bearing> bearings;
+    private int bearingIndex;
 
     private Material materialNoDesign;
-    private int wheelIndex;
 
     public SelectBearingsScene()
     {
         materialNoDesign = new Material(R.drawable.grey);
-        wheelIndex = 0;
+        bearingIndex = 0;
 
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
@@ -138,20 +139,20 @@ public class SelectBearingsScene extends Scene
 
         touchRotation = new TouchRotation();
 
-        WheelConfigReader wheelConfigReader = WheelConfigReader.getInstance();
-        wheels = wheelConfigReader.getWheels();
+        BearingConfigReader bearingConfigReader = BearingConfigReader.getInstance();
+        bearings = bearingConfigReader.getBearings();
 
         materials = new ArrayList<>();
         // Load the wheel materials
-        for(int i = 0; i < wheels.size(); i++)
+        for(int i = 0; i < bearings.size(); i++)
         {
-            materials.add(new Material(wheels.get(i).resourceId));
+            materials.add(new Material(bearings.get(i).resourceId));
         }
 
-        ThreadedOBJLoader.loadModel(R.raw.bearings_export_7, model ->
+        ThreadedOBJLoader.loadModel(R.raw.bearings, model ->
         {
             this.model = model;
-            this.model.setMaterial(new Material(R.drawable.bearing_test_2));
+            this.model.setMaterial(nextBearing());
         });
 
         setupUI();
@@ -165,7 +166,7 @@ public class SelectBearingsScene extends Scene
         modelMatrix.reset();
         modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
         modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-        modelMatrix.scale(0.5f);
+        modelMatrix.scale(1.5f);
 
         fadeTransition.update(deltaTime);
     }
@@ -194,39 +195,39 @@ public class SelectBearingsScene extends Scene
         touchRotation.touch(type, position);
     }
 
-   /* private Material nextWheel()
+    private Material nextBearing()
     {
-        if(wheels.isEmpty())
+        if(bearings.isEmpty())
         {
-            Logger.error(TAG, "There are no wheels");
+            Logger.error(TAG, "There are no bearings");
             return materialNoDesign;
         }
 
-        wheelIndex++;
-        if(wheelIndex >= materials.size())
+        bearingIndex++;
+        if(bearingIndex >= materials.size())
         {
-            wheelIndex = 0;
+            bearingIndex = 0;
         }
 
-        return materials.get(wheelIndex);
+        return materials.get(bearingIndex);
     }
 
-    private Material previousWheel()
+    private Material previousBearing()
     {
         if(materials.isEmpty())
         {
-            Logger.error(TAG, "There are no wheels");
+            Logger.error(TAG, "There are no bearings");
             return materialNoDesign;
         }
 
-        wheelIndex--;
-        if(wheelIndex < 0)
+        bearingIndex--;
+        if(bearingIndex < 0)
         {
-            wheelIndex = materials.size() - 1;
+            bearingIndex = materials.size() - 1;
         }
 
-        return materials.get(wheelIndex);
-    }*/
+        return materials.get(bearingIndex);
+    }
 
     private void setupUI()
     {
@@ -267,8 +268,7 @@ public class SelectBearingsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                //subject.setGrip(grips.get(gripIndex).id);
-                //model.setMaterial(previousWheel());
+                model.setMaterial(previousBearing());
             }
         });
 
@@ -280,8 +280,7 @@ public class SelectBearingsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                // subject.setDesign(grips.get(gripIndex).id);
-                //model.setMaterial(nextWheel());
+                model.setMaterial(nextBearing());
             }
         });
 

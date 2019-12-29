@@ -148,7 +148,7 @@ public class SelectWheelsScene extends Scene
             materials.add(new Material(wheels.get(i).resourceId));
         }
 
-        ThreadedOBJLoader.loadModel(R.raw.wheels_export_3, model ->
+        ThreadedOBJLoader.loadModel(R.raw.wheels, model ->
         {
             this.model = model;
             this.model.setMaterial(nextWheel());
