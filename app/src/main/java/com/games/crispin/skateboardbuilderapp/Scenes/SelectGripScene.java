@@ -328,7 +328,7 @@ public class SelectGripScene extends Scene
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 
-                    fadeTransition.fadeOutToScence(SelectGripScene::new);
+                    fadeTransition.fadeOutToScence(SelectWheelsScene::new);
                     break;
             }
         });

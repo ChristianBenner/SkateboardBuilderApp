@@ -1,5 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
+import com.games.crispin.crispinmobile.Utilities.Scene;
+
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
@@ -11,33 +13,32 @@ import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.Utilities.Logger;
-import com.games.crispin.crispinmobile.Utilities.OBJModelLoader;
-import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DesignConfigReader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.GripConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectDeckDesignScene extends Scene
+public class SelectWheelsScene extends Scene
 {
-    private static final String TAG = "SelectDeckDesignScene";
+    // Tag used for logging
+    private static final String TAG = "SelectWheelsScene";
 
     // Padding for the back button
     private static final Point2D BACK_BUTTON_PADDING = new Point2D(50.0f, 50.0f);
@@ -65,7 +66,7 @@ public class SelectDeckDesignScene extends Scene
     // Camera for 3D model rendering
     private Camera3D modelCamera;
 
-    // Render object model
+    // Render object model for the deck
     private Model model;
 
     // Render object model matrix
@@ -95,22 +96,13 @@ public class SelectDeckDesignScene extends Scene
     // Right button for selecting the next design in the list
     private Button rightButton;
 
-    private int designIndex;
-
     // The skateboard that is being worked on
     private Skateboard subject;
 
-    private Material materialNoDesign;
+    private int gripIndex;
 
-    // Materials stored by design ID
-    private List<Material> materials;
-
-    private List<Design> designs;
-
-    public SelectDeckDesignScene()
+    public SelectWheelsScene()
     {
-        materialNoDesign = new Material(R.drawable.grey);
-
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
 
@@ -122,18 +114,8 @@ public class SelectDeckDesignScene extends Scene
         }
         else
         {
-            Logger.info("Design scene started with deck ID[" + subject.getDeck() + "]");
-        }
-
-        // Get the designs compatible with the subjects deck size
-        designs = DesignConfigReader.getInstance().getDesigns(subject.getDeck());
-
-        materials = new ArrayList<>();
-
-        // Load the materials for the compatible designs
-        for(Design design : designs)
-        {
-            materials.add(new Material(design.resourceId));
+            Logger.info("Grip scene started with deck ID[" + subject.getDeck() +
+                    "] and design ID[" + subject.getDesign() + "]");
         }
 
         // Set the background to a blue colour
@@ -151,70 +133,11 @@ public class SelectDeckDesignScene extends Scene
 
         touchRotation = new TouchRotation();
 
-
-        // Create the fade transition object and set it to fade in
-        fadeTransition = new FadeTransition();
-        fadeTransition.setFadeColour(HomeScene.BACKGROUND_COLOR);
-        fadeTransition.fadeIn();
-
-        // Create the loading icon
-        loadingIcon = new LoadingIcon();
-
-        // The font for text on the scene
-        Font aileronRegularFont = new Font(R.raw.aileron_regular, 76);
-
-        // Create the back button
-        backButton = new CustomButton(R.drawable.back_icon);
-        nextButton = new Button(aileronRegularFont, "Next");
-
-        titleText = new Text(aileronRegularFont, "Select Design", false,
-                true, Crispin.getSurfaceWidth());
-
-        leftButton = new CustomButton(R.drawable.arrow_left);
-        rightButton = new CustomButton(R.drawable.arrow_right);
-
-
-
-
-
-        // Read all the designs from the config file and then create materials from them
-        DesignConfigReader designConfigReader = DesignConfigReader.getInstance();
-        designConfigReader.printInfo();
-
-        List<Design> tempDesigns = designConfigReader.getDesigns();
-
-        DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
-        Deck selectedDeck = deckConfigReader.getDeck(subject.getDeck());
-
-        for(Design design : tempDesigns)
+        ThreadedOBJLoader.loadModel(R.raw.wheels_export_3, model ->
         {
-            // Only add the design if it is compatible with the deck
-            if(design.deckId == selectedDeck.id)
-            {
-                designs.add(design);
-            }
-        }
-
-        designIndex = 0;
-
-        if(subject != null)
-        {
-            int id = selectedDeck.modelId;
-            String name = selectedDeck.name;
-            System.out.println("Loading deck id: " + id + ", name: " + name);
-            ThreadedOBJLoader.loadModel(id, model ->
-            {
-                this.model = model;
-                this.model.setMaterial(nextDesign());
-            });
-        }
-        else
-        {
-            System.err.println("ERROR!");
-        }
-
-        touchRotation = new TouchRotation();
-        modelMatrix = new ModelMatrix();
+            this.model = model;
+            this.model.setMaterial(new Material(R.drawable.wheel_test3));
+        });
 
         setupUI();
     }
@@ -227,7 +150,6 @@ public class SelectDeckDesignScene extends Scene
         modelMatrix.reset();
         modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
         modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-
         modelMatrix.scale(0.2f);
 
         fadeTransition.update(deltaTime);
@@ -257,44 +179,29 @@ public class SelectDeckDesignScene extends Scene
         touchRotation.touch(type, position);
     }
 
-    private Material nextDesign()
-    {
-        if(designs.isEmpty())
-        {
-            Logger.error("SelectDeckDesignScene",
-                    "There are no designs for the selected board");
-            return materialNoDesign;
-        }
-
-        designIndex++;
-        if(designIndex >= materials.size())
-        {
-            designIndex = 0;
-        }
-
-        return materials.get(designIndex);
-    }
-
-    private Material previousDesign()
-    {
-        if(materials.isEmpty())
-        {
-            Logger.error("SelectDeckDesignScene",
-                    "There are no designs for the selected board");
-            return materialNoDesign;
-        }
-
-        designIndex--;
-        if(designIndex < 0)
-        {
-            designIndex = materials.size() - 1;
-        }
-
-        return materials.get(designIndex);
-    }
-
     private void setupUI()
     {
+        // Create the fade transition object and set it to fade in
+        fadeTransition = new FadeTransition();
+        fadeTransition.setFadeColour(HomeScene.BACKGROUND_COLOR);
+        fadeTransition.fadeIn();
+
+        // Create the loading icon
+        loadingIcon = new LoadingIcon();
+
+        // The font for text on the scene
+        Font aileronRegularFont = new Font(R.raw.aileron_regular, 76);
+
+        // Create the back button
+        backButton = new CustomButton(R.drawable.back_icon);
+        nextButton = new Button(aileronRegularFont, "Next");
+
+        titleText = new Text(aileronRegularFont, "Select Wheels", false,
+                true, Crispin.getSurfaceWidth());
+
+        leftButton = new CustomButton(R.drawable.arrow_left);
+        rightButton = new CustomButton(R.drawable.arrow_right);
+
         backButton.setPosition(BACK_BUTTON_POSITION);
         backButton.setSize(BACK_BUTTON_SIZE);
 
@@ -311,7 +218,8 @@ public class SelectDeckDesignScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                model.setMaterial(previousDesign());
+                /*subject.setGrip(grips.get(gripIndex).id);
+                grip.setMaterial(previousGrip());*/
             }
         });
 
@@ -323,7 +231,8 @@ public class SelectDeckDesignScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                model.setMaterial(nextDesign());
+                /*subject.setDesign(grips.get(gripIndex).id);
+                grip.setMaterial(nextGrip());*/
             }
         });
 
@@ -339,7 +248,7 @@ public class SelectDeckDesignScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
+                    fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
                     break;
             }
         });
@@ -350,14 +259,13 @@ public class SelectDeckDesignScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    subject.setDesign(designs.get(designIndex).id);
-
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 
-                    fadeTransition.fadeOutToScence(SelectGripScene::new);
+                    fadeTransition.fadeOutToScence(HomeScene::new);
                     break;
             }
         });
     }
 }
+
