@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<trucks>
+	<truck id="0" price="0.0" texture="grey" model="truck_export_2" name="Test Truck" info="Test Truck Info"/>
+	<truck id="1" price="0.0" texture="no_material" model="truck_export_2" name="Test Truck" info="Test Truck Info"/>
+</trucks>

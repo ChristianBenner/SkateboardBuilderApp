@@ -191,6 +191,9 @@ public class SelectDeckDesignScene extends Scene
         // Update the touch rotation object to keep updating the rotation velocity
         touchRotation.update(deltaTime);
 
+        // Update the loading icon to spin
+        loadingIcon.update(deltaTime);
+
         // Update the custom buttons (because they have colours when held)
         backButton.update(deltaTime);
         infoButton.update(deltaTime);
@@ -201,7 +204,6 @@ public class SelectDeckDesignScene extends Scene
         modelMatrix.reset();
         modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
         modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-
         modelMatrix.scale(DEFAULT_MODEL_SCALE);
 
         // Update the fade transition object
@@ -380,7 +382,7 @@ public class SelectDeckDesignScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                previousDesignNew();
+                previousDesign();
             }
         });
 
@@ -392,7 +394,7 @@ public class SelectDeckDesignScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                nextDesignNew();
+                nextDesign();
             }
         });
 
@@ -482,7 +484,7 @@ public class SelectDeckDesignScene extends Scene
      * @see     #setDesign()
      * @since   1.0
      */
-    private void nextDesignNew()
+    private void nextDesign()
     {
         designArrayIndex++;
         setDesign();
@@ -494,7 +496,7 @@ public class SelectDeckDesignScene extends Scene
      * @see     #setDesign()
      * @since   1.0
      */
-    private void previousDesignNew()
+    private void previousDesign()
     {
         designArrayIndex--;
         setDesign();
@@ -522,7 +524,7 @@ public class SelectDeckDesignScene extends Scene
             ThreadedOBJLoader.loadModel(selectedDeck.modelId, model ->
             {
                 this.model = model;
-                nextDesignNew();
+                nextDesign();
             });
         }
         else

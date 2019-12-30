@@ -287,7 +287,7 @@ public class SelectBearingsScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    fadeTransition.fadeOutToScence(SelectWheelsScene::new);
+                    fadeTransition.fadeOutToScence(SelectTrucksScene::new);
                     break;
             }
         });
@@ -301,7 +301,7 @@ public class SelectBearingsScene extends Scene
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 
-                    fadeTransition.fadeOutToScence(HomeScene::new);
+                    fadeTransition.fadeOutToScence(SelectWheelsScene::new);
                     break;
             }
         });
