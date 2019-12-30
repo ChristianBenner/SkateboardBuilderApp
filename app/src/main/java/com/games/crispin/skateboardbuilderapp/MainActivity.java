@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Window;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.skateboardbuilderapp.Scenes.HomeScene;
-import com.games.crispin.skateboardbuilderapp.Scenes.SelectBearingsScene;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -18,6 +17,6 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().hide();
 
         // Add graphical view to frame layout
-        Crispin.init(this, () -> new SelectBearingsScene());
+        Crispin.init(this, () -> new HomeScene());
     }
 }

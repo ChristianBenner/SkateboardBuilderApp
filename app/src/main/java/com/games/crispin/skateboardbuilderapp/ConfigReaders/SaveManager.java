@@ -39,7 +39,7 @@ public class SaveManager
             if(skateboards.isEmpty())
             {
                 System.err.println("Error: Current save empty");
-                return null;
+                return new Skateboard();
             }
             else
             {

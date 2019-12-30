@@ -195,7 +195,7 @@ public class HomeScene extends Scene
         openText.setColour(openButton.getColour());
         buyButton.setColour(buyButton.getColour());
 
-        // update the fade transition
+        // Update the fade transition
         fadeTransition.update(deltaTime);
     }
 
@@ -203,8 +203,8 @@ public class HomeScene extends Scene
      * Render function overridden from the Scene parent class. The render function should contain
      * the draw. The function is where the user interface is drawn so it is processed by the engine.
      *
-     * @see             Scene
-     * @since           1.0
+     * @see     Scene
+     * @since   1.0
      */
     @Override
     public void render()

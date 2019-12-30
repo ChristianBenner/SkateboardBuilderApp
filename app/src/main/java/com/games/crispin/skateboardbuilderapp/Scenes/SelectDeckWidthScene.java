@@ -36,6 +36,7 @@ import java.util.List;
 
 public class SelectDeckWidthScene extends Scene
 {
+
     // Position of the back button
     private static final Point2D BACK_BUTTON_POSITION = new Point2D(Constants.BACK_BUTTON_PADDING.x,
             Crispin.getSurfaceHeight() - Constants.BACK_BUTTON_PADDING.y -
@@ -152,7 +153,6 @@ public class SelectDeckWidthScene extends Scene
         widthSelectDropdown = new Dropdown("Select Width");
 
         DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
-        deckConfigReader.printInfo();
         decks = deckConfigReader.getDecks();
         dropdownUIDecks = new HashMap<>();
 

@@ -20,10 +20,10 @@ public class TouchRotation
     private Point2D averageVelocity;
     private int velocitySampleIndex;
 
-    public TouchRotation()
+    public TouchRotation(float startRotationX, float startRotationY)
     {
-        rotationX = 0.0f;
-        rotationY = 0.0f;
+        rotationX = startRotationX;
+        rotationY = startRotationY;
         lastPos = new Point2D();
         dragging = false;
         difference = new Point2D();
@@ -31,6 +31,11 @@ public class TouchRotation
         velocitySamplesY = new float[MAX_SAMPLES];
         averageVelocity = new Point2D();
         velocitySampleIndex = 0;
+    }
+
+    public TouchRotation()
+    {
+        this(0.0f, 0.0f);
     }
 
     public float getRotationX()
