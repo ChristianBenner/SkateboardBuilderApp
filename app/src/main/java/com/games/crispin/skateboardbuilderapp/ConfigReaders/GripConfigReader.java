@@ -88,6 +88,26 @@ public class GripConfigReader extends ComponentConfigReaderBase
     }
 
     /**
+     * Get the grip that matches a certain ID
+     *
+     * @param gripId    ID of the grip to fetch
+     * @return  The grip that matches the given ID
+     * @since   1.0
+     */
+    public Grip getGrip(int gripId)
+    {
+        for(int i = 0; i < grips.size(); i++)
+        {
+            if(grips.get(i).id == gripId)
+            {
+                return grips.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Print some information on the grip data that has been read in from the configuration file
      *
      * @since   1.0

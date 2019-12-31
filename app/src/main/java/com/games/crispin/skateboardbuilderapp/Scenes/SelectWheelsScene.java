@@ -258,7 +258,6 @@ public class SelectWheelsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                //subject.setGrip(grips.get(gripIndex).id);
                 model.setMaterial(previousWheel());
             }
         });
@@ -271,7 +270,6 @@ public class SelectWheelsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-               // subject.setDesign(grips.get(gripIndex).id);
                 model.setMaterial(nextWheel());
             }
         });
@@ -299,10 +297,12 @@ public class SelectWheelsScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
+                    subject.setWheels(wheels.get(wheelIndex).id);
+
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 
-                    fadeTransition.fadeOutToScence(HomeScene::new);
+                    fadeTransition.fadeOutToScence(ViewBoardScene::new);
                     break;
             }
         });

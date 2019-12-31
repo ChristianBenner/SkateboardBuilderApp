@@ -298,6 +298,8 @@ public class SelectBearingsScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
+                    subject.setBearings(bearings.get(bearingIndex).id);
+
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 

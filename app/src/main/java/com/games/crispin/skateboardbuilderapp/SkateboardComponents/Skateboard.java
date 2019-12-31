@@ -1,5 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
+import com.games.crispin.crispinmobile.Utilities.Logger;
+
 public class Skateboard
 {
     public static final int NO_PART = -1;
@@ -102,5 +104,18 @@ public class Skateboard
     public int getDesign()
     {
         return design;
+    }
+
+    public void print()
+    {
+        Logger.info("Skateboard {");
+        Logger.info("\tName: " + name);
+        Logger.info("\tDeck: " + deck);
+        Logger.info("\tGrip: " + grip);
+        Logger.info("\tTrucks: " + trucks);
+        Logger.info("\tBearings: " + bearings);
+        Logger.info("\tWheels: " + wheels);
+        Logger.info("\tDesign: " + design);
+        Logger.info("}");
     }
 }

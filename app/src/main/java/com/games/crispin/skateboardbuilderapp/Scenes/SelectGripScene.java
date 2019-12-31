@@ -275,7 +275,6 @@ public class SelectGripScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                subject.setGrip(grips.get(gripIndex).id);
                 grip.setMaterial(previousGrip());
             }
         });
@@ -288,7 +287,6 @@ public class SelectGripScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                subject.setDesign(grips.get(gripIndex).id);
                 grip.setMaterial(nextGrip());
             }
         });
@@ -316,6 +314,8 @@ public class SelectGripScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
+                    subject.setGrip(grips.get(gripIndex).id);
+
                     // Save the current skateboard
                     SaveManager.writeCurrentSave(subject);
 

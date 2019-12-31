@@ -5,6 +5,7 @@ import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Truck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -86,6 +87,27 @@ public class WheelConfigReader extends ComponentConfigReaderBase
     public List<Wheel> getWheels()
     {
         return wheels;
+    }
+
+    /**
+     * Get the wheel that matches the specified ID
+     *
+     * @param id    The ID of the wheel
+     * @return      The wheel that matches the specified ID or null if that array does not contain a
+     *              wheel that matches that ID.
+     * @since       1.0
+     */
+    public Wheel getWheel(int id)
+    {
+        for(Wheel wheel : wheels)
+        {
+            if(wheel.id == id)
+            {
+                return wheel;
+            }
+        }
+
+        return null;
     }
 
     /**

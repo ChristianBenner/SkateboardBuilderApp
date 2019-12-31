@@ -90,6 +90,27 @@ public class TruckConfigReader extends ComponentConfigReaderBase
     }
 
     /**
+     * Get the truck that matches the specified ID
+     *
+     * @param id    The ID of the truck
+     * @return      The truck that matches the specified ID or null if that array does not contain a
+     *              truck that matches that ID.
+     * @since       1.0
+     */
+    public Truck getTruck(int id)
+    {
+        for(Truck truck : trucks)
+        {
+            if(truck.id == id)
+            {
+                return truck;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Print some information on the truck data that has been read in from the configuration file
      *
      * @since   1.0

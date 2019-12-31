@@ -89,6 +89,27 @@ public class BearingConfigReader extends ComponentConfigReaderBase
     }
 
     /**
+     * Get the bearing that matches the specified ID
+     *
+     * @param id    The ID of the bearing
+     * @return      The bearing that matches the specified ID or null if that array does not contain
+     *              a bearing that matches that ID.
+     * @since       1.0
+     */
+    public Bearing getBearing(int id)
+    {
+        for(Bearing bearing : bearings)
+        {
+            if(bearing.id == id)
+            {
+                return bearing;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Print some information on the bearing data that has been read in from the configuration file
      *
      * @since   1.0

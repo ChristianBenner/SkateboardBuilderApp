@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Window;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.skateboardbuilderapp.Scenes.HomeScene;
+import com.games.crispin.skateboardbuilderapp.Scenes.ViewBoardScene;
 
 public class MainActivity extends AppCompatActivity
 {
