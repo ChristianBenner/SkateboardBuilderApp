@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <decks>
-	<deck id="0" model="deck_8_1" gripmodel="grip_8_1" name="8.1 inches" info="A deck that has a width of 8.1 inches" truckOneX="0.0" truckOneY="0.0" truckOneZ="0.0" truckTwoX="0.0" truckTwoY="0.0" truckTwoZ="0.0"/>
-	<deck id="1" model="deck_8_5" gripmodel="grip_8_5" name="8.5 inches" info="A deck that has a width of 8.5 inches" truckOneX="0.0" truckOneY="0.0" truckOneZ="0.0" truckTwoX="0.0" truckTwoY="0.0" truckTwoZ="0.0"/>
+	<deck id="0" model="deck_8_1" gripmodel="grip_8_1" name="8.1 inches" info="A deck that has a width of 8.1 inches" truckOneX="-0.0" truckOneY="-0.18" truckOneZ="-1.48" truckTwoX="0.0" truckTwoY="-0.18" truckTwoZ="1.73"/>
 	<deck id="2" model="deck_8_375" gripmodel="grip_8_375" name="8.375 inches" info="A deck that has a width of 8.375 inches" truckOneX="0.0" truckOneY="-0.32" truckOneZ="-1.65" truckTwoX="0.0" truckTwoY="-0.32" truckTwoZ="1.85"/>
+		<deck id="1" model="deck_8_5" gripmodel="grip_8_5" name="8.5 inches" info="A deck that has a width of 8.5 inches" truckOneX="-0.0" truckOneY="-0.28" truckOneZ="-1.65" truckTwoX="0.0" truckTwoY="-0.28" truckTwoZ="1.85"/>
 </decks>
