@@ -1,7 +1,5 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
-import android.view.KeyEvent;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
@@ -69,7 +67,7 @@ public class SelectDeckDesignScene extends Scene
     // The skateboard that is being worked on
     private Skateboard subject;
 
-    // The current designs
+    // The current design
     private Design currentDesign;
 
     // List of the designs
@@ -152,14 +150,8 @@ public class SelectDeckDesignScene extends Scene
         designs = DesignConfigReader.getInstance().getDesigns(subject.getDeck());
         designArrayIndex = 0;
 
-        // Create the materials map
-        designMaterials = new HashMap<>();
-
-        // Load all the materials
-        for(Design temp : designs)
-        {
-            designMaterials.put(temp.id, new Material(temp.resourceId));
-        }
+        // Load the design materials
+        loadDesignMaterials();
 
         // Material for when no texture has been found
         noTexture = new Material(R.drawable.no_material);
@@ -279,6 +271,7 @@ public class SelectDeckDesignScene extends Scene
         rightButton.setEnabled(state);
         infoButton.setEnabled(state);
         backButton.setEnabled(state);
+        nextButton.setEnabled(state);
     }
 
     /**
@@ -502,6 +495,24 @@ public class SelectDeckDesignScene extends Scene
     {
         designArrayIndex--;
         setDesign();
+    }
+
+    /**
+     * Load the design materials compatible with the subjects deck width
+     *
+     * @see             Scene
+     * @since           1.0
+     */
+    private void loadDesignMaterials()
+    {
+        // Create the materials map
+        designMaterials = new HashMap<>();
+
+        // Load all the materials
+        for(Design temp : designs)
+        {
+            designMaterials.put(temp.id, new Material(temp.resourceId));
+        }
     }
 
     /**
