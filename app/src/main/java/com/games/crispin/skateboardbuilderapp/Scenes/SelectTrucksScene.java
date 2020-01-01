@@ -280,6 +280,7 @@ public class SelectTrucksScene extends Scene
         rightButton.setEnabled(state);
         infoButton.setEnabled(state);
         backButton.setEnabled(state);
+        nextButton.setEnabled(state);
     }
 
     /**
