@@ -1,5 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
+import android.view.KeyEvent;
+
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Scale2D;
@@ -106,7 +108,7 @@ public class OpenSaveScene extends Scene
         List<Skateboard> temp = new ArrayList<>();
         temp.add(new Skateboard("Example save", 1, 1, 1, 1, 1, 1));
         temp.add(new Skateboard("Test board", 2, 1, 2, 1, 3, 5));
-        SaveManager.writeSave(temp);
+       // SaveManager.writeSave(temp);
 /*
         <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
             <saves>
@@ -121,6 +123,7 @@ public class OpenSaveScene extends Scene
         {
             for(Skateboard save : saves)
             {
+                System.out.println("Adding save: " + save.getName());
                 dropdownComponents.put(saveDropdown.addItem(save.getName()), save);
             }
         }

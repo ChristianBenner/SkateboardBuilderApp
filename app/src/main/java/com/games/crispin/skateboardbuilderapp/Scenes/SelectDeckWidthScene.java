@@ -8,7 +8,6 @@ import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
-import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
@@ -34,32 +33,25 @@ import com.games.crispin.skateboardbuilderapp.TouchRotation;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.games.crispin.skateboardbuilderapp.Constants.SELECT_DECK_WIDTH_DROPDOWN_PADDING;
+import static com.games.crispin.skateboardbuilderapp.Constants.SELECT_DECK_WIDTH_DROPDOWN_SIZE;
+
 public class SelectDeckWidthScene extends Scene
 {
-
-    // Position of the back button
-    private static final Point2D BACK_BUTTON_POSITION = new Point2D(Constants.BACK_BUTTON_PADDING.x,
-            Crispin.getSurfaceHeight() - Constants.BACK_BUTTON_PADDING.y -
-                    Constants.BACK_BUTTON_SIZE.y);
-
-    // Next button position
-    private static final Point2D NEXT_BUTTON_POSITION = new Point2D((Crispin.getSurfaceWidth() /
-            2.0f) - (Constants.NEXT_BUTTON_SIZE.x / 2.0f) + Constants.NEXT_BUTTON_PADDING.x,
-            Constants.NEXT_BUTTON_PADDING.y);
-
-    // Padding for the select deck width dropdown
-    private static final Point2D SELECT_DECK_WIDTH_DROPDOWN_PADDING = new Point2D(50.0f,
-            50.0f);
-
-    // Size for the select deck width dropdown
-    private static final Scale2D SELECT_DECK_WIDTH_DROPDOWN_SIZE = new Scale2D(
-            Crispin.getSurfaceWidth() - (SELECT_DECK_WIDTH_DROPDOWN_PADDING.x * 2.0f),
-            100.0f);
-
     // Title of the scene
     private static final String SCENE_TITLE_TEXT = "Select Skateboard Width";
 
-    private final Material BOARD_GREY = new Material(new Texture(R.drawable.grey));
+    // Material used on the board
+    private final Material BOARD_GREY;
+
+    // Scale for the model
+    private static final float DEFAULT_MODEL_SCALE = 0.2f;
+
+    // Default X axis rotation for the touch rotation
+    private static final float DEFAULT_ROTATION_X = 180.0f;
+
+    // Default Y axis rotation for the touch rotation
+    private static final float DEFAULT_ROTATION_Y = 270.0f;
 
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
@@ -111,14 +103,11 @@ public class SelectDeckWidthScene extends Scene
         // Set the background to a blue colour
         Crispin.setBackgroundColour(Constants.BACKGROUND_COLOR);
 
+        // Load the default board material
+        BOARD_GREY = new Material(new Texture(R.drawable.grey));
+
         // Read the current save if there is one
         subject = SaveManager.loadCurrentSave();
-
-        // If the current save doesn't exist then create a new skateboard subject
-        if(subject == null)
-        {
-            subject = new Skateboard();
-        }
 
         // Create the user interface camera
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
@@ -127,13 +116,82 @@ public class SelectDeckWidthScene extends Scene
         modelCamera = new Camera3D();
         modelCamera.setPosition(new Point3D(0.0f, 0.0f, 7.0f));
 
+        // Position, re-size, colour and add touch listeners to the UI
+        setupUI();
+
+        // Load the decks from the config file into the dropdown UI
+        loadDeckConfig();
+
         // Create the model matrix for transforming the model
         modelMatrix = new ModelMatrix();
 
-        modelScale = 1.0f;
+        // Create touch rotation object that calculated the rotation for the 3D view when the user
+        // interacts with the page
+        touchRotation = new TouchRotation(DEFAULT_ROTATION_X, DEFAULT_ROTATION_Y);
+    }
 
-        touchRotation = new TouchRotation();
+    private void loadDeckConfig()
+    {
+        decks = DeckConfigReader.getInstance().getDecks();
+        dropdownUIDecks = new HashMap<>();
 
+        // Add the decks that have been loaded from the configuration file to a map so that they
+        // can be accessed easily later.
+        for(Deck deck : decks)
+        {
+            final int tempId = widthSelectDropdown.addItem(deck.name);
+            dropdownUIDecks.put(tempId, deck);
+        }
+    }
+
+    @Override
+    public void update(float deltaTime)
+    {
+        // Update the touch rotation object to keep updating the rotation velocity
+        touchRotation.update(deltaTime);
+
+        // Update the loading icon to spin
+        loadingIcon.update(deltaTime);
+
+        // Update the custom buttons (because they have colours when held)
+        backButton.update(deltaTime);
+
+        // Update the model matrix to the most recent touch rotation values
+        modelMatrix.reset();
+        modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+        modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+        modelMatrix.scale(DEFAULT_MODEL_SCALE);
+
+        // Update the fade transition object
+        fadeTransition.update(deltaTime);
+    }
+
+    @Override
+    public void render()
+    {
+        // If the model exists and is currently not loading, render it
+        if(model != null && !loadingIcon.isShown())
+        {
+            model.render(modelCamera, modelMatrix);
+        }
+
+        // Draw all of the user interface
+        titleText.draw(uiCamera);
+        widthSelectDropdown.draw(uiCamera);
+        backButton.draw(uiCamera);
+        nextButton.draw(uiCamera);
+        loadingIcon.draw(uiCamera);
+        fadeTransition.draw(uiCamera);
+    }
+
+    @Override
+    public void touch(int type, Point2D position)
+    {
+        touchRotation.touch(type, position);
+    }
+
+    private void setupUI()
+    {
         // Create the fade transition object and set it to fade in
         fadeTransition = new FadeTransition();
         fadeTransition.setFadeColour(Constants.BACKGROUND_COLOR);
@@ -152,65 +210,19 @@ public class SelectDeckWidthScene extends Scene
                 true, Crispin.getSurfaceWidth());
         widthSelectDropdown = new Dropdown("Select Width");
 
-        DeckConfigReader deckConfigReader = DeckConfigReader.getInstance();
-        decks = deckConfigReader.getDecks();
-        dropdownUIDecks = new HashMap<>();
 
-        // Position, re-size, colour and add touch listeners to the UI
-        setupUI();
-    }
-
-    @Override
-    public void update(float deltaTime)
-    {
-        backButton.update(deltaTime);
-        fadeTransition.update(deltaTime);
-
-        touchRotation.update(deltaTime);
-
-        modelMatrix.reset();
-        modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
-        modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-        modelMatrix.scale(modelScale);
-
-        loadingIcon.update(deltaTime);
-    }
-
-    @Override
-    public void render()
-    {
-        if(model != null && !loadingIcon.isShown())
-        {
-            model.render(modelCamera, modelMatrix);
-        }
-
-        backButton.draw(uiCamera);
-        widthSelectDropdown.draw(uiCamera);
-        titleText.draw(uiCamera);
-        nextButton.draw(uiCamera);
-        loadingIcon.draw(uiCamera);
-        fadeTransition.draw(uiCamera);
-    }
-
-    @Override
-    public void touch(int type, Point2D position)
-    {
-        touchRotation.touch(type, position);
-    }
-
-    private void setupUI()
-    {
-        backButton.setPosition(BACK_BUTTON_POSITION);
+        backButton.setPosition(Constants.getBackButtonPosition());
         backButton.setSize(Constants.BACK_BUTTON_SIZE);
 
         nextButton.setSize(Constants.NEXT_BUTTON_SIZE);
-        nextButton.setPosition(NEXT_BUTTON_POSITION);
+        nextButton.setPosition(Constants.getNextButtonPosition());
         nextButton.setColour(Constants.BACKGROUND_COLOR);
         nextButton.setBorder(new Border(Colour.WHITE, 8));
         nextButton.setTextColour(Colour.WHITE);
         nextButton.setEnabled(false);
 
-        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, BACK_BUTTON_POSITION.y -
+        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f,
+                Constants.getBackButtonPosition().y -
                 Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
 
         titleText.setColour(Colour.WHITE);
@@ -220,7 +232,6 @@ public class SelectDeckWidthScene extends Scene
                 SELECT_DECK_WIDTH_DROPDOWN_PADDING.x, TITLE_TEXT_POSITION.y -
                 SELECT_DECK_WIDTH_DROPDOWN_SIZE.y - SELECT_DECK_WIDTH_DROPDOWN_PADDING.y);
 
-
         widthSelectDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
         widthSelectDropdown.setSize(SELECT_DECK_WIDTH_DROPDOWN_SIZE);
         widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
@@ -228,13 +239,6 @@ public class SelectDeckWidthScene extends Scene
         widthSelectDropdown.setTextColour(Colour.WHITE);
         widthSelectDropdown.setBorderColour(Colour.WHITE);
         widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
-
-        // Add the decks that have been loaded from the configuration file
-        for(Deck deck : decks)
-        {
-            final int tempId = widthSelectDropdown.addItem(deck.name);
-            dropdownUIDecks.put(tempId, deck);
-        }
 
         // Add touch listener to back button
         backButton.addTouchListener(e ->

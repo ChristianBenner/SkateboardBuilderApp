@@ -1,10 +1,19 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.opengl.Matrix;
+import android.os.IBinder;
+import android.text.InputType;
+import android.view.KeyEvent;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
+import com.games.crispin.crispinmobile.Geometry.Scale2D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
@@ -16,6 +25,7 @@ import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
+import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.LoadListener;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.Scene;
@@ -31,6 +41,7 @@ import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
+import com.games.crispin.skateboardbuilderapp.MainActivity;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
@@ -67,6 +78,9 @@ public class ViewBoardScene extends Scene
 
     // Back button UI (return to home screen)
     private CustomButton backButton;
+
+    // Edit name button
+    private CustomButton editNameButton;
 
     // Next button UI
     private Button buyButton;
@@ -121,8 +135,20 @@ public class ViewBoardScene extends Scene
     private static final float wheelScaleAfter = wheelScale * truckScale;
     private static final float bearingScaleAfter = bearingScale * truckScale;
 
+    private static final String DEFAULT_NAME = "Skateboard";
+
+    private boolean nameGiven;
+    private String name;
+
+    private List<Skateboard> saves;
+
     public ViewBoardScene()
     {
+        name = DEFAULT_NAME;
+        nameGiven = false;
+
+        saves = SaveManager.loadSaves();
+
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
 
@@ -433,6 +459,7 @@ public class ViewBoardScene extends Scene
         titleText.draw(uiCamera);
         buyButton.draw(uiCamera);
         backButton.draw(uiCamera);
+        editNameButton.draw(uiCamera);
 
 
         loadingIcon.draw(uiCamera);
@@ -497,9 +524,63 @@ public class ViewBoardScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    fadeTransition.fadeOutToScence(HomeScene::new);
+                    if(!nameGiven)
+                    {
+                        enterName();
+                    }
+
+                    if(nameGiven)
+                    {
+                        subject.setName(name);
+                        saves.add(subject);
+                        SaveManager.writeSave(saves);
+
+                        fadeTransition.fadeOutToScence(HomeScene::new);
+                    }
                     break;
             }
         });
+
+        editNameButton = new CustomButton(R.drawable.edit_icon);
+        Scale2D size = new Scale2D(120.0f, 120.0f);
+        Point2D padding = new Point2D(0.0f, 50.0f);
+        editNameButton.setPosition((Crispin.getSurfaceWidth() / 2.0f) - (size.x / 2.0f),
+                titleText.getPosition().y - size.y - padding.y);
+        editNameButton.setSize(size);
+        editNameButton.addTouchListener(new TouchListener()
+        {
+            @Override
+            public void touchEvent(TouchEvent e)
+            {
+                switch (e.getEvent())
+                {
+                    case RELEASE:
+                        enterName();
+                }
+            }
+        });
+    }
+
+    private void enterName()
+    {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(Crispin.getActivity());
+        alertBuilder.setTitle("Enter a name for your design");
+        EditText textInput = new EditText(Crispin.getActivity());
+        textInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        alertBuilder.setView(textInput);
+
+        alertBuilder.setPositiveButton("Ok", (dialog, which) ->
+        {
+            name = textInput.getText().toString();
+            nameGiven = true;
+            titleText.setText(name);
+        });
+
+        alertBuilder.setNegativeButton("Cancel", (dialog, which) ->
+        {
+            dialog.cancel();
+        });
+
+        alertBuilder.show();
     }
 }

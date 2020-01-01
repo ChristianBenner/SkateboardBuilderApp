@@ -111,7 +111,8 @@ public class SaveManager
     {
         try
         {
-            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("saves.xml", Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput(
+                    "saves.xml", Context.MODE_PRIVATE);
             XmlSerializer serializer = Xml.newSerializer();
             serializer.setOutput(fileOutputStream, "UTF-8");
             serializer.startDocument("UTF-8", true);

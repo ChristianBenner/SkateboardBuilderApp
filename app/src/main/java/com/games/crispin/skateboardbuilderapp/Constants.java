@@ -31,6 +31,15 @@ public class Constants
     // Selected object text padding
     public static final Point2D SELECTED_OBJECT_TEXT_PADDING = new Point2D(0.0f, 50.0f);
 
+    // Padding for the select deck width dropdown
+    public static final Point2D SELECT_DECK_WIDTH_DROPDOWN_PADDING = new Point2D(50.0f,
+            50.0f);
+
+    // Size for the select deck width dropdown
+    public static final Scale2D SELECT_DECK_WIDTH_DROPDOWN_SIZE = new Scale2D(
+            Crispin.getSurfaceWidth() - (SELECT_DECK_WIDTH_DROPDOWN_PADDING.x * 2.0f),
+            100.0f);
+
     public static final Point2D getBackButtonPosition()
     {
         return new Point2D(BACK_BUTTON_PADDING.x,Crispin.getSurfaceHeight() -
