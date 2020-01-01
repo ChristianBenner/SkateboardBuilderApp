@@ -18,6 +18,6 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().hide();
 
         // Add graphical view to frame layout
-        Crispin.init(this, () -> new HomeScene());
+        Crispin.init(this, () -> new ViewBoardScene());
     }
 }

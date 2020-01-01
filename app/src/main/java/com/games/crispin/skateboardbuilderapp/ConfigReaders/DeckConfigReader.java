@@ -1,6 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 
 import com.games.crispin.crispinmobile.Crispin;
+import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
@@ -126,6 +127,10 @@ public class DeckConfigReader extends ComponentConfigReaderBase
             System.out.println("\tGripModelID: " + decks.get(i).gripModelId);
             System.out.println("\tName: " + decks.get(i).name);
             System.out.println("\tInfo: " + decks.get(i).info);
+            System.out.println("\tTruckOneRelativePosition: " +
+                    decks.get(i).truckTwoRelativePosition);
+            System.out.println("\tTruckTwoRelativePosition: " +
+                    decks.get(i).truckTwoRelativePosition);
             System.out.println("}");
         }
     }
@@ -200,6 +205,22 @@ public class DeckConfigReader extends ComponentConfigReaderBase
 
         // Read and set the info of the deck
         tempDeck.info = parser.getAttributeValue(null, "info");
+
+        float truckOneX = Float.parseFloat(parser.getAttributeValue(null,
+                "truckOneX"));
+        float truckOneY = Float.parseFloat(parser.getAttributeValue(null,
+                "truckOneY"));
+        float truckOneZ = Float.parseFloat(parser.getAttributeValue(null,
+                "truckOneZ"));
+        tempDeck.truckOneRelativePosition = new Point3D(truckOneX, truckOneY, truckOneZ);
+
+        float truckTwoX = Float.parseFloat(parser.getAttributeValue(null,
+                "truckTwoX"));
+        float truckTwoY = Float.parseFloat(parser.getAttributeValue(null,
+                "truckTwoY"));
+        float truckTwoZ = Float.parseFloat(parser.getAttributeValue(null,
+                "truckTwoZ"));
+        tempDeck.truckTwoRelativePosition = new Point3D(truckTwoX, truckTwoY, truckTwoZ);
 
         // Iterate through the parser until an end tag is found
         while(parser.next() != XmlPullParser.END_TAG)

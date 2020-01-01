@@ -1,6 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 
 import com.games.crispin.crispinmobile.Crispin;
+import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
@@ -129,6 +130,11 @@ public class TruckConfigReader extends ComponentConfigReaderBase
             System.out.println("\tModelID: " + trucks.get(i).modelResourceId);
             System.out.println("\tName: " + trucks.get(i).name);
             System.out.println("\tInfo: " + trucks.get(i).info);
+            System.out.println("\tWheelRelativePosition: " + trucks.get(i).wheelRelativePosition);
+            System.out.println("\tBearingOneRelativePosition: " +
+                    trucks.get(i).bearingOneRelativePosition);
+            System.out.println("\tBearingTwoRelativePosition: " +
+                    trucks.get(i).bearingTwoRelativePosition);
             System.out.println("}");
         }
     }
@@ -207,6 +213,27 @@ public class TruckConfigReader extends ComponentConfigReaderBase
 
         // Read and set the info of the truck
         tempTruck.info = parser.getAttributeValue(null, "info");
+
+        float wheelX = Float.parseFloat(parser.getAttributeValue(null, "wheelX"));
+        float wheelY = Float.parseFloat(parser.getAttributeValue(null, "wheelY"));
+        float wheelZ = Float.parseFloat(parser.getAttributeValue(null, "wheelZ"));
+        tempTruck.wheelRelativePosition = new Point3D(wheelX, wheelY, wheelZ);
+
+        float bearingOneX = Float.parseFloat(parser.getAttributeValue(null,
+                "bearingOneX"));
+        float bearingOneY = Float.parseFloat(parser.getAttributeValue(null,
+                "bearingOneY"));
+        float bearingOneZ = Float.parseFloat(parser.getAttributeValue(null,
+                "bearingOneZ"));
+        tempTruck.bearingOneRelativePosition = new Point3D(bearingOneX, bearingOneY, bearingOneZ);
+
+        float bearingTwoX = Float.parseFloat(parser.getAttributeValue(null,
+                "bearingTwoX"));
+        float bearingTwoY = Float.parseFloat(parser.getAttributeValue(null,
+                "bearingTwoY"));
+        float bearingTwoZ = Float.parseFloat(parser.getAttributeValue(null,
+                "bearingTwoZ"));
+        tempTruck.bearingTwoRelativePosition = new Point3D(bearingTwoX, bearingTwoY, bearingTwoZ);
 
         // Iterate through the parser until an end tag is found
         while(parser.next() != XmlPullParser.END_TAG)

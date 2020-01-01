@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <trucks>
-	<truck id="1" price="0.0" texture="thunder_148_high_lights_two_night" model="thunder_148_high_lights_two" name="Test Truck2" info="Test Truck Info2"/>
+	<truck id="1" price="0.0" texture="thunder_148_high_lights_two_night" model="thunder_148_high_lights_two" name="Test Truck2" info="Test Truck Info2" wheelX="0.63" wheelY="-0.22" wheelZ="-0.12" bearingOneX="0.7" bearingOneY="-0.22" bearingOneZ="-0.12" bearingTwoX="0.57" bearingTwoY="-0.22" bearingTwoZ="-0.12"/>
 </trucks>

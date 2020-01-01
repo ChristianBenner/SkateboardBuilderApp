@@ -93,6 +93,34 @@ public class ViewBoardScene extends Scene
     private ModelMatrix wheelThreeModelMatrix;
     private ModelMatrix wheelFourModelMatrix;
 
+    // Relative positions
+    private Point3D truckOnePos;            // Relative to deck
+    private Point3D truckTwoPos;            // Relative to deck
+    private Point3D wheelRelativePos;       // Relative to trucks
+    private Point3D bearingOneRelativePos;  // Relative to trucks
+    private Point3D bearingTwoRelativePos;  // Relative to trucks
+
+    // Real positions of components
+    private Point3D wheelOneRealPos;
+    private Point3D wheelTwoRealPos;
+    private Point3D wheelThreeRealPos;
+    private Point3D wheelFourRealPos;
+    private Point3D bearingOneRealPos;
+    private Point3D bearingTwoRealPos;
+    private Point3D bearingThreeRealPos;
+    private Point3D bearingFourRealPos;
+    private Point3D bearingFiveRealPos;
+    private Point3D bearingSixRealPos;
+    private Point3D bearingSevenRealPos;
+    private Point3D bearingEightRealPos;
+
+    // Scales
+    private static final float truckScale = 0.07f;
+    private static final float wheelScale = 1.157f;
+    private static final float bearingScale = 3.040f;
+    private static final float wheelScaleAfter = wheelScale * truckScale;
+    private static final float bearingScaleAfter = bearingScale * truckScale;
+
     public ViewBoardScene()
     {
         // Try to load the skateboard that is currently being worked on
@@ -104,6 +132,52 @@ public class ViewBoardScene extends Scene
             subject = new Skateboard();
             Logger.error(TAG, "ERROR: Failed to load subject skateboard");
         }
+
+        truckOnePos = DeckConfigReader.getInstance().getDeck(subject.getDeck()).truckOneRelativePosition;
+        truckTwoPos = DeckConfigReader.getInstance().getDeck(subject.getDeck()).truckTwoRelativePosition;
+        wheelRelativePos = TruckConfigReader.getInstance().getTruck(subject.getTrucks()).wheelRelativePosition;
+        bearingOneRelativePos = TruckConfigReader.getInstance().getTruck(subject.getTrucks()).bearingOneRelativePosition;
+        bearingTwoRelativePos = TruckConfigReader.getInstance().getTruck(subject.getTrucks()).bearingTwoRelativePosition;
+
+        // Real positions of components
+        wheelOneRealPos = new Point3D(truckOnePos.x + wheelRelativePos.x,
+                truckOnePos.y + wheelRelativePos.y,
+                truckOnePos.z + wheelRelativePos.z);
+        wheelTwoRealPos = new Point3D(truckOnePos.x - wheelRelativePos.x,
+                truckOnePos.y + wheelRelativePos.y,
+                truckOnePos.z + wheelRelativePos.z);
+        wheelThreeRealPos = new Point3D(truckTwoPos.x + wheelRelativePos.x,
+                truckTwoPos.y + wheelRelativePos.y,
+                truckTwoPos.z - wheelRelativePos.z);
+        wheelFourRealPos = new Point3D(truckTwoPos.x - wheelRelativePos.x,
+                truckTwoPos.y + wheelRelativePos.y,
+                truckTwoPos.z - wheelRelativePos.z);
+        bearingOneRealPos = new Point3D(truckOnePos.x + bearingOneRelativePos.x,
+                truckOnePos.y + bearingOneRelativePos.y,
+                truckOnePos.z + bearingOneRelativePos.z);
+        bearingTwoRealPos = new Point3D(truckOnePos.x + bearingTwoRelativePos.x,
+                truckOnePos.y + bearingTwoRelativePos.y,
+                truckOnePos.z + bearingTwoRelativePos.z);
+        bearingThreeRealPos = new Point3D(truckOnePos.x - bearingOneRelativePos.x,
+                truckOnePos.y + bearingOneRelativePos.y,
+                truckOnePos.z + bearingOneRelativePos.z);
+        bearingFourRealPos = new Point3D(truckOnePos.x - bearingTwoRelativePos.x,
+                truckOnePos.y + bearingTwoRelativePos.y,
+                truckOnePos.z + bearingTwoRelativePos.z);
+
+        bearingFiveRealPos = new Point3D(truckTwoPos.x + bearingOneRelativePos.x,
+                truckTwoPos.y + bearingOneRelativePos.y,
+                truckTwoPos.z - bearingOneRelativePos.z);
+        bearingSixRealPos = new Point3D(truckTwoPos.x + bearingTwoRelativePos.x,
+                truckTwoPos.y + bearingTwoRelativePos.y,
+                truckTwoPos.z - bearingTwoRelativePos.z);
+        bearingSevenRealPos = new Point3D(truckTwoPos.x - bearingOneRelativePos.x,
+                truckTwoPos.y + bearingOneRelativePos.y,
+                truckTwoPos.z - bearingOneRelativePos.z);
+        bearingEightRealPos = new Point3D(truckTwoPos.x - bearingTwoRelativePos.x,
+                truckTwoPos.y + bearingTwoRelativePos.y,
+                truckTwoPos.z - bearingTwoRelativePos.z);
+
 
         // Set the background to a blue colour
         Crispin.setBackgroundColour(Constants.BACKGROUND_COLOR);
@@ -197,42 +271,22 @@ public class ViewBoardScene extends Scene
         deckAndGripModelMatrix.rotate(yRot, 1.0f, 0.0f, 0.0f);
         deckAndGripModelMatrix.scale(0.2f);
 
-        float truckPosY = -0.32f;
-        float truckPosZ = -1.65f;
-
         truckOneModelMatrix.reset();
-        truckOneModelMatrix.translate(0.0f, truckPosY, truckPosZ);
-        truckOneModelMatrix.rotateAroundPoint(new Point3D(0.0f, -truckPosY, -truckPosZ), xRot,
+        truckOneModelMatrix.translate(truckOnePos.x, truckOnePos.y, truckOnePos.z);
+        truckOneModelMatrix.rotateAroundPoint(-truckOnePos.x, -truckOnePos.y, -truckOnePos.z, xRot,
                 0.0f, 1.0f, 0.0f);
-        truckOneModelMatrix.rotateAroundPoint(new Point3D(0.0f, -truckPosY, -truckPosZ), yRot,
+        truckOneModelMatrix.rotateAroundPoint(-truckOnePos.x, -truckOnePos.y ,-truckOnePos.z, yRot,
                 1.0f, 0.0f, 0.0f);
-        truckOneModelMatrix.scale(0.07f);
-
-        float truckTwoX = 0.0f;
-        float truckTwoY = truckPosY;
-        float truckTwoZ = 1.85f;
+        truckOneModelMatrix.scale(truckScale);
 
         truckTwoModelMatrix.reset();
-        truckTwoModelMatrix.translate(0.0f, truckPosY, truckTwoZ);
-        truckTwoModelMatrix.rotateAroundPoint(new Point3D(0.0f, -truckPosY, -truckTwoZ), xRot,
+        truckTwoModelMatrix.translate(truckTwoPos.x, truckTwoPos.y, truckTwoPos.z);
+        truckTwoModelMatrix.rotateAroundPoint(-truckTwoPos.x, -truckTwoPos.y, -truckTwoPos.z, xRot,
                 0.0f, 1.0f, 0.0f);
-        truckTwoModelMatrix.rotateAroundPoint(new Point3D(0.0f, -truckPosY, -truckTwoZ), yRot,
+        truckTwoModelMatrix.rotateAroundPoint(-truckTwoPos.x, -truckTwoPos.y, -truckTwoPos.z, yRot,
                 1.0f, 0.0f, 0.0f);
         truckTwoModelMatrix.rotate(180.0f, 0.0f, 1.0f, 0.0f);
-        truckTwoModelMatrix.scale(0.07f);
-
-        float bearingScale = 3.040f;
-        float wheelScale = 1.157f;
-        float wheelScaleAfter = 1.157f * 0.07f;
-
-        float truckOneX = 0.0f;
-        float truckOneY = truckPosY;
-        float truckOneZ = truckPosZ;
-
-        Point3D wheelOneRelativePos = new Point3D(0.65f, -0.22f, -0.12f);
-        Point3D wheelOneRealPos = new Point3D(truckOneX + wheelOneRelativePos.x,
-                truckOneY + wheelOneRelativePos.y,
-                truckOneZ + wheelOneRelativePos.z);
+        truckTwoModelMatrix.scale(truckScale);
 
         wheelOneModelMatrix.reset();
         wheelOneModelMatrix.translate(wheelOneRealPos.x, wheelOneRealPos.y, wheelOneRealPos.z);
@@ -243,11 +297,6 @@ public class ViewBoardScene extends Scene
         wheelOneModelMatrix.rotate(-270.0f, 0.0f, 0.0f, 1.0f);
         wheelOneModelMatrix.scale(wheelScaleAfter);
 
-        Point3D wheelTwoRelativePos = new Point3D(-wheelOneRelativePos.x, wheelOneRelativePos.y, wheelOneRelativePos.z);
-        Point3D wheelTwoRealPos = new Point3D(truckOneX + wheelTwoRelativePos.x,
-                truckOneY + wheelTwoRelativePos.y,
-                truckOneZ + wheelTwoRelativePos.z);
-
         wheelTwoModelMatrix.reset();
         wheelTwoModelMatrix.translate(wheelTwoRealPos.x, wheelTwoRealPos.y, wheelTwoRealPos.z);
         wheelTwoModelMatrix.rotateAroundPoint(new Point3D(-wheelTwoRealPos.x, -wheelTwoRealPos.y, -wheelTwoRealPos.z), xRot,
@@ -257,11 +306,6 @@ public class ViewBoardScene extends Scene
         wheelTwoModelMatrix.rotate(-90.0f, 0.0f, 0.0f, 1.0f);
         wheelTwoModelMatrix.scale(wheelScaleAfter);
 
-        Point3D wheelThreeRelativePos = new Point3D(0.65f, -0.22f, 0.115f);
-        Point3D wheelThreeRealPos = new Point3D(truckTwoX + wheelThreeRelativePos.x,
-                truckTwoY + wheelThreeRelativePos.y,
-                truckTwoZ + wheelThreeRelativePos.z);
-
         wheelThreeModelMatrix.reset();
         wheelThreeModelMatrix.translate(wheelThreeRealPos.x, wheelThreeRealPos.y, wheelThreeRealPos.z);
         wheelThreeModelMatrix.rotateAroundPoint(new Point3D(-wheelThreeRealPos.x, -wheelThreeRealPos.y, -wheelThreeRealPos.z), xRot,
@@ -269,12 +313,8 @@ public class ViewBoardScene extends Scene
         wheelThreeModelMatrix.rotateAroundPoint(new Point3D(-wheelThreeRealPos.x, -wheelThreeRealPos.y, -wheelThreeRealPos.z), yRot,
                 1.0f, 0.0f, 0.0f);
         wheelThreeModelMatrix.rotate(-90.0f, 0.0f, 0.0f, 1.0f);
+        wheelThreeModelMatrix.rotate(180.0f, 1.0f, 0.0f, 1.0f);
         wheelThreeModelMatrix.scale(wheelScaleAfter);
-
-        Point3D wheelFourRelativePos = new Point3D(-wheelThreeRelativePos.x, wheelThreeRelativePos.y, wheelThreeRelativePos.z);
-        Point3D wheelFourRealPos = new Point3D(truckTwoX + wheelFourRelativePos.x,
-                truckTwoY + wheelFourRelativePos.y,
-                truckTwoZ + wheelFourRelativePos.z);
 
         wheelFourModelMatrix.reset();
         wheelFourModelMatrix.translate(wheelFourRealPos.x, wheelFourRealPos.y, wheelFourRealPos.z);
@@ -283,42 +323,86 @@ public class ViewBoardScene extends Scene
         wheelFourModelMatrix.rotateAroundPoint(new Point3D(-wheelFourRealPos.x, -wheelFourRealPos.y, -wheelFourRealPos.z), yRot,
                 1.0f, 0.0f, 0.0f);
         wheelFourModelMatrix.rotate(-270.0f, 0.0f, 0.0f, 1.0f);
+        wheelFourModelMatrix.rotate(180.0f, 1.0f, 0.0f, 1.0f);
         wheelFourModelMatrix.scale(wheelScaleAfter);
 
-    /*    bearingOneModelMatrix.reset();
-        bearingOneModelMatrix.translate(0.0f, truckPosY, truckPosZ);
-        bearingOneModelMatrix.rotateAroundPoint(new Point3D(0.0f, -truckPosY, -truckPosZ), xRot,
+        bearingOneModelMatrix.reset();
+        bearingOneModelMatrix.translate(bearingOneRealPos.x, bearingOneRealPos.y, bearingOneRealPos.z);
+        bearingOneModelMatrix.rotateAroundPoint(new Point3D(-bearingOneRealPos.x, -bearingOneRealPos.y, -bearingOneRealPos.z), xRot,
                 0.0f, 1.0f, 0.0f);
-        bearingOneModelMatrix.rotateAroundPoint(new Point3D(0.0f, -truckPosY, -truckPosZ), yRot,
+        bearingOneModelMatrix.rotateAroundPoint(new Point3D(-bearingOneRealPos.x, -bearingOneRealPos.y, -bearingOneRealPos.z), yRot,
                 1.0f, 0.0f, 0.0f);
-        bearingOneModelMatrix.scale(1f);*/
-
-
+        bearingOneModelMatrix.rotate(-270.0f, 0.0f, 0.0f, 1.0f);
+        bearingOneModelMatrix.scale(bearingScaleAfter);
 
         bearingTwoModelMatrix.reset();
-
+        bearingTwoModelMatrix.translate(bearingTwoRealPos.x, bearingTwoRealPos.y, bearingTwoRealPos.z);
+        bearingTwoModelMatrix.rotateAroundPoint(new Point3D(-bearingTwoRealPos.x, -bearingTwoRealPos.y, -bearingTwoRealPos.z), xRot,
+                0.0f, 1.0f, 0.0f);
+        bearingTwoModelMatrix.rotateAroundPoint(new Point3D(-bearingTwoRealPos.x, -bearingTwoRealPos.y, -bearingTwoRealPos.z), yRot,
+                1.0f, 0.0f, 0.0f);
+        bearingTwoModelMatrix.rotate(-90.0f, 0.0f, 0.0f, 1.0f);
+        bearingTwoModelMatrix.scale(bearingScaleAfter);
 
         bearingThreeModelMatrix.reset();
-        bearingFourModelMatrix.reset();
-        bearingFiveModelMatrix.reset();
-        bearingSixModelMatrix.reset();
-        bearingSevenModelMatrix.reset();
-        bearingEightModelMatrix.reset();
-
-
-
-/*        float wheelPosY = truckPosY - 0.5f;
-        wheelOneModelMatrix.reset();
-        wheelOneModelMatrix.translate(0.0f, wheelPosY, truckPosZ);
-        wheelOneModelMatrix.rotateAroundPoint(new Point3D(0.0f, -wheelPosY, -truckPosZ), xRot,
+        bearingThreeModelMatrix.translate(bearingThreeRealPos.x, bearingThreeRealPos.y, bearingThreeRealPos.z);
+        bearingThreeModelMatrix.rotateAroundPoint(new Point3D(-bearingThreeRealPos.x, -bearingThreeRealPos.y, -bearingThreeRealPos.z), xRot,
                 0.0f, 1.0f, 0.0f);
-        wheelOneModelMatrix.rotateAroundPoint(new Point3D(0.0f, -wheelPosY, -truckPosZ), yRot,
+        bearingThreeModelMatrix.rotateAroundPoint(new Point3D(-bearingThreeRealPos.x, -bearingThreeRealPos.y, -bearingThreeRealPos.z), yRot,
                 1.0f, 0.0f, 0.0f);
-        wheelOneModelMatrix.scale(0.1f);*/
+        bearingThreeModelMatrix.rotate(-270.0f, 0.0f, 0.0f, 1.0f);
+        bearingThreeModelMatrix.scale(bearingScaleAfter);
+
+        bearingFourModelMatrix.reset();
+        bearingFourModelMatrix.translate(bearingFourRealPos.x, bearingFourRealPos.y, bearingFourRealPos.z);
+        bearingFourModelMatrix.rotateAroundPoint(new Point3D(-bearingFourRealPos.x, -bearingFourRealPos.y, -bearingFourRealPos.z), xRot,
+                0.0f, 1.0f, 0.0f);
+        bearingFourModelMatrix.rotateAroundPoint(new Point3D(-bearingFourRealPos.x, -bearingFourRealPos.y, -bearingFourRealPos.z), yRot,
+                1.0f, 0.0f, 0.0f);
+        bearingFourModelMatrix.rotate(-90.0f, 0.0f, 0.0f, 1.0f);
+        bearingFourModelMatrix.scale(bearingScaleAfter);
 
 
 
+        bearingFiveModelMatrix.reset();
+        bearingFiveModelMatrix.translate(bearingFiveRealPos.x, bearingFiveRealPos.y, bearingFiveRealPos.z);
+        bearingFiveModelMatrix.rotateAroundPoint(new Point3D(-bearingFiveRealPos.x, -bearingFiveRealPos.y, -bearingFiveRealPos.z), xRot,
+                0.0f, 1.0f, 0.0f);
+        bearingFiveModelMatrix.rotateAroundPoint(new Point3D(-bearingFiveRealPos.x, -bearingFiveRealPos.y, -bearingFiveRealPos.z), yRot,
+                1.0f, 0.0f, 0.0f);
+        bearingFiveModelMatrix.rotate(-270.0f, 0.0f, 0.0f, 1.0f);
+        bearingFiveModelMatrix.rotate(180.0f, 1.0f, 0.0f, 1.0f);
+        bearingFiveModelMatrix.scale(bearingScaleAfter);
 
+        bearingSixModelMatrix.reset();
+        bearingSixModelMatrix.translate(bearingSixRealPos.x, bearingSixRealPos.y, bearingSixRealPos.z);
+        bearingSixModelMatrix.rotateAroundPoint(new Point3D(-bearingSixRealPos.x, -bearingSixRealPos.y, -bearingSixRealPos.z), xRot,
+                0.0f, 1.0f, 0.0f);
+        bearingSixModelMatrix.rotateAroundPoint(new Point3D(-bearingSixRealPos.x, -bearingSixRealPos.y, -bearingSixRealPos.z), yRot,
+                1.0f, 0.0f, 0.0f);
+        bearingSixModelMatrix.rotate(-90.0f, 0.0f, 0.0f, 1.0f);
+        bearingSixModelMatrix.rotate(180.0f, 1.0f, 0.0f, 1.0f);
+        bearingSixModelMatrix.scale(bearingScaleAfter);
+
+        bearingSevenModelMatrix.reset();
+        bearingSevenModelMatrix.translate(bearingSevenRealPos.x, bearingSevenRealPos.y, bearingSevenRealPos.z);
+        bearingSevenModelMatrix.rotateAroundPoint(new Point3D(-bearingSevenRealPos.x, -bearingSevenRealPos.y, -bearingSevenRealPos.z), xRot,
+                0.0f, 1.0f, 0.0f);
+        bearingSevenModelMatrix.rotateAroundPoint(new Point3D(-bearingSevenRealPos.x, -bearingSevenRealPos.y, -bearingSevenRealPos.z), yRot,
+                1.0f, 0.0f, 0.0f);
+        bearingSevenModelMatrix.rotate(-270.0f, 0.0f, 0.0f, 1.0f);
+        bearingSevenModelMatrix.rotate(180.0f, 1.0f, 0.0f, 1.0f);
+        bearingSevenModelMatrix.scale(bearingScaleAfter);
+
+        bearingEightModelMatrix.reset();
+        bearingEightModelMatrix.translate(bearingEightRealPos.x, bearingEightRealPos.y, bearingEightRealPos.z);
+        bearingEightModelMatrix.rotateAroundPoint(new Point3D(-bearingEightRealPos.x, -bearingEightRealPos.y, -bearingEightRealPos.z), xRot,
+                0.0f, 1.0f, 0.0f);
+        bearingEightModelMatrix.rotateAroundPoint(new Point3D(-bearingEightRealPos.x, -bearingEightRealPos.y, -bearingEightRealPos.z), yRot,
+                1.0f, 0.0f, 0.0f);
+        bearingEightModelMatrix.rotate(-90.0f, 0.0f, 0.0f, 1.0f);
+        bearingEightModelMatrix.rotate(180.0f, 1.0f, 0.0f, 1.0f);
+        bearingEightModelMatrix.scale(bearingScaleAfter);
 
         fadeTransition.update(deltaTime);
     }
@@ -332,10 +416,14 @@ public class ViewBoardScene extends Scene
             grip.render(modelCamera, deckAndGripModelMatrix);
             truck.render(modelCamera, truckOneModelMatrix);
             truck.render(modelCamera, truckTwoModelMatrix);
-       //     bearing.render(modelCamera, bearingOneModelMatrix);
-        /*    bearing.render(modelCamera, bearingTwoModelMatrix);
+            bearing.render(modelCamera, bearingOneModelMatrix);
+            bearing.render(modelCamera, bearingTwoModelMatrix);
             bearing.render(modelCamera, bearingThreeModelMatrix);
-            bearing.render(modelCamera, bearingFourModelMatrix);*/
+            bearing.render(modelCamera, bearingFourModelMatrix);
+            bearing.render(modelCamera, bearingFiveModelMatrix);
+            bearing.render(modelCamera, bearingSixModelMatrix);
+            bearing.render(modelCamera, bearingSevenModelMatrix);
+            bearing.render(modelCamera, bearingEightModelMatrix);
             wheel.render(modelCamera, wheelOneModelMatrix);
             wheel.render(modelCamera, wheelTwoModelMatrix);
             wheel.render(modelCamera, wheelThreeModelMatrix);
@@ -415,4 +503,3 @@ public class ViewBoardScene extends Scene
         });
     }
 }
-
