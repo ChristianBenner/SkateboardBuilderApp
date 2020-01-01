@@ -372,7 +372,7 @@ public class SelectDeckDesignScene extends Scene
                 // Save the current skateboard
                 SaveManager.writeCurrentSave(subject);
 
-                fadeTransition.fadeOutToScence(SelectGripScene::new);
+                fadeTransition.fadeOutToScence(SelectGriptapeScene::new);
             }
         });
 

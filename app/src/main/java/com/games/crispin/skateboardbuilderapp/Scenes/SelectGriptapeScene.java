@@ -1,7 +1,5 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
-import android.view.KeyEvent;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
@@ -21,8 +19,8 @@ import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DesignConfigReader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.GripConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
-import com.games.crispin.skateboardbuilderapp.ConfigReaders.TruckConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
@@ -31,27 +29,29 @@ import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Truck;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * The SelectTrucksScene class manages and displays a page that allows the user to select the trucks
- * for their skateboard design. The class extends the CrispinEngine class 'Scene' which allows the
- * engine to handle it.
+ * The SelectGriptapeScene class manages and displays a page that allows the user to select a
+ * griptape for there skateboard. Previously the user selected a design, in this scene you can see
+ * that design on the also previously selected deck model. To access the scene you must select a
+ * design for the skateboard on the SelectDeckDesign scene and the press the 'Next' button. The
+ * class extends the CrispinEngine class 'Scene' which allows the engine to handle it.
  *
  * @see         Scene
  * @author      Christian Benner
  * @version     %I%, %G%
  * @since       1.0
  */
-public class SelectTrucksScene extends Scene
+public class SelectGriptapeScene extends Scene
 {
     // Tag used for logging
-    private static final String TAG = "SelectTrucksScene";
+    private static final String TAG = "SelectGriptapeScene";
 
     // Scale for the model
     private static final float DEFAULT_MODEL_SCALE = 0.2f;
@@ -60,7 +60,7 @@ public class SelectTrucksScene extends Scene
     private static final float DEFAULT_ROTATION_X = 0.0f;
 
     // Default Y axis rotation for the touch rotation
-    private static final float DEFAULT_ROTATION_Y = 225.0f;
+    private static final float DEFAULT_ROTATION_Y = 90.0f;
 
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
@@ -71,23 +71,26 @@ public class SelectTrucksScene extends Scene
     // The skateboard that is being worked on
     private Skateboard subject;
 
-    // The current truck
-    private Truck currentTruck;
+    // The current griptape
+    private Grip currentGrip;
 
-    // List of the trucks
-    private List<Truck> trucks;
+    // List of the grips
+    private List<Grip> grips;
 
-    // Index for the list of trucks
-    private int truckArrayIndex;
+    // Index for the list of grips
+    private int gripArrayIndex;
 
-    // Materials stored with their respective truck ID
-    private HashMap<Integer, Material> truckMaterials;
+    // Materials stored with their respective grip IDs
+    private HashMap<Integer, Material> gripMaterials;
 
     // Material for no texture
     private Material noTexture;
 
-    // Render object model
-    private Model model;
+    // Render object model for the deck
+    private Model deckModel;
+
+    // Render object model for the griptape
+    private Model gripModel;
 
     // Render object model matrix
     private ModelMatrix modelMatrix;
@@ -113,10 +116,10 @@ public class SelectTrucksScene extends Scene
     // Next button UI
     private Button nextButton;
 
-    // Left button for selecting the previous truck in the list
+    // Left button for selecting the previous griptape in the list
     private CustomButton leftButton;
 
-    // Right button for selecting the next truck in the list
+    // Right button for selecting the next griptape in the list
     private CustomButton rightButton;
 
     // Select deck width text UI
@@ -126,12 +129,12 @@ public class SelectTrucksScene extends Scene
     private Text selectedObjectText;
 
     /**
-     * Constructor to create the select deck truck scene. Creates all of the UI, loads the model
-     * and loads all of the trucks.
+     * Constructor to create the select griptape scene. Creates all of the UI, loads the model
+     * and loads all of the griptape materials.
      *
      * @since   1.0
      */
-    public SelectTrucksScene()
+    public SelectGriptapeScene()
     {
         // Set the background to a blue colour
         Crispin.setBackgroundColour(Constants.BACKGROUND_COLOR);
@@ -146,20 +149,20 @@ public class SelectTrucksScene extends Scene
         // Try to load the skateboard that is currently being worked on
         subject = SaveManager.loadCurrentSave();
 
-        // Create truck object with default values
-        currentTruck = new Truck();
+        // Create grip object with default values
+        currentGrip = new Grip();
 
-        // Get the trucks from the config reader
-        trucks = TruckConfigReader.getInstance().getTrucks();
-        truckArrayIndex = 0;
+        // Get the grips from the grip config
+        grips = GripConfigReader.getInstance().getGrips();
+        gripArrayIndex = 0;
 
         // Create the materials map
-        truckMaterials = new HashMap<>();
+        gripMaterials = new HashMap<>();
 
         // Load all the materials
-        for(Truck temp : trucks)
+        for(Grip temp : grips)
         {
-            truckMaterials.put(temp.id, new Material(temp.resourceId));
+            gripMaterials.put(temp.id, new Material(temp.resourceId));
         }
 
         // Material for when no texture has been found
@@ -168,7 +171,8 @@ public class SelectTrucksScene extends Scene
         // Initialise all of the user interface on the page
         initUI();
 
-        nextTruck();
+        // Load the deck and grip
+        loadModels(subject);
 
         // Create the model matrix for transforming the model
         modelMatrix = new ModelMatrix();
@@ -206,7 +210,6 @@ public class SelectTrucksScene extends Scene
         modelMatrix.reset();
         modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
         modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-
         modelMatrix.scale(DEFAULT_MODEL_SCALE);
 
         // Update the fade transition object
@@ -225,9 +228,10 @@ public class SelectTrucksScene extends Scene
     public void render()
     {
         // If the model exists, render it
-        if(model != null)
+        if(gripModel != null && deckModel != null)
         {
-            model.render(modelCamera, modelMatrix);
+            deckModel.render(modelCamera, modelMatrix);
+            gripModel.render(modelCamera, modelMatrix);
         }
 
         // Draw all of the user interface
@@ -342,7 +346,7 @@ public class SelectTrucksScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                fadeTransition.fadeOutToScence(SelectGriptapeScene::new);
+                fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
             }
         });
 
@@ -353,7 +357,7 @@ public class SelectTrucksScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                infoPanel.setText(currentTruck.info);
+                infoPanel.setText(currentGrip.info);
                 infoPanel.show();
             }
         });
@@ -368,12 +372,12 @@ public class SelectTrucksScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                subject.setTrucks(currentTruck.id);
+                subject.setGrip(currentGrip.id);
 
                 // Save the current skateboard
                 SaveManager.writeCurrentSave(subject);
 
-                fadeTransition.fadeOutToScence(SelectBearingsScene::new);
+                fadeTransition.fadeOutToScence(SelectTrucksScene::new);
             }
         });
 
@@ -385,7 +389,7 @@ public class SelectTrucksScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                previousTruck();
+                previousGrip();
             }
         });
 
@@ -397,12 +401,12 @@ public class SelectTrucksScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                nextTruck();
+                nextGrip();
             }
         });
 
         // Create the title text
-        titleText = new Text(aileronRegularFont, "Select Trucks", false,
+        titleText = new Text(aileronRegularFont, "Select Griptape", false,
                 true, Crispin.getSurfaceWidth());
 
         // Calculate the position of the title text
@@ -429,87 +433,125 @@ public class SelectTrucksScene extends Scene
     }
 
     /**
-     *
+     * Set the grip using the grip array index and the grip array. Fetches the material from the
+     * material map based on the grip ID. This is so that a material doesn't have to be loaded on
+     * button press.
      *
      * @since   1.0
      */
-    private void setTruck()
+    private void setGrip()
     {
-        // Check if the trucks array doesn't exist or have any contents
-        if(trucks == null || trucks.isEmpty())
+        // Check if the grip array doesn't exist or have any contents
+        if(grips == null || grips.isEmpty())
         {
-            Logger.error(TAG, "No trucks to iterate through");
+            Logger.error(TAG, "No grips to iterate through");
 
             // If there is a model, set it to use the no texture material
-            if(model != null)
+            if(gripModel != null)
             {
-                model.setMaterial(noTexture);
+                gripModel.setMaterial(noTexture);
             }
         }
         else
         {
-            // Check if the truck index is within range of the array
-            if(truckArrayIndex >= trucks.size())
+            // Check if the grip index is within range of the array
+            if(gripArrayIndex >= grips.size())
             {
-                truckArrayIndex = 0;
+                gripArrayIndex = 0;
             }
-            else if(truckArrayIndex < 0)
+            else if(gripArrayIndex < 0)
             {
-                truckArrayIndex = trucks.size() - 1;
+                gripArrayIndex = grips.size() - 1;
             }
 
-            // Set the new current truck
-            currentTruck = trucks.get(truckArrayIndex);
+            // Set the new current grip
+            currentGrip = grips.get(gripArrayIndex);
 
-            // Set the selected object text to display the name of the new truck
-            selectedObjectText.setText(currentTruck.name);
+            // Set the selected object text to display the name of the new grip
+            selectedObjectText.setText(currentGrip.name);
 
-            Logger.info("Switching truck to ID[" + currentTruck.id + "]: " +
-                    currentTruck.name);
+            Logger.info("Switching grip to ID[" + currentGrip.id + "]: " +
+                    currentGrip.name);
 
-            loadingIcon.show();
-            model = null;
-
-            // Load new truck
-            ThreadedOBJLoader.loadModel(currentTruck.modelResourceId, model ->
-            {
-                this.model = model;
-                loadingIcon.hide();
-            });
-
-            // If the model exists, set the material to the new truck
-            if(model == null)
+            // If the model exists, set the material to the new grip
+            if(gripModel == null)
             {
                 Logger.error(TAG, "Model does not exist. Cannot set material.");
             }
             else
             {
-                model.setMaterial(truckMaterials.get(currentTruck.id));
+                gripModel.setMaterial(gripMaterials.get(currentGrip.id));
             }
         }
     }
 
     /**
-     * Set the truck of the deck to the next one in the array
+     * Set the grip material to be the next one in the array
      *
-     * @see     #setTruck() ()
+     * @see     #setGrip()
      * @since   1.0
      */
-    private void nextTruck()
+    private void nextGrip()
     {
-        truckArrayIndex++;
-        setTruck();
+        gripArrayIndex++;
+        setGrip();
     }
 
     /**
-     * Set the truck of the deck to the previous one in the array
+     * Set the grip material to be the previous one in the array
      *
-     * @see     #setTruck() ()
+     * @see     #setGrip()
      * @since   1.0
      */
-    private void previousTruck()
+    private void previousGrip()
     {
-        truckArrayIndex--;
-        setTruck();
+        gripArrayIndex--;
+        setGrip();
+    }
+
+    /**
+     * Load a deck and grip model for a specific skateboard.
+     *
+     * @param skateboard    The skateboard containing the deck and grip ID to load
+     * @see                 Skateboard
+     * @since               1.0
+     */
+    private void loadModels(Skateboard skateboard)
+    {
+        // Get the currently selected deck
+        Deck selectedDeck = DeckConfigReader.getInstance().getDeck(skateboard.getDeck());
+
+        // Get the currently selected design
+        Design selectedDesign = DesignConfigReader.getInstance().getDesign(skateboard.getDesign());
+
+        // If the selected deck exists
+        if(selectedDeck != null)
+        {
+            Logger.info("Loading deck ID[" + selectedDeck.modelId + "]: and grip ID[" +
+                    selectedDeck.gripModelId);
+
+            // Load the selected deck model and apply a design to it when loaded
+            ThreadedOBJLoader.loadModel(selectedDeck.modelId, model ->
+            {
+                this.deckModel = model;
+
+                // Apply the design to the model
+                this.deckModel.setMaterial(new Material(selectedDesign.resourceId));
+            });
+
+            // Load the grip model that is associated to the deck
+            ThreadedOBJLoader.loadModel(selectedDeck.gripModelId, model ->
+            {
+                this.gripModel = model;
+
+                // Apply a grip material to the model
+                nextGrip();
+            });
+        }
+        else
+        {
+            Logger.error(TAG, "Failed to load deck because ID[" + skateboard.getDeck() +
+                    "] does not exist.");
+        }
     }
 }

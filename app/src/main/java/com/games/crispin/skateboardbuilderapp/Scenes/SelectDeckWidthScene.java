@@ -36,6 +36,18 @@ import java.util.List;
 import static com.games.crispin.skateboardbuilderapp.Constants.SELECT_DECK_WIDTH_DROPDOWN_PADDING;
 import static com.games.crispin.skateboardbuilderapp.Constants.SELECT_DECK_WIDTH_DROPDOWN_SIZE;
 
+/**
+ * The SelectDeckWidthScene class manages and displays a page that allows the user to select the
+ * desired deck width of there skateboard. The scene is accessed by clicking the 'New' button on the
+ * HomeScene. The class extends the CrispinEngine class 'Scene' which allows the engine to handle
+ * it.
+ *
+ * @see         HomeScene
+ * @see         Scene
+ * @author      Christian Benner
+ * @version     %I%, %G%
+ * @since       1.0
+ */
 public class SelectDeckWidthScene extends Scene
 {
     // Title of the scene
@@ -110,6 +122,12 @@ public class SelectDeckWidthScene extends Scene
     // Has a deck been selected yet
     private boolean deckSelected;
 
+    /**
+     * Constructor to create the select deck width scene. Creates all of the UI loads all of the
+     * decks into the dropdown ready to be selected by the user.
+     *
+     * @since   1.0
+     */
     public SelectDeckWidthScene()
     {
         // Set the background to a blue colour
