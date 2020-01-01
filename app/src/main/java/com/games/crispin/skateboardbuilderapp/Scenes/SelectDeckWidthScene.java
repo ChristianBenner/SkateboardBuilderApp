@@ -1,7 +1,5 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
-import android.widget.Toast;
-
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
@@ -17,6 +15,7 @@ import com.games.crispin.crispinmobile.UserInterface.Border;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 import com.games.crispin.crispinmobile.UserInterface.Dropdown;
 import com.games.crispin.crispinmobile.UserInterface.Text;
+import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
@@ -24,6 +23,7 @@ import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
+import com.games.crispin.skateboardbuilderapp.InfoPanel;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
@@ -74,29 +74,41 @@ public class SelectDeckWidthScene extends Scene
     // Transition object that allows us to fade the scene in and out
     private FadeTransition fadeTransition;
 
+    // Information panel
+    private InfoPanel infoPanel;
+
     // The loading icon UI
     private LoadingIcon loadingIcon;
 
     // Back button UI (return to home screen)
     private CustomButton backButton;
 
+    // Information button
+    private CustomButton infoButton;
+
     // Next button UI
     private Button nextButton;
-
-    // Width select dropdown UI
-    private Dropdown widthSelectDropdown;
 
     // Select deck width text UI
     private Text titleText;
 
+    // Width select dropdown UI
+    private Dropdown widthSelectDropdown;
+
     // The skateboard that is being worked on
     private Skateboard subject;
+
+    // The current deck that has been select
+    private Deck currentDeck;
 
     // Decks loaded from configuration file
     private List<Deck> decks;
 
     // Decks with associated IDs in the dropdown user interface
     private HashMap<Integer, Deck> dropdownUIDecks;
+
+    // Has a deck been selected yet
+    private boolean deckSelected;
 
     public SelectDeckWidthScene()
     {
@@ -109,6 +121,12 @@ public class SelectDeckWidthScene extends Scene
         // Read the current save if there is one
         subject = SaveManager.loadCurrentSave();
 
+        // A deck has not been selected yet
+        deckSelected = false;
+
+        // The current deck width selected
+        currentDeck = new Deck();
+
         // Create the user interface camera
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
 
@@ -117,7 +135,7 @@ public class SelectDeckWidthScene extends Scene
         modelCamera.setPosition(new Point3D(0.0f, 0.0f, 7.0f));
 
         // Position, re-size, colour and add touch listeners to the UI
-        setupUI();
+        initUI();
 
         // Load the decks from the config file into the dropdown UI
         loadDeckConfig();
@@ -130,20 +148,15 @@ public class SelectDeckWidthScene extends Scene
         touchRotation = new TouchRotation(DEFAULT_ROTATION_X, DEFAULT_ROTATION_Y);
     }
 
-    private void loadDeckConfig()
-    {
-        decks = DeckConfigReader.getInstance().getDecks();
-        dropdownUIDecks = new HashMap<>();
-
-        // Add the decks that have been loaded from the configuration file to a map so that they
-        // can be accessed easily later.
-        for(Deck deck : decks)
-        {
-            final int tempId = widthSelectDropdown.addItem(deck.name);
-            dropdownUIDecks.put(tempId, deck);
-        }
-    }
-
+    /**
+     * Update function overridden from the Scene parent class. The update function should contain
+     * the logic in the scene that needs to be updated frequently.
+     *
+     * @param deltaTime Timing value used to update logic based on time passed instead of update
+     *                  frequency
+     * @see             Scene
+     * @since           1.0
+     */
     @Override
     public void update(float deltaTime)
     {
@@ -155,6 +168,7 @@ public class SelectDeckWidthScene extends Scene
 
         // Update the custom buttons (because they have colours when held)
         backButton.update(deltaTime);
+        infoButton.update(deltaTime);
 
         // Update the model matrix to the most recent touch rotation values
         modelMatrix.reset();
@@ -166,6 +180,14 @@ public class SelectDeckWidthScene extends Scene
         fadeTransition.update(deltaTime);
     }
 
+    /**
+     * Render function overridden from the Scene parent class. The render function should contain
+     * the draw. The function is where the user interface is drawn so it is processed by the engine.
+     * It also renders the 3D model.
+     *
+     * @see     Scene
+     * @since   1.0
+     */
     @Override
     public void render()
     {
@@ -176,22 +198,103 @@ public class SelectDeckWidthScene extends Scene
         }
 
         // Draw all of the user interface
+        backButton.draw(uiCamera);
+
+        // Only draw the info button if a deck has been selected
+        if(deckSelected)
+        {
+            infoButton.draw(uiCamera);
+        }
+
+        nextButton.draw(uiCamera);
         titleText.draw(uiCamera);
         widthSelectDropdown.draw(uiCamera);
-        backButton.draw(uiCamera);
-        nextButton.draw(uiCamera);
         loadingIcon.draw(uiCamera);
+        infoPanel.draw(uiCamera);
         fadeTransition.draw(uiCamera);
     }
 
+    /**
+     * Touch function overridden from the Scene parent class. The touch function allows you to
+     * intercept user touch input and process it. The touch control on this page allows the user to
+     * control the rotation of the model view. It also feeds the touch event to the info panel.
+     *
+     * @param type      The type of touch event (e.g. click, release or drag)
+     * @param position  The position of the touch event (x, y)
+     * @see             Scene
+     * @since           1.0
+     */
     @Override
     public void touch(int type, Point2D position)
     {
-        touchRotation.touch(type, position);
+        // If the info panel is not visible, feed the touch rotation the touch event. This is
+        // so that the touch does not work whilst the info is being displayed. If the info panel is
+        // visible, feed the touch event to that instead.
+        if(!infoPanel.isVisible())
+        {
+            touchRotation.touch(type, position);
+        }
+        else
+        {
+            infoPanel.touch(type, position);
+        }
     }
 
-    private void setupUI()
+    /**
+     * Disable or enable all of the interactable user interface objects on the page
+     *
+     * @since   1.0
+     */
+    private void setEnabledStateAll(boolean state)
     {
+        infoButton.setEnabled(state);
+        backButton.setEnabled(state);
+        widthSelectDropdown.setEnabled(state);
+        nextButton.setEnabled(state);
+    }
+
+    /**
+     * Initialise, position and set-up all of the user interface on the page.
+     *
+     * @since   1.0
+     */
+    private void initUI()
+    {
+        // Create the information panel
+        infoPanel = new InfoPanel();
+
+        // Visibility listener to run code when the info panel is shown or hidden
+        infoPanel.setVisibilityListener(new InfoPanel.VisibilityListener()
+        {
+            /**
+             * Called when the information panel is shown. Used to disable all the interactable user
+             * interface on the page so that they cannot be interacted with whilst the information
+             * panel is visible.
+             *
+             * @since   1.0
+             */
+            @Override
+            public void onShow()
+            {
+                // Disable UI
+                setEnabledStateAll(false);
+            }
+
+            /**
+             * Called when the information panel is hidden. Used to enable all the interactable user
+             * interface on the page because it may have been previously disabled when the
+             * information panel was last shown.
+             *
+             * @since   1.0
+             */
+            @Override
+            public void onHide()
+            {
+                // Enable UI
+                setEnabledStateAll(true);
+            }
+        });
+
         // Create the fade transition object and set it to fade in
         fadeTransition = new FadeTransition();
         fadeTransition.setFadeColour(Constants.BACKGROUND_COLOR);
@@ -205,42 +308,8 @@ public class SelectDeckWidthScene extends Scene
 
         // Create the back button
         backButton = new CustomButton(R.drawable.back_icon);
-        nextButton = new Button(aileronRegularFont, "Next");
-        titleText = new Text(aileronRegularFont, SCENE_TITLE_TEXT, false,
-                true, Crispin.getSurfaceWidth());
-        widthSelectDropdown = new Dropdown("Select Width");
-
-
         backButton.setPosition(Constants.getBackButtonPosition());
         backButton.setSize(Constants.BACK_BUTTON_SIZE);
-
-        nextButton.setSize(Constants.NEXT_BUTTON_SIZE);
-        nextButton.setPosition(Constants.getNextButtonPosition());
-        nextButton.setColour(Constants.BACKGROUND_COLOR);
-        nextButton.setBorder(new Border(Colour.WHITE, 8));
-        nextButton.setTextColour(Colour.WHITE);
-        nextButton.setEnabled(false);
-
-        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f,
-                Constants.getBackButtonPosition().y -
-                Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
-
-        titleText.setColour(Colour.WHITE);
-        titleText.setPosition(TITLE_TEXT_POSITION);
-
-        final Point2D SELECT_DECK_WIDTH_DROPDOWN_POSITION = new Point2D(
-                SELECT_DECK_WIDTH_DROPDOWN_PADDING.x, TITLE_TEXT_POSITION.y -
-                SELECT_DECK_WIDTH_DROPDOWN_SIZE.y - SELECT_DECK_WIDTH_DROPDOWN_PADDING.y);
-
-        widthSelectDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
-        widthSelectDropdown.setSize(SELECT_DECK_WIDTH_DROPDOWN_SIZE);
-        widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
-        widthSelectDropdown.setColour(Constants.BACKGROUND_COLOR);
-        widthSelectDropdown.setTextColour(Colour.WHITE);
-        widthSelectDropdown.setBorderColour(Colour.WHITE);
-        widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
-
-        // Add touch listener to back button
         backButton.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -251,7 +320,26 @@ public class SelectDeckWidthScene extends Scene
             }
         });
 
-        // Add touch listener to next button
+        infoButton = new CustomButton(R.drawable.info_icon);
+        infoButton.setEnabled(false);
+        infoButton.setPosition(Constants.getInfoButtonPosition());
+        infoButton.setSize(Constants.INFO_BUTTON_SIZE);
+        infoButton.addTouchListener(e ->
+        {
+            if(e.getEvent() == TouchEvent.Event.RELEASE)
+            {
+                infoPanel.setText(currentDeck.info);
+                infoPanel.show();
+            }
+        });
+
+        nextButton = new Button(aileronRegularFont, "Next");
+        nextButton.setSize(Constants.NEXT_BUTTON_SIZE);
+        nextButton.setPosition(Constants.getNextButtonPosition());
+        nextButton.setColour(Constants.BACKGROUND_COLOR);
+        nextButton.setBorder(new Border(Colour.WHITE, 8));
+        nextButton.setTextColour(Colour.WHITE);
+        nextButton.setEnabled(false);
         nextButton.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -264,17 +352,32 @@ public class SelectDeckWidthScene extends Scene
                         SaveManager.writeCurrentSave(subject);
                         fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
                     }
-                    else
-                    {
-                        Toast.makeText(Crispin.getApplicationContext(),
-                                "Selected part invalid",
-                                Toast.LENGTH_LONG);
-                    }
                     break;
             }
         });
 
-        // Add touch listener to dropdown
+        titleText = new Text(aileronRegularFont, SCENE_TITLE_TEXT, false,
+                true, Crispin.getSurfaceWidth());
+
+        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f,
+                Constants.getBackButtonPosition().y -
+                        Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
+
+        titleText.setColour(Colour.WHITE);
+        titleText.setPosition(TITLE_TEXT_POSITION);
+
+        final Point2D SELECT_DECK_WIDTH_DROPDOWN_POSITION = new Point2D(
+                SELECT_DECK_WIDTH_DROPDOWN_PADDING.x, TITLE_TEXT_POSITION.y -
+                SELECT_DECK_WIDTH_DROPDOWN_SIZE.y - SELECT_DECK_WIDTH_DROPDOWN_PADDING.y);
+
+        widthSelectDropdown = new Dropdown("Select Width");
+        widthSelectDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
+        widthSelectDropdown.setSize(SELECT_DECK_WIDTH_DROPDOWN_SIZE);
+        widthSelectDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
+        widthSelectDropdown.setColour(Constants.BACKGROUND_COLOR);
+        widthSelectDropdown.setTextColour(Colour.WHITE);
+        widthSelectDropdown.setBorderColour(Colour.WHITE);
+        widthSelectDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
         widthSelectDropdown.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -291,8 +394,12 @@ public class SelectDeckWidthScene extends Scene
                         loadingIcon.show();
 
                         // Load the deck associated to the selected ID
-                        Deck deck = dropdownUIDecks.get(selectedId);
-                        ThreadedOBJLoader.loadModel(deck.modelId, model ->
+                        currentDeck = dropdownUIDecks.get(selectedId);
+
+                        infoButton.setEnabled(true);
+                        deckSelected = true;
+
+                        ThreadedOBJLoader.loadModel(currentDeck.modelId, model ->
                         {
                             this.model = model;
                             this.model.setMaterial(BOARD_GREY);
@@ -306,12 +413,32 @@ public class SelectDeckWidthScene extends Scene
 
                             loadingIcon.hide();
                             nextButton.setEnabled(true);
-                            subject.setDeck(deck.id);
+                            subject.setDeck(currentDeck.id);
                         });
                     }
 
                     break;
             }
         });
+    }
+
+    /**
+     * Load the decks from the deck config file and put them in the dropdown user interface
+     *
+     * @see     DeckConfigReader
+     * @since   1.0
+     */
+    private void loadDeckConfig()
+    {
+        decks = DeckConfigReader.getInstance().getDecks();
+        dropdownUIDecks = new HashMap<>();
+
+        // Add the decks that have been loaded from the configuration file to a map so that they
+        // can be accessed easily later.
+        for(Deck deck : decks)
+        {
+            final int tempId = widthSelectDropdown.addItem(deck.name);
+            dropdownUIDecks.put(tempId, deck);
+        }
     }
 }
