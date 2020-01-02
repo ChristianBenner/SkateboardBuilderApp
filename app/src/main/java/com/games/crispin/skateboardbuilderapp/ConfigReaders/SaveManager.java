@@ -49,7 +49,7 @@ public class SaveManager
         catch (Exception e)
         {
             e.printStackTrace();
-            return null;
+            return new Skateboard();
         }
     }
 
@@ -57,6 +57,7 @@ public class SaveManager
     {
         try
         {
+            System.out.println("Writing save file currentsave.xml");
             FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("currentsave.xml", Context.MODE_PRIVATE);
             XmlSerializer serializer = Xml.newSerializer();
             serializer.setOutput(fileOutputStream, "UTF-8");
@@ -88,6 +89,7 @@ public class SaveManager
         }
         catch (Exception e)
         {
+            System.err.println("Failed to write save file currentsave.xml");
             e.printStackTrace();
         }
     }
@@ -103,7 +105,7 @@ public class SaveManager
         catch (Exception e)
         {
             e.printStackTrace();
-            return null;
+            return new ArrayList<>();
         }
     }
 

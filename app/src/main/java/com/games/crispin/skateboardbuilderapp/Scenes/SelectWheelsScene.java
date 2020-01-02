@@ -6,7 +6,7 @@ import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera2D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
+import com.games.crispin.crispinmobile.UserInterface.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
@@ -361,7 +361,7 @@ public class SelectWheelsScene extends Scene
         {
             if(e.getEvent() == TouchEvent.Event.RELEASE)
             {
-                subject.setDesign(currentWheel.id);
+                subject.setWheels(currentWheel.id);
 
                 // Save the current skateboard
                 SaveManager.writeCurrentSave(subject);

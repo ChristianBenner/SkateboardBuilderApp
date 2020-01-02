@@ -3,7 +3,7 @@ package com.games.crispin.skateboardbuilderapp.Scenes;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point2D;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
+import com.games.crispin.crispinmobile.UserInterface.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
@@ -136,14 +136,14 @@ public class SelectDeckWidthScene extends Scene
         // Load the default board material
         BOARD_GREY = new Material(new Texture(R.drawable.grey));
 
-        // Read the current save if there is one
-        subject = SaveManager.loadCurrentSave();
-
         // A deck has not been selected yet
         deckSelected = false;
 
         // The current deck width selected
         currentDeck = new Deck();
+
+        // Get the board that is currently being worked on
+        subject = SaveManager.loadCurrentSave();
 
         // Create the user interface camera
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
@@ -363,11 +363,13 @@ public class SelectDeckWidthScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-
-                    if(subject.getDeck() != Skateboard.NO_PART)
+                    if(deckSelected)
                     {
+                        subject.setDeck(currentDeck.id);
+
                         // Save the currently selected board
                         SaveManager.writeCurrentSave(subject);
+
                         fadeTransition.fadeOutToScence(SelectDeckDesignScene::new);
                     }
                     break;
@@ -431,7 +433,6 @@ public class SelectDeckWidthScene extends Scene
 
                             loadingIcon.hide();
                             nextButton.setEnabled(true);
-                            subject.setDeck(currentDeck.id);
                         });
                     }
 

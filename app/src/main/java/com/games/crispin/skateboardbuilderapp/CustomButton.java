@@ -1,7 +1,7 @@
 package com.games.crispin.skateboardbuilderapp;
 
 import com.games.crispin.crispinmobile.Rendering.Data.Colour;
-import com.games.crispin.crispinmobile.Rendering.Utilities.Font;
+import com.games.crispin.crispinmobile.UserInterface.Font;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.crispinmobile.UserInterface.Button;
 
