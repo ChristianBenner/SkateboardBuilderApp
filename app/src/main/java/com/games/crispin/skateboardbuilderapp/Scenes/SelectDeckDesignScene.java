@@ -206,8 +206,8 @@ public class SelectDeckDesignScene extends Scene
 
     /**
      * Render function overridden from the Scene parent class. The render function should contain
-     * the draw. The function is where the user interface is drawn so it is processed by the engine.
-     * It also renders the 3D model.
+     * the draw calls. The function is where the user interface is drawn so it is processed by the
+     * engine. It also renders the 3D model.
      *
      * @see     Scene
      * @since   1.0

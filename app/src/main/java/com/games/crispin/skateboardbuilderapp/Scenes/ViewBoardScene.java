@@ -1,7 +1,9 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
 import android.app.AlertDialog;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.widget.EditText;
 
 import com.games.crispin.crispinmobile.Crispin;
@@ -45,10 +47,38 @@ import com.games.crispin.skateboardbuilderapp.TouchRotation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ViewBoardScene class manages and displays a page that allows the user to view the board that
+ * they have designed in the previous component selection scenes. The class
+ * extends the CrispinEngine class 'Scene' which allows the engine to handle it.
+ *
+ * @see         Scene
+ * @author      Christian Benner
+ * @version     %I%, %G%
+ * @since       1.0
+ */
 public class ViewBoardScene extends Scene
 {
     // Tag used for logging
     private static final String TAG = "ViewBoardScene";
+
+    // Default name of the skateboard design
+    private static final String DEFAULT_NAME = "Skateboard";
+
+    // Scale of the deck model
+    private static final float DECK_SCALE = 0.2f;
+
+    // Scale of the grip model
+    private static final float GRIP_SCALE = 0.2f;
+
+    // Scale of the truck models
+    private static final float TRUCK_SCALE = 0.07f;
+
+    // Scale of the wheel models
+    private static final float WHEEL_SCALE = 1.157f * TRUCK_SCALE;
+
+    // Scale of the bearing models
+    private static final float BEARING_SCALE = 3.040f * TRUCK_SCALE;
 
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
@@ -158,17 +188,13 @@ public class ViewBoardScene extends Scene
     // Select deck width text UI
     private Text titleText;
 
-
-
-    private static final String DEFAULT_NAME = "Skateboard";
-
-    private static final float DECK_SCALE = 0.2f;
-    private static final float GRIP_SCALE = 0.2f;
-    private static final float TRUCK_SCALE = 0.07f;
-    private static final float WHEEL_SCALE = 1.157f * TRUCK_SCALE;
-    private static final float BEARING_SCALE = 3.040f * TRUCK_SCALE;
-
-
+    /**
+     * The view board scene allows the user to see the board that they have designed throughout the
+     * component selection scenes. It will read the current save configuration and build the
+     * skateboard using relative positions stored in the component configuration data.
+     *
+     * @since   1.0
+     */
     public ViewBoardScene()
     {
         // Set the background to a blue colour
@@ -263,21 +289,34 @@ public class ViewBoardScene extends Scene
         initUI();
     }
 
+    /**
+     * Update function overridden from the Scene parent class. The update function should contain
+     * the logic in the scene that needs to be updated frequently. In this function the models are
+     * positioned and rotated according to the touch rotation object.
+     *
+     * @param deltaTime Timing value used to update logic based on time passed instead of update
+     *                  frequency
+     * @see             Scene
+     * @since           1.0
+     */
     @Override
     public void update(float deltaTime)
     {
         touchRotation.update(deltaTime);
 
+        // Update the deck model if it exists
         if(deck != null)
         {
             deck.update(touchRotation);
         }
 
+        // Update the grip model if it exists
         if(grip != null)
         {
             grip.update(touchRotation);
         }
 
+        // Update the truck models if they exist
         if(truckOne != null && truckTwo != null)
         {
             // Update the trucks
@@ -297,9 +336,21 @@ public class ViewBoardScene extends Scene
             bearingModels.get(i).update(touchRotation);
         }
 
+        // Update the custom button UI
+        backButton.update(deltaTime);
+        editNameButton.update(deltaTime);
+
+        // Update the fade transition object
         fadeTransition.update(deltaTime);
     }
 
+    /**
+     * Render function overridden from the Scene parent class. The render function should contain
+     * the draw calls. In this function all of the 3D models are rendered
+     *
+     * @see     Scene
+     * @since   1.0
+     */
     @Override
     public void render()
     {
@@ -332,22 +383,36 @@ public class ViewBoardScene extends Scene
             bearingModels.get(i).render(modelCamera);
         }
 
+        // Draw the user interface
         titleText.draw(uiCamera);
         buyButton.draw(uiCamera);
         backButton.draw(uiCamera);
         editNameButton.draw(uiCamera);
-
-
         loadingIcon.draw(uiCamera);
         fadeTransition.draw(uiCamera);
     }
 
+    /**
+     * Touch function overridden from the Scene parent class. The touch function allows you to
+     * intercept user touch input and process it. The touch control on this page allows the user to
+     * control the rotation of the model view.
+     *
+     * @param type      The type of touch event (e.g. click, release or drag)
+     * @param position  The position of the touch event (x, y)
+     * @see             Scene
+     * @since           1.0
+     */
     @Override
     public void touch(int type, Point2D position)
     {
         touchRotation.touch(type, position);
     }
 
+    /**
+     * Initialise, position and set-up all of the user interface on the page.
+     *
+     * @since   1.0
+     */
     private void initUI()
     {
         // Create the fade transition object and set it to fade in
@@ -363,27 +428,8 @@ public class ViewBoardScene extends Scene
 
         // Create the back button
         backButton = new CustomButton(R.drawable.back_icon);
-        buyButton = new Button(aileronRegularFont, "Buy");
-
-        titleText = new Text(aileronRegularFont, subject.getName(), false,
-                true, Crispin.getSurfaceWidth());
-
         backButton.setPosition(Constants.getBackButtonPosition());
         backButton.setSize(Constants.BACK_BUTTON_SIZE);
-
-        buyButton.setSize(Constants.NEXT_BUTTON_SIZE);
-        buyButton.setPosition(Constants.getNextButtonPosition());
-        buyButton.setColour(Constants.BACKGROUND_COLOR);
-        buyButton.setBorder(new Border(Colour.WHITE, 8));
-        buyButton.setTextColour(Colour.WHITE);
-
-        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, Constants.getBackButtonPosition().y -
-                Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
-
-        titleText.setColour(Colour.WHITE);
-        titleText.setPosition(TITLE_TEXT_POSITION);
-
-        // Add touch listener to back button
         backButton.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -394,7 +440,12 @@ public class ViewBoardScene extends Scene
             }
         });
 
-        // Add touch listener to next button
+        buyButton = new Button(aileronRegularFont, "Buy");
+        buyButton.setSize(Constants.NEXT_BUTTON_SIZE);
+        buyButton.setPosition(Constants.getNextButtonPosition());
+        buyButton.setColour(Constants.BACKGROUND_COLOR);
+        buyButton.setBorder(new Border(Colour.WHITE, 8));
+        buyButton.setTextColour(Colour.WHITE);
         buyButton.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -417,6 +468,15 @@ public class ViewBoardScene extends Scene
             }
         });
 
+        titleText = new Text(aileronRegularFont, subject.getName(), false,
+                true, Crispin.getSurfaceWidth());
+
+        final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, Constants.getBackButtonPosition().y -
+                Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
+
+        titleText.setColour(Colour.WHITE);
+        titleText.setPosition(TITLE_TEXT_POSITION);
+
         editNameButton = new CustomButton(R.drawable.edit_icon);
         Scale2D size = new Scale2D(120.0f, 120.0f);
         Point2D padding = new Point2D(0.0f, 50.0f);
@@ -437,12 +497,37 @@ public class ViewBoardScene extends Scene
         });
     }
 
+    /**
+     * Presents a dialogue with a text box that allows the user to enter a name for their design.
+     *
+     * @since   1.0
+     */
     private void enterName()
     {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(Crispin.getActivity());
         alertBuilder.setTitle("Enter a name for your design");
         EditText textInput = new EditText(Crispin.getActivity());
         textInput.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        // Limit the input to only letters and numbers (also exclamation and question mark)
+        textInput.setFilters(new InputFilter[] {
+                (src, start, end, dst, dstart, dend) ->
+                {
+                    // Allow user to enter backspace
+                    if(src.equals(""))
+                    {
+                        return src;
+                    }
+
+                    // Limit the text to letters and number
+                    if(src.toString().matches("[a-zA-Z 0-9!?]+"))
+                    {
+                        return src;
+                    }
+
+                    return "";
+                }
+        });
         alertBuilder.setView(textInput);
 
         alertBuilder.setPositiveButton("Ok", (dialog, which) ->
@@ -460,35 +545,69 @@ public class ViewBoardScene extends Scene
         alertBuilder.show();
     }
 
-
-
-
+    /**
+     * Loads the deck model and applies a material to it. The deck model that it loads depends on
+     * the ID contained in the deck parameter. The material that is applied depends on the resource
+     * ID of the design parameter.
+     *
+     * @param deck      The deck data which contains the ID of the model to load
+     * @param design    The design data which contains the resource ID of the texture to load
+     * @since           1.0
+     */
     private void loadDeck(Deck deck, Design design)
     {
+        // Load the model on another thread
         ThreadedOBJLoader.loadModel(deck.modelId, model ->
         {
+            // Apply the design to the deck model by loading its texture
             model.setMaterial(new Material(design.resourceId));
+
+            // Create a new component model using the loaded model
             this.deck = new ComponentModel(model, new Point3D(), 0.0f, 0.0f,
                     DECK_SCALE);
         });
     }
 
+    /**
+     * Loads the grip model and applies a material to it. The grip model that it loads depends on
+     * the griptape ID contained in the deck parameter. The material that is applied depends on the
+     * resource ID of the grip parameter.
+     *
+     * @param deck  The deck data which contains the grip ID of the model to load
+     * @param grip  The grip data which contains the resource ID of the texture to load
+     * @since       1.0
+     */
     private void loadGrip(Deck deck, Grip grip)
     {
+        // Load the model on another thread
         ThreadedOBJLoader.loadModel(deck.gripModelId, model ->
         {
+            // Apply the design to the griptape model by loading its texture
             model.setMaterial(new Material(grip.resourceId));
+
+            // Create a new component model using the loaded model
             this.grip = new ComponentModel(model, new Point3D(), 0.0f, 0.0f,
                     GRIP_SCALE);
         });
     }
 
+    /**
+     * Loads the truck model and applies a material to it. The truck model that it loads depends on
+     * the truck ID contained in the truck parameter. The material that is applied depends on the
+     * resource ID also contained in the truck parameter.
+     *
+     * @param truck The truck data which contains the truck model ID and texture resource ID
+     * @since       1.0
+     */
     private void loadTrucks(Truck truck)
     {
+        // Load the model on another thread
         ThreadedOBJLoader.loadModel(truck.modelResourceId, model ->
         {
+            // Apply the design to the truck model by loading its texture
             model.setMaterial(new Material(truck.resourceId));
 
+            // Create a new component models using the loaded model
             truckOne = new ComponentModel(model, truckOnePos, 0.0f, 0.0f,
                     TRUCK_SCALE);
             truckTwo = new ComponentModel(model, truckTwoPos, 180.0f, 0.0f,
@@ -496,14 +615,27 @@ public class ViewBoardScene extends Scene
         });
     }
 
+    /**
+     * Loads the wheel model and applies a material to it. The wheel model that it loads is
+     * contained in the 'raw' resources folder. This is because the application does not cater for
+     * differently shapes wheels as this is very uncommon in skateboarding. The material that is
+     * applied depends on the resource ID contained in the wheel parameter.
+     *
+     * @param wheel The wheel data which contains the wheel texture resource ID
+     * @since       1.0
+     */
     private void loadWheels(Wheel wheel)
     {
+        // Create the wheel model array list
         wheelModels = new ArrayList<>();
 
+        // Load the model on another thread
         ThreadedOBJLoader.loadModel(R.raw.wheels, model ->
         {
+            // Apply the design to the wheel model by loading its texture
             model.setMaterial(new Material(wheel.resourceId));
 
+            // Create a new component models using the loaded model
             wheelModels.add(new ComponentModel(model, wheelOneRealPos, 0.0f,
                     90.0f, WHEEL_SCALE));
             wheelModels.add(new ComponentModel(model, wheelTwoRealPos, 0.0f,
@@ -515,14 +647,27 @@ public class ViewBoardScene extends Scene
         });
     }
 
+    /**
+     * Loads the bearing model and applies a material to it. The bearing model that it loads is
+     * contained in the 'raw' resources folder. This is because the application does not cater for
+     * differently shapes bearings as skateboard bearings come in only one shape. The material that
+     * is applied depends on the resource ID contained in the bearing parameter.
+     *
+     * @param bearing   The bearing data which contains the bearing texture resource ID
+     * @since           1.0
+     */
     private void loadBearings(Bearing bearing)
     {
+        // Create the bearing model array list
         bearingModels = new ArrayList<>();
 
+        // Load the model on another thread
         ThreadedOBJLoader.loadModel(R.raw.bearings, model ->
         {
+            // Apply the design to the bearing model by loading its texture
             model.setMaterial(new Material(bearing.resourceId));
 
+            // Create a new component models using the loaded model
             bearingModels.add(new ComponentModel(model, bearingOneRealPos, 0.0f,
                     90.0f, BEARING_SCALE));
             bearingModels.add(new ComponentModel(model, bearingTwoRealPos, 0.0f,
