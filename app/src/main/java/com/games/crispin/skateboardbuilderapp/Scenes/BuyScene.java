@@ -16,6 +16,7 @@ import com.games.crispin.skateboardbuilderapp.ConfigReaders.DesignConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.GripConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.TruckConfigReader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
@@ -25,6 +26,7 @@ import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Truck;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -79,10 +81,15 @@ public class BuyScene extends Scene
 
     private Text totalText;
 
+    private boolean showText;
+
     public BuyScene()
     {
         // Set the background to a blue colour
         Crispin.setBackgroundColour(Constants.BACKGROUND_COLOR);
+
+        // To show the text or not
+        showText = false;
 
         // Create the user interface camera
         uiCamera = new Camera2D(0, 0, Crispin.getSurfaceWidth(), Crispin.getSurfaceHeight());
@@ -120,7 +127,7 @@ public class BuyScene extends Scene
             switch (e.getEvent())
             {
                 case RELEASE:
-                    fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
+                    fadeTransition.fadeOutToScence(HomeScene::new);
                     break;
             }
         });
@@ -171,7 +178,10 @@ public class BuyScene extends Scene
                 case RELEASE:
                     int selectedId = saveDropdown.getSelectedId();
 
-                    Design design = DesignConfigReader.getInstance().getDesign(selectedId);
+                    Skateboard board = dropdownComponents.get(selectedId);
+
+                    // DESIGN TEXT AND PRICE
+                    Design design = DesignConfigReader.getInstance().getDesign(board.getDesign());
                     deckText.setText("Deck: " + design.name);
                     deckText.setPosition(50.0f, partListTitle.getPosition().y - 25.0f -
                             deckText.getHeight());
@@ -181,7 +191,9 @@ public class BuyScene extends Scene
                             partListTitle.getPosition().y - 25.0f -
                                     deckPrice.getHeight());
 
-                    Grip grip = GripConfigReader.getInstance().getGrip(selectedId);
+
+                    // GRIP TEXT AND PRICE
+                    Grip grip = GripConfigReader.getInstance().getGrip(board.getGrip());
                     gripText.setText("Grip: " + grip.name);
                     gripText.setPosition(50.0f, deckText.getPosition().y - 25.0f - gripText.getHeight());
 
@@ -189,7 +201,9 @@ public class BuyScene extends Scene
                     gripPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - gripPrice.getWidth(),
                             deckText.getPosition().y - 25.0f - gripPrice.getHeight());
 
-                    Truck truck = TruckConfigReader.getInstance().getTruck(selectedId);
+
+                    // TRUCK TEXT AND PRICE
+                    Truck truck = TruckConfigReader.getInstance().getTruck(board.getTrucks());
                     truckText.setText("Truck: " + truck.name);
                     truckText.setPosition(50.0f, gripText.getPosition().y - 25.0f -
                             truckText.getHeight());
@@ -198,7 +212,34 @@ public class BuyScene extends Scene
                     truckPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - truckPrice.getWidth(),
                             gripText.getPosition().y - 25.0f - truckPrice.getHeight());
 
-                    Bearing bearing = BearingConfigReader.getInstance().getBearing(selectedId);
+
+                    // BEARING TEXT AND PRICE
+                    Bearing bearing = BearingConfigReader.getInstance().getBearing(board.getBearings());
+                    bearingText.setText("Bearing: " + bearing.name);
+                    bearingText.setPosition(50.0f, truckPrice.getPosition().y - 25.0f -
+                            bearingText.getHeight());
+
+                    bearingPrice.setText(priceFormat(bearing.price));
+                    bearingPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - bearingPrice.getWidth(),
+                            truckText.getPosition().y - 25.0f - bearingPrice.getHeight());
+
+
+                    // WHEEL TEXT AND PRICE
+                    Wheel wheel  = WheelConfigReader.getInstance().getWheel(board.getWheels());
+                    wheelText.setText("Wheel: " + wheel.name);
+                    wheelText.setPosition(50.0f, bearingText.getPosition().y - 25.0f -
+                            wheelText.getHeight());
+
+                    wheelPrice.setText(priceFormat(wheel.price));
+                    wheelPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - wheelPrice.getWidth(),
+                            bearingText.getPosition().y - 25.0f - wheelPrice.getHeight());
+
+                    float total = design.price + grip.price + truck.price + bearing.price +
+                            wheel.price;
+                    totalText.setText("Total: " + priceFormat(total));
+                    totalText.setPosition(50.0f, wheelText.getPosition().y - 100.0f);
+
+                    showText = true;
                     break;
             }
         });
@@ -249,6 +290,37 @@ public class BuyScene extends Scene
                 gripText.getPosition().y - 25.0f - gripPrice.getHeight());
         truckPrice.setColour(Colour.WHITE);
 
+        bearingText = new Text(partInfoFont, "Bearing: None selected", true,
+                false, Crispin.getSurfaceWidth());
+        bearingText.setPosition(50.0f, truckText.getPosition().y - 25.0f -
+                bearingText.getHeight());
+        bearingText.setColour(Colour.WHITE);
+
+        bearingPrice = new Text(partInfoFont, "£0.00", true,
+                false, Crispin.getSurfaceWidth());
+        bearingPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - bearingPrice.getWidth(),
+                truckText.getPosition().y - 25.0f - bearingPrice.getHeight());
+        bearingPrice.setColour(Colour.WHITE);
+
+        // Wheel text and price
+        wheelText = new Text(partInfoFont, "Wheel: None selected", true,
+                false, Crispin.getSurfaceWidth());
+        wheelText.setPosition(50.0f, bearingText.getPosition().y - 25.0f -
+                wheelText.getHeight());
+        wheelText.setColour(Colour.WHITE);
+
+        wheelPrice = new Text(partInfoFont, "£0.00", true,
+                false, Crispin.getSurfaceWidth());
+        wheelPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - wheelPrice.getWidth(),
+                bearingText.getPosition().y - 25.0f - wheelPrice.getHeight());
+        wheelPrice.setColour(Colour.WHITE);
+
+        totalText = new Text(partInfoFont, "Total: £0.00", true, false,
+                Crispin.getSurfaceWidth());
+        totalText.setPosition(50.0f, wheelText.getPosition().y - 100.0f);
+        totalText.setColour(Colour.WHITE);
+
+
 /*        private Text truckText;
         private Text truckPrice;
 
@@ -274,36 +346,21 @@ public class BuyScene extends Scene
         backButton.draw(uiCamera);
         buyButton.draw(uiCamera);
         titleText.draw(uiCamera);
-        partListTitle.draw(uiCamera);
 
-        if(deckText != null)
+        if(showText)
         {
+            partListTitle.draw(uiCamera);
             deckText.draw(uiCamera);
-        }
-
-        if(deckPrice != null)
-        {
             deckPrice.draw(uiCamera);
-        }
-
-        if(gripText != null)
-        {
             gripText.draw(uiCamera);
-        }
-
-        if(gripPrice != null)
-        {
             gripPrice.draw(uiCamera);
-        }
-
-        if(truckText != null)
-        {
             truckText.draw(uiCamera);
-        }
-
-        if(truckPrice != null)
-        {
             truckPrice.draw(uiCamera);
+            bearingText.draw(uiCamera);
+            bearingPrice.draw(uiCamera);
+            wheelText.draw(uiCamera);
+            wheelPrice.draw(uiCamera);
+            totalText.draw(uiCamera);
         }
 
         saveDropdown.draw(uiCamera);
