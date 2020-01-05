@@ -427,7 +427,7 @@ public class SelectDeckDesignScene extends Scene
      *
      * @since   1.0
      */
-    private void setDesign()
+    private void setDesign(int designArrayIndex)
     {
         // Check if the design array doesn't exist or have any contents
         if(designs == null || designs.isEmpty())
@@ -476,25 +476,25 @@ public class SelectDeckDesignScene extends Scene
     /**
      * Set the design of the deck to the next one in the array
      *
-     * @see     #setDesign()
+     * @see     #setDesign(int)
      * @since   1.0
      */
     private void nextDesign()
     {
         designArrayIndex++;
-        setDesign();
+        setDesign(designArrayIndex);
     }
 
     /**
      * Set the design of the deck to the previous one in the array
      *
-     * @see     #setDesign()
+     * @see     #setDesign(int)
      * @since   1.0
      */
     private void previousDesign()
     {
         designArrayIndex--;
-        setDesign();
+        setDesign(designArrayIndex);
     }
 
     /**
@@ -537,7 +537,24 @@ public class SelectDeckDesignScene extends Scene
             ThreadedOBJLoader.loadModel(selectedDeck.modelId, model ->
             {
                 this.model = model;
-                nextDesign();
+
+                // If the skateboard subject has a design, load that by default
+                if(skateboard.getDesign() != Skateboard.NO_PART)
+                {
+                    // Set the new current design
+                    currentDesign = DesignConfigReader.getInstance().
+                            getDesign(skateboard.getDesign());
+
+                    // Set the selected object text to display the name of the new design
+                    selectedObjectText.setText(currentDesign.name);
+
+                    // Set the model material
+                    model.setMaterial(designMaterials.get(currentDesign.id));
+                }
+                else
+                {
+                    nextDesign();
+                }
             });
         }
         else

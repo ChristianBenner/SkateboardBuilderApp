@@ -18,6 +18,7 @@ import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.TruckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
@@ -160,7 +161,24 @@ public class SelectWheelsScene extends Scene
         ThreadedOBJLoader.loadModel(R.raw.wheels, model ->
         {
             this.model = model;
-            nextWheel();
+
+            // If the skateboard subject has a wheel, load that by default
+            if(subject.getWheels() != Skateboard.NO_PART)
+            {
+                // Set the new current wheel
+                currentWheel = WheelConfigReader.getInstance().getWheel(subject.getWheels());
+
+                // Set the selected object text to display the name of the new wheel
+                selectedObjectText.setText(currentWheel.name);
+
+                // Set the model material
+                model.setMaterial(wheelMaterials.get(currentWheel.id));
+            }
+            else
+            {
+                // Apply a wheel material to the model
+                nextWheel();
+            }
         });
 
         // Create the model matrix for transforming the model

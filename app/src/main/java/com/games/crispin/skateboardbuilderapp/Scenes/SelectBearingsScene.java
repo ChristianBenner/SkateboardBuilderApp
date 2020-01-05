@@ -20,6 +20,7 @@ import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.BearingConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
@@ -530,7 +531,25 @@ public class SelectBearingsScene extends Scene
         ThreadedOBJLoader.loadModel(R.raw.bearings, model ->
         {
             this.model = model;
-            nextBearing();
+
+            // If the skateboard subject has a bearing, load that by default
+            if(subject.getBearings() != Skateboard.NO_PART)
+            {
+                // Set the new current bearing
+                currentBearing = BearingConfigReader.getInstance().getBearing(
+                        subject.getBearings());
+
+                // Set the selected object text to display the name of the new bearing
+                selectedObjectText.setText(currentBearing.name);
+
+                // Set the model material
+                model.setMaterial(bearingMaterials.get(currentBearing.id));
+            }
+            else
+            {
+                // Apply a bearing material to the model
+                nextBearing();
+            }
         });
     }
 }

@@ -17,6 +17,7 @@ import com.games.crispin.crispinmobile.UserInterface.TouchEvent;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.crispinmobile.Utilities.ThreadedOBJLoader;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.GripConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.TruckConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
@@ -162,7 +163,33 @@ public class SelectTrucksScene extends Scene
         // Initialise all of the user interface on the page
         initUI();
 
-        nextTruck();
+        // If the skateboard subject has a truck, load that by default
+        if(subject.getTrucks() != Skateboard.NO_PART)
+        {
+            // Set the new current grip
+            currentTruck = TruckConfigReader.getInstance().getTruck(subject.getTrucks());
+
+            // Set the selected object text to display the name of the new truck
+            selectedObjectText.setText(currentTruck.name);
+
+            // Show the loading icon
+            loadingIcon.show();
+
+            // Load new truck
+            ThreadedOBJLoader.loadModel(currentTruck.modelResourceId, model ->
+            {
+                this.model = model;
+                loadingIcon.hide();
+            });
+
+            // Set the model material
+            model.setMaterial(truckMaterials.get(currentTruck.id));
+        }
+        else
+        {
+            // Apply a truck material to the model
+            nextTruck();
+        }
 
         // Create the model matrix for transforming the model
         modelMatrix = new ModelMatrix();

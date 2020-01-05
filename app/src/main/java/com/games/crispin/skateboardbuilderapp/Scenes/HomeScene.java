@@ -12,10 +12,12 @@ import com.games.crispin.crispinmobile.UserInterface.LinearLayout;
 import com.games.crispin.crispinmobile.UserInterface.Text;
 import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
+import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.R;
+import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 
 /**
  * The HomeScene class manages and displays the Home page in the application. It is the page that
@@ -253,6 +255,10 @@ public class HomeScene extends Scene
                 // Stop wiggling the text above the button
                 newText.disableWiggle();
 
+                // Clear the current save because we do not want the select component scenes to
+                // open on any existing save
+                SaveManager.writeCurrentSave(new Skateboard());
+
                 // Transition to the first scene in board creation (the Select Deck Width page)
                 fadeTransition.fadeOutToScence(SelectDeckWidthScene::new);
                 break;
@@ -304,6 +310,9 @@ public class HomeScene extends Scene
             case RELEASE:
                 // Stop wiggling the text above the button
                 buyText.disableWiggle();
+
+                // Transition to the buy page
+                fadeTransition.fadeOutToScence(BuyScene::new);
                 break;
         }
     };

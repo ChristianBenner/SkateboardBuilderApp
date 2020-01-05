@@ -30,8 +30,12 @@ import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.games.crispin.skateboardbuilderapp.Constants.SELECT_DECK_WIDTH_DROPDOWN_PADDING;
 import static com.games.crispin.skateboardbuilderapp.Constants.SELECT_DECK_WIDTH_DROPDOWN_SIZE;
@@ -164,6 +168,27 @@ public class SelectDeckWidthScene extends Scene
         // Create touch rotation object that calculated the rotation for the 3D view when the user
         // interacts with the page
         touchRotation = new TouchRotation(DEFAULT_ROTATION_X, DEFAULT_ROTATION_Y);
+
+        // If the subject contains an already selected deck its because we have opened a save not
+        // started a new one. Load the deck in the save
+        if(subject != null)
+        {
+            if(subject.getDeck() != Skateboard.NO_PART)
+            {
+                Set<Map.Entry<Integer, Deck>> set = dropdownUIDecks.entrySet();
+                for(Map.Entry<Integer, Deck> val : set)
+                {
+                    if(val.getValue().id == subject.getDeck())
+                    {
+                        widthSelectDropdown.selectItemInList(val.getKey());
+
+                        // Load the deck
+                        loadDeck(widthSelectDropdown.getSelectedId());
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -407,38 +432,42 @@ public class SelectDeckWidthScene extends Scene
                     break;
                 case RELEASE:
                     int selectedId = widthSelectDropdown.getSelectedId();
-
-                    if(dropdownUIDecks.containsKey(selectedId))
-                    {
-                        model = null;
-                        loadingIcon.show();
-
-                        // Load the deck associated to the selected ID
-                        currentDeck = dropdownUIDecks.get(selectedId);
-
-                        infoButton.setEnabled(true);
-                        deckSelected = true;
-
-                        ThreadedOBJLoader.loadModel(currentDeck.modelId, model ->
-                        {
-                            this.model = model;
-                            this.model.setMaterial(BOARD_GREY);
-
-                            modelScale = 0.2f;
-
-                            modelMatrix.reset();
-                            modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
-                            modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
-                            modelMatrix.scale(modelScale);
-
-                            loadingIcon.hide();
-                            nextButton.setEnabled(true);
-                        });
-                    }
-
+                    loadDeck(selectedId);
                     break;
             }
         });
+    }
+
+    private void loadDeck(int selectedId)
+    {
+        if(dropdownUIDecks.containsKey(selectedId))
+        {
+            model = null;
+            loadingIcon.show();
+
+            // Load the deck associated to the selected ID
+            currentDeck = dropdownUIDecks.get(selectedId);
+
+            infoButton.setEnabled(true);
+            deckSelected = true;
+
+            ThreadedOBJLoader.loadModel(currentDeck.modelId, model ->
+            {
+                this.model = model;
+                this.model.setMaterial(BOARD_GREY);
+
+                modelScale = 0.2f;
+
+                modelMatrix = new ModelMatrix();
+                modelMatrix.reset();
+                modelMatrix.rotate(touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
+                modelMatrix.rotate(touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+                modelMatrix.scale(modelScale);
+
+                loadingIcon.hide();
+                nextButton.setEnabled(true);
+            });
+        }
     }
 
     /**

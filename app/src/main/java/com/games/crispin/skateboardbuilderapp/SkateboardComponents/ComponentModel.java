@@ -2,8 +2,10 @@ package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
 import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Camera3D;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Material;
 import com.games.crispin.crispinmobile.Rendering.Utilities.Model;
 import com.games.crispin.crispinmobile.Rendering.Utilities.ModelMatrix;
+import com.games.crispin.crispinmobile.Rendering.Utilities.Texture;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
 
 public class ComponentModel
@@ -28,6 +30,11 @@ public class ComponentModel
         this.scale = scale;
 
         modelMatrix = new ModelMatrix();
+    }
+
+    public void setTexture(int resourceId)
+    {
+        model.setMaterial(new Material(resourceId));
     }
 
     public void update(TouchRotation touchRotation)

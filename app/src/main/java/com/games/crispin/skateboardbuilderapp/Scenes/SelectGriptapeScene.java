@@ -544,8 +544,24 @@ public class SelectGriptapeScene extends Scene
             {
                 this.gripModel = model;
 
-                // Apply a grip material to the model
-                nextGrip();
+                // If the skateboard subject has a griptape, load that by default
+                if(skateboard.getGrip() != Skateboard.NO_PART)
+                {
+                    // Set the new current grip
+                    currentGrip = GripConfigReader.getInstance().
+                            getGrip(skateboard.getGrip());
+
+                    // Set the selected object text to display the name of the new grip
+                    selectedObjectText.setText(currentGrip.name);
+
+                    // Set the model material
+                    model.setMaterial(gripMaterials.get(currentGrip.id));
+                }
+                else
+                {
+                    // Apply a grip material to the model
+                    nextGrip();
+                }
             });
         }
         else

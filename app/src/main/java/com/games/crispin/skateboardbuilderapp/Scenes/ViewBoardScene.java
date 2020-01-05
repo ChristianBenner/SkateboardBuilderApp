@@ -1,6 +1,7 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
@@ -183,7 +184,7 @@ public class ViewBoardScene extends Scene
     private CustomButton editNameButton;
 
     // Next button UI
-    private Button buyButton;
+    private Button saveButton;
 
     // Select deck width text UI
     private Text titleText;
@@ -215,7 +216,7 @@ public class ViewBoardScene extends Scene
         saves = SaveManager.loadSaves();
 
         // Use default name to begin with
-        name = DEFAULT_NAME;
+        name = subject.getName();
         nameGiven = false;
 
         // Load all of the components from their configs using their IDs
@@ -385,7 +386,7 @@ public class ViewBoardScene extends Scene
 
         // Draw the user interface
         titleText.draw(uiCamera);
-        buyButton.draw(uiCamera);
+        saveButton.draw(uiCamera);
         backButton.draw(uiCamera);
         editNameButton.draw(uiCamera);
         loadingIcon.draw(uiCamera);
@@ -440,29 +441,48 @@ public class ViewBoardScene extends Scene
             }
         });
 
-        buyButton = new Button(aileronRegularFont, "Buy");
-        buyButton.setSize(Constants.NEXT_BUTTON_SIZE);
-        buyButton.setPosition(Constants.getNextButtonPosition());
-        buyButton.setColour(Constants.BACKGROUND_COLOR);
-        buyButton.setBorder(new Border(Colour.WHITE, 8));
-        buyButton.setTextColour(Colour.WHITE);
-        buyButton.addTouchListener(e ->
+        saveButton = new Button(aileronRegularFont, "Save");
+        saveButton.setSize(Constants.NEXT_BUTTON_SIZE);
+        saveButton.setPosition(Constants.getNextButtonPosition());
+        saveButton.setColour(Constants.BACKGROUND_COLOR);
+        saveButton.setBorder(new Border(Colour.WHITE, 8));
+        saveButton.setTextColour(Colour.WHITE);
+        saveButton.addTouchListener(e ->
         {
             switch (e.getEvent())
             {
                 case RELEASE:
                     if(!nameGiven)
                     {
-                        enterName();
+                        enterName(false);
                     }
 
                     if(nameGiven)
                     {
                         subject.setName(name);
-                        saves.add(subject);
-                        SaveManager.writeSave(saves);
 
-                        fadeTransition.fadeOutToScence(HomeScene::new);
+                        boolean nameExists = false;
+
+                        // Check if the name already exists
+                        for(int i = 0; i < saves.size(); i++)
+                        {
+                            if(saves.get(i).getName().compareTo(subject.getName()) == 0)
+                            {
+                                nameExists = true;
+                                break;
+                            }
+                        }
+
+                        if(nameExists)
+                        {
+                            enterName(true);
+                        }
+                        else
+                        {
+                            saves.add(subject);
+                            SaveManager.writeSave(saves);
+                            fadeTransition.fadeOutToScence(HomeScene::new);
+                        }
                     }
                     break;
             }
@@ -491,7 +511,7 @@ public class ViewBoardScene extends Scene
                 switch (e.getEvent())
                 {
                     case RELEASE:
-                        enterName();
+                        enterName(false);
                 }
             }
         });
@@ -502,10 +522,19 @@ public class ViewBoardScene extends Scene
      *
      * @since   1.0
      */
-    private void enterName()
+    private void enterName(boolean nameExists)
     {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(Crispin.getActivity());
-        alertBuilder.setTitle("Enter a name for your design");
+
+        if(nameExists)
+        {
+            alertBuilder.setTitle("A save with that name already exists, please enter a different one");
+        }
+        else
+        {
+            alertBuilder.setTitle("Enter a name for your design");
+        }
+
         EditText textInput = new EditText(Crispin.getActivity());
         textInput.setInputType(InputType.TYPE_CLASS_TEXT);
 
