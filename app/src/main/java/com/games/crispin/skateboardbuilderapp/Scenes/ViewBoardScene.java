@@ -1,10 +1,8 @@
 package com.games.crispin.skateboardbuilderapp.Scenes;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Spanned;
 import android.widget.EditText;
 
 import com.games.crispin.crispinmobile.Crispin;
@@ -31,7 +29,7 @@ import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.TruckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
-import com.games.crispin.skateboardbuilderapp.CustomButton;
+import com.games.crispin.skateboardbuilderapp.UserInterface.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.ComponentModel;

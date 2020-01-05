@@ -14,7 +14,7 @@ import com.games.crispin.crispinmobile.UserInterface.TouchListener;
 import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.Constants;
-import com.games.crispin.skateboardbuilderapp.CustomButton;
+import com.games.crispin.skateboardbuilderapp.UserInterface.CustomButton;
 import com.games.crispin.skateboardbuilderapp.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
@@ -81,7 +81,7 @@ public class HomeScene extends Scene
     /**
      * Constructor that creates the home scene
      *
-     * @since   1.0
+     * @since 1.0
      */
     public HomeScene()
     {
