@@ -4,10 +4,7 @@ import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
-import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Bearing;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Truck;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -201,11 +198,11 @@ public class TruckConfigReader extends ComponentConfigReaderBase
                 "price"));
 
         // Read and set the texture resource ID data
-        tempTruck.resourceId = ResourceUtilities.getDrawableResource(parser.getAttributeValue(
+        tempTruck.resourceId = super.getDrawableResource(parser.getAttributeValue(
                 null, "texture"));
 
         // Read and set the model resource ID data
-        tempTruck.modelResourceId = ResourceUtilities.getRawResource(parser.getAttributeValue(
+        tempTruck.modelResourceId = super.getRawResource(parser.getAttributeValue(
                 null, "model"));
 
         // Read and set the name of the truck

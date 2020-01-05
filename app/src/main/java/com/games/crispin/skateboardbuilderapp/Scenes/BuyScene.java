@@ -19,7 +19,7 @@ import com.games.crispin.skateboardbuilderapp.ConfigReaders.TruckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.WheelConfigReader;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.UserInterface.CustomButton;
-import com.games.crispin.skateboardbuilderapp.FadeTransition;
+import com.games.crispin.skateboardbuilderapp.UserInterface.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Bearing;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;

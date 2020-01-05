@@ -3,9 +3,7 @@ package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
-import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Bearing;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -193,7 +191,7 @@ public class BearingConfigReader extends ComponentConfigReaderBase
                 "price"));
 
         // Read and set the texture resource ID data
-        tempBearing.resourceId = ResourceUtilities.getDrawableResource(
+        tempBearing.resourceId = super.getDrawableResource(
                 parser.getAttributeValue(null, "texture"));
 
         // Read and set the name of the bearing

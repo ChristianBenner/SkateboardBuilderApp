@@ -2,11 +2,14 @@ package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 
 import android.util.Xml;
 
+import com.games.crispin.skateboardbuilderapp.R;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -19,6 +22,9 @@ import java.util.List;
  */
 public abstract class ComponentConfigReaderBase
 {
+    // Return value for when a resource could not be found
+    protected static final int RESOURCE_FILE_NOT_FOUND = -1;
+
     /**
      * Print some information on the components data that has been read in from the configuration
      * file
@@ -61,6 +67,7 @@ public abstract class ComponentConfigReaderBase
             inputStream.close();
         }
     }
+
     /**
      * Skip the current XML entry
      *
@@ -90,6 +97,52 @@ public abstract class ComponentConfigReaderBase
                     levels++;
                     break;
             }
+        }
+    }
+
+    /**
+     * Get the resource ID of the given filename
+     *
+     * @param resourceName  The filename of the resource
+     * @return              The resource ID of a file with a filename matching the given string
+     * @since               1.0
+     */
+    protected static int getDrawableResource(String resourceName)
+    {
+        try
+        {
+            // Get the ID of the drawable resource
+            Field idField = R.drawable.class.getDeclaredField(resourceName);
+            return (idField).getInt(idField);
+        }
+        catch (Exception e)
+        {
+            // File with that filename could not be found in the drawable resource directory
+            e.printStackTrace();
+            return RESOURCE_FILE_NOT_FOUND;
+        }
+    }
+
+    /**
+     * Get the resource ID of the given filename
+     *
+     * @param resourceName  The filename of the resource
+     * @return              The resource ID of a file with a filename matching the given string
+     * @since               1.0
+     */
+    protected static int getRawResource(String resourceName)
+    {
+        try
+        {
+            // Get the ID of the raw resource
+            Field idField = R.raw.class.getDeclaredField(resourceName);
+            return (idField).getInt(idField);
+        }
+        catch (Exception e)
+        {
+            // File with that filename could not be found in the drawable resource directory
+            e.printStackTrace();
+            return RESOURCE_FILE_NOT_FOUND;
         }
     }
 }

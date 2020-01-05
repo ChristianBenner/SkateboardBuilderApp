@@ -15,7 +15,7 @@ import com.games.crispin.crispinmobile.Utilities.Scene;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.UserInterface.CustomButton;
-import com.games.crispin.skateboardbuilderapp.FadeTransition;
+import com.games.crispin.skateboardbuilderapp.UserInterface.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 

@@ -22,13 +22,14 @@ import com.games.crispin.skateboardbuilderapp.ConfigReaders.DeckConfigReader;
 import com.games.crispin.skateboardbuilderapp.ConfigReaders.SaveManager;
 import com.games.crispin.skateboardbuilderapp.Constants;
 import com.games.crispin.skateboardbuilderapp.UserInterface.CustomButton;
-import com.games.crispin.skateboardbuilderapp.FadeTransition;
+import com.games.crispin.skateboardbuilderapp.UserInterface.FadeTransition;
 import com.games.crispin.skateboardbuilderapp.UserInterface.InfoPanel;
-import com.games.crispin.skateboardbuilderapp.LoadingIcon;
+import com.games.crispin.skateboardbuilderapp.UserInterface.LoadingIcon;
 import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.TouchRotation;
+import com.games.crispin.skateboardbuilderapp.UserInterface.VisibilityListener;
 
 import java.util.HashMap;
 import java.util.List;
@@ -305,7 +306,7 @@ public class SelectDeckWidthScene extends Scene
         infoPanel = new InfoPanel();
 
         // Visibility listener to run code when the info panel is shown or hidden
-        infoPanel.setVisibilityListener(new InfoPanel.VisibilityListener()
+        infoPanel.setVisibilityListener(new VisibilityListener()
         {
             /**
              * Called when the information panel is shown. Used to disable all the interactable user

@@ -3,9 +3,6 @@ package com.games.crispin.skateboardbuilderapp.ConfigReaders;
 import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
-import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
-import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Truck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -194,7 +191,7 @@ public class WheelConfigReader extends ComponentConfigReaderBase
                 "price"));
 
         // Read and set the texture resource ID data
-        tempWheel.resourceId = ResourceUtilities.getDrawableResource(
+        tempWheel.resourceId = super.getDrawableResource(
                 parser.getAttributeValue(null, "texture"));
 
         // Read and set the name of the wheel

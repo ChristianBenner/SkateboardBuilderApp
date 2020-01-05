@@ -4,7 +4,6 @@ import com.games.crispin.crispinmobile.Crispin;
 import com.games.crispin.crispinmobile.Geometry.Point3D;
 import com.games.crispin.crispinmobile.Utilities.Logger;
 import com.games.crispin.skateboardbuilderapp.R;
-import com.games.crispin.skateboardbuilderapp.ResourceUtilities;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -193,11 +192,11 @@ public class DeckConfigReader extends ComponentConfigReaderBase
         tempDeck.id = Integer.parseInt(parser.getAttributeValue(null, "id"));
 
         // Read and set the model resource ID
-        tempDeck.modelId = ResourceUtilities.getRawResource(parser.getAttributeValue(
+        tempDeck.modelId = super.getRawResource(parser.getAttributeValue(
                 null, "model"));
 
         // Read and set the grip model resource ID
-        tempDeck.gripModelId = ResourceUtilities.getRawResource(parser.getAttributeValue(
+        tempDeck.gripModelId = super.getRawResource(parser.getAttributeValue(
                 null, "gripmodel"));
 
         // Read and set the name of the deck
