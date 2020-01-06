@@ -37,8 +37,20 @@ public class ComponentModel
     // The scale of the model
     private float scale;
 
+    // Model matrix for the transformations of the model
     private ModelMatrix modelMatrix;
 
+    /**
+     * Create the component model object. This will apply an initial position, rotation and scale to
+     * the model.
+     *
+     * @param model     The model to assign to the component
+     * @param position  The position of the component
+     * @param rotationY The Y-axis rotation of the object (not the rotation around the center point)
+     * @param rotationZ The Z-axis rotation of the object (not the rotation around the center point)
+     * @param scale     The scale of the model
+     * @since           1.0
+     */
     public ComponentModel(Model model,
                           Point3D position,
                           float rotationY,
@@ -53,33 +65,64 @@ public class ComponentModel
         modelMatrix = new ModelMatrix();
     }
 
+    /**
+     * Set the texture of the model by supplying the textures resource ID
+     *
+     * @param resourceId    The resource ID of the texture
+     * @since               1.0
+     */
     public void setTexture(int resourceId)
     {
         model.setMaterial(new Material(resourceId));
     }
 
+    /**
+     * Update the transformations of model matrix by re-applying the new rotations from the touch
+     * rotation object.
+     *
+     * @param touchRotation Touch rotation object that contains the rotations to apply to the model
+     * @since               1.0
+     */
     public void update(TouchRotation touchRotation)
     {
+        // Reset the model matrix with a new identity
         modelMatrix.reset();
+
+        // Translate the model away from the origin
         modelMatrix.translate(position);
+
+        // Rotate the model around the center of the 3D space on the Y axis
         modelMatrix.rotateAroundPoint(-position.x, -position.y, -position.z,
                 touchRotation.getRotationX(), 0.0f, 1.0f, 0.0f);
+
+        // Rotate the model around the center of the 3D space on teh Z axis
         modelMatrix.rotateAroundPoint(-position.x, -position.y, -position.z,
                 touchRotation.getRotationY(), 1.0f, 0.0f, 0.0f);
 
+        // If the Y rotation is not 0, rotate the matrix. This is because there is a bug with the
+        // Android matrix code where if you rotate by 0 degrees the matrix is broken and no model
+        // appears.
         if(rotationY != 0.0f)
         {
             modelMatrix.rotate(rotationY, 0.0f, 1.0f, 0.0f);
         }
 
+        // If the Z rotation is not 0, rotate the matrix.
         if(rotationZ != 0.0f)
         {
             modelMatrix.rotate(rotationZ, 0.0f, 0.0f, 1.0f);
         }
 
+        // Scale the model to the correct size
         modelMatrix.scale(scale);
     }
 
+    /**
+     * Render the skateboard component using an existing camera
+     *
+     * @param camera3D  The 3D camera object used to render models in a 3-dimensional space
+     * @since           1.0
+     */
     public void render(Camera3D camera3D)
     {
         model.render(camera3D, modelMatrix);

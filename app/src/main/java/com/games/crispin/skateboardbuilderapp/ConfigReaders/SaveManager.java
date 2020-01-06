@@ -17,32 +17,49 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Save manager class contains static functions designed to read or write saves. The save manager
+ * will manage the current save and the list of skateboard saves in the currentsave.xml config and
+ * saves.xml configuration files respectively.
+ *
+ * @author      Christian Benner
+ * @version     %I%, %G%
+ * @since       1.0
+ */
 public class SaveManager
 {
+    // Tag used for logging
     private static final String TAG = "SaveManager";
 
-    private static final String ns = null;
+    // Namespace used in the XML parser
+    private static final String NAMESPACE = null;
 
+    /**
+     * Load the current skateboard save from the currentsave.xml configuration file
+     *
+     * @return The current skateboard save
+     * @since 1.0
+     */
     public static Skateboard loadCurrentSave()
     {
         Logger.info(TAG + ": Reading current save");
 
+        // Attempt to load the current skateboard save
         try
         {
+            // Open and parse the configuration file
             List<Skateboard> skateboards = SaveManager.parse(Crispin.getApplicationContext().
                     openFileInput("currentsave.xml"));
 
-            for(int i = 0; i < skateboards.size(); i++)
-            {
-                System.out.println("Skateboard: " + skateboards.get(i).getDeck());
-            }
+            // If there is no skateboards, print an error
             if(skateboards.isEmpty())
             {
-                System.err.println("Error: Current save empty");
+                Logger.error(TAG, "Current save empty");
                 return new Skateboard();
             }
             else
             {
+                // Return the first skateboard in the array
                 return skateboards.get(0);
             }
         }
@@ -53,11 +70,18 @@ public class SaveManager
         }
     }
 
+    /**
+     * Write the current skateboard subject to the currentsave.xml configuration file
+     *
+     * @param currentSkateboard The current skateboard subject to save
+     * @since 1.0
+     */
     public static void writeCurrentSave(Skateboard currentSkateboard)
     {
+        // Attempt to write configuration file for the current save
         try
         {
-            System.out.println("Writing save file currentsave.xml");
+            Logger.info("Writing save file currentsave.xml");
             FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("currentsave.xml", Context.MODE_PRIVATE);
             XmlSerializer serializer = Xml.newSerializer();
             serializer.setOutput(fileOutputStream, "UTF-8");
@@ -164,7 +188,7 @@ public class SaveManager
     private static List readSaves(XmlPullParser parser) throws XmlPullParserException, IOException
     {
         List entries = new ArrayList();
-        parser.require(XmlPullParser.START_TAG, ns, "saves");
+        parser.require(XmlPullParser.START_TAG, NAMESPACE, "saves");
         while(parser.next() != XmlPullParser.END_TAG)
         {
             if(parser.getEventType() != XmlPullParser.START_TAG)
@@ -189,7 +213,7 @@ public class SaveManager
 
     private static Skateboard readSkateboardSave(XmlPullParser parser) throws XmlPullParserException, IOException
     {
-        parser.require(XmlPullParser.START_TAG, ns, "skateboard");
+        parser.require(XmlPullParser.START_TAG, NAMESPACE, "skateboard");
         String name = null;
         int deckId = 0;
         int gripId = 0;
