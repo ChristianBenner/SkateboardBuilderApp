@@ -41,7 +41,7 @@ import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Grip;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Truck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Wheel;
-import com.games.crispin.skateboardbuilderapp.TouchRotation;
+import com.games.crispin.skateboardbuilderapp.UserInterface.TouchRotation;
 
 import java.util.ArrayList;
 import java.util.List;

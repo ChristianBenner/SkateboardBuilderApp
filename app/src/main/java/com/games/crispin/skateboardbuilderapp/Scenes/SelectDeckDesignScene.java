@@ -29,7 +29,7 @@ import com.games.crispin.skateboardbuilderapp.R;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Deck;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Design;
 import com.games.crispin.skateboardbuilderapp.SkateboardComponents.Skateboard;
-import com.games.crispin.skateboardbuilderapp.TouchRotation;
+import com.games.crispin.skateboardbuilderapp.UserInterface.TouchRotation;
 import com.games.crispin.skateboardbuilderapp.UserInterface.VisibilityListener;
 
 import java.util.HashMap;

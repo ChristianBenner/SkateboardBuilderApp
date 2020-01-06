@@ -47,11 +47,14 @@ public class BuyScene extends Scene
     // Camera for 2D/user interface rendering
     private Camera2D uiCamera;
 
+    // The UI dropdown components
     private HashMap<Integer, Skateboard> dropdownComponents;
 
-    private FadeTransition fadeTransition;
-
+    // Save dropdown user interface
     private Dropdown saveDropdown;
+
+    // Fade transition object used to fade in and out
+    private FadeTransition fadeTransition;
 
     // Back button UI (return to home screen)
     private CustomButton backButton;
@@ -59,28 +62,49 @@ public class BuyScene extends Scene
     // Buy button
     private Button buyButton;
 
+    // The title text for the scene
     private Text titleText;
 
+    // Font for the part information text
     private Font partInfoFont;
 
+    // The part list title text
     private Text partListTitle;
+
+    // The selected deck text
     private Text deckText;
+
+    // The text that displays the price of the selected deck
     private Text deckPrice;
 
+    // The selected grip text
     private Text gripText;
+
+    // The text that displays the price of the selected grip
     private Text gripPrice;
 
+    // The selected truck text
     private Text truckText;
+
+    // The text that displays the price of the selected truck
     private Text truckPrice;
 
+    // The selected bearing text
     private Text bearingText;
+
+    // The text that displays the price of the selected bearing
     private Text bearingPrice;
 
+    // The selected wheel text
     private Text wheelText;
+
+    // The text that displays the price of the selected wheel
     private Text wheelPrice;
 
+    // The text that displays the total price of all components
     private Text totalText;
 
+    // Whether to show the text
     private boolean showText;
 
     public BuyScene()
@@ -116,6 +140,7 @@ public class BuyScene extends Scene
         // The font for text on the scene
         Font aileronRegularFont = new Font(R.raw.aileron_regular, 76);
 
+        // Create the buy button
         buyButton = new Button(aileronRegularFont, "Buy");
         buyButton.setSize(Constants.NEXT_BUTTON_SIZE);
         buyButton.setPosition(Constants.getNextButtonPosition());
@@ -132,21 +157,20 @@ public class BuyScene extends Scene
             }
         });
 
+
+        // Create the title text
         titleText = new Text(aileronRegularFont, "Select a design to buy", false,
                 true, Crispin.getSurfaceWidth());
-
         final Point2D TITLE_TEXT_POSITION = new Point2D(0.0f, Constants.getBackButtonPosition().y -
                 Constants.BACK_BUTTON_PADDING.y - titleText.getHeight());
-
         titleText.setColour(Colour.WHITE);
         titleText.setPosition(TITLE_TEXT_POSITION);
 
+        // Create the save dropdown
         saveDropdown = new Dropdown("Select save");
-
         final Point2D SELECT_DECK_WIDTH_DROPDOWN_POSITION = new Point2D(
                 SELECT_SAVE_DROPDOWN_PADDING.x, TITLE_TEXT_POSITION.y -
                 SELECT_SAVE_DROPDOWN_SIZE.y - SELECT_SAVE_DROPDOWN_PADDING.y);
-
         saveDropdown.setPosition(SELECT_DECK_WIDTH_DROPDOWN_POSITION);
         saveDropdown.setSize(SELECT_SAVE_DROPDOWN_SIZE);
         saveDropdown.setDisabledBorders(Dropdown.INNER_BORDERS);
@@ -154,20 +178,6 @@ public class BuyScene extends Scene
         saveDropdown.setTextColour(Colour.WHITE);
         saveDropdown.setBorderColour(Colour.WHITE);
         saveDropdown.setStateIcons(R.drawable.expand_icon, R.drawable.collapse_icon);
-
-        // Add contents to save dropdown
-        List<Skateboard> saves = SaveManager.loadSaves();
-        dropdownComponents = new HashMap<>();
-        if(saves != null && saves.isEmpty() == false)
-        {
-            for(Skateboard save : saves)
-            {
-                System.out.println("Adding save: " + save.getName());
-                dropdownComponents.put(saveDropdown.addItem(save.getName()), save);
-            }
-        }
-
-        // Add touch listener to dropdown
         saveDropdown.addTouchListener(e ->
         {
             switch (e.getEvent())
@@ -244,23 +254,39 @@ public class BuyScene extends Scene
             }
         });
 
+        // Add contents to save dropdown
+        List<Skateboard> saves = SaveManager.loadSaves();
+        dropdownComponents = new HashMap<>();
+        if(saves != null && saves.isEmpty() == false)
+        {
+            // Iterate through the skateboard saves and add each to the dropdown UI
+            for(Skateboard save : saves)
+            {
+                System.out.println("Adding save: " + save.getName());
+                dropdownComponents.put(saveDropdown.addItem(save.getName()), save);
+            }
+        }
+
+        // Create a font with the '£' symbol as an extra/special character
         ArrayList<Character> specialCharacters = new ArrayList<>();
         specialCharacters.add('£');
-
         partInfoFont = new Font(R.raw.aileron_regular, 36, specialCharacters);
+
+        // Create the part list title
         partListTitle = new Text(partInfoFont, "Selected parts:", true,
                 false, Crispin.getSurfaceWidth());
         partListTitle.setPosition(50.0f, saveDropdown.getPosition().y - 50.0f -
                 partListTitle.getHeight());
         partListTitle.setColour(Colour.WHITE);
 
-        // Open some info on the save
+        // Create the deck name text
         deckText = new Text(partInfoFont, "Deck: None selected", true,
                 false, Crispin.getSurfaceWidth());
         deckText.setPosition(50.0f, partListTitle.getPosition().y - 25.0f -
                 deckText.getHeight());
         deckText.setColour(Colour.WHITE);
 
+        // Create the deck price text
         deckPrice = new Text(partInfoFont, "£0.00", true,
                 false, Crispin.getSurfaceWidth());
         deckPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - deckPrice.getWidth(),
@@ -268,71 +294,76 @@ public class BuyScene extends Scene
                 deckPrice.getHeight());
         deckPrice.setColour(Colour.WHITE);
 
+        // Create the grip name text
         gripText = new Text(partInfoFont, "Grip: None selected", true,
                 false, Crispin.getSurfaceWidth());
         gripText.setPosition(50.0f, deckText.getPosition().y - 25.0f - gripText.getHeight());
         gripText.setColour(Colour.WHITE);
 
+        // Create the grip price text
         gripPrice = new Text(partInfoFont, "£0.00", true,
                 false, Crispin.getSurfaceWidth());
         gripPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - gripPrice.getWidth(),
                 deckText.getPosition().y - 25.0f - gripPrice.getHeight());
         gripPrice.setColour(Colour.WHITE);
 
+        // Create the truck name text
         truckText = new Text(partInfoFont, "Truck: None selected", true,
                 false, Crispin.getSurfaceWidth());
         truckText.setPosition(50.0f, gripText.getPosition().y - 25.0f - truckText.getHeight());
         truckText.setColour(Colour.WHITE);
 
+        // Create the truck price text
         truckPrice = new Text(partInfoFont, "£0.00", true,
                 false, Crispin.getSurfaceWidth());
         truckPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - truckPrice.getWidth(),
                 gripText.getPosition().y - 25.0f - gripPrice.getHeight());
         truckPrice.setColour(Colour.WHITE);
 
+        // Create the bearing name text
         bearingText = new Text(partInfoFont, "Bearing: None selected", true,
                 false, Crispin.getSurfaceWidth());
         bearingText.setPosition(50.0f, truckText.getPosition().y - 25.0f -
                 bearingText.getHeight());
         bearingText.setColour(Colour.WHITE);
 
+        // Create the bearing price text
         bearingPrice = new Text(partInfoFont, "£0.00", true,
                 false, Crispin.getSurfaceWidth());
         bearingPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - bearingPrice.getWidth(),
                 truckText.getPosition().y - 25.0f - bearingPrice.getHeight());
         bearingPrice.setColour(Colour.WHITE);
 
-        // Wheel text and price
+        // Create the wheel name text
         wheelText = new Text(partInfoFont, "Wheel: None selected", true,
                 false, Crispin.getSurfaceWidth());
         wheelText.setPosition(50.0f, bearingText.getPosition().y - 25.0f -
                 wheelText.getHeight());
         wheelText.setColour(Colour.WHITE);
 
+        // Create the wheel price text
         wheelPrice = new Text(partInfoFont, "£0.00", true,
                 false, Crispin.getSurfaceWidth());
         wheelPrice.setPosition(Crispin.getSurfaceWidth() - 50.0f - wheelPrice.getWidth(),
                 bearingText.getPosition().y - 25.0f - wheelPrice.getHeight());
         wheelPrice.setColour(Colour.WHITE);
 
+        // Create the total price text
         totalText = new Text(partInfoFont, "Total: £0.00", true, false,
                 Crispin.getSurfaceWidth());
         totalText.setPosition(50.0f, wheelText.getPosition().y - 100.0f);
         totalText.setColour(Colour.WHITE);
-
-
-/*        private Text truckText;
-        private Text truckPrice;
-
-        private Text bearingText;
-        private Text bearingPrice;
-
-        private Text wheelText;
-        private Text wheelPrice;
-
-        private Text totalText;*/
     }
 
+    /**
+     * Update function overridden from the Scene parent class. The update function should contain
+     * the logic in the scene that needs to be updated frequently.
+     *
+     * @param deltaTime Timing value used to update logic based on time passed instead of update
+     *                  frequency
+     * @see             Scene
+     * @since           1.0
+     */
     @Override
     public void update(float deltaTime)
     {
@@ -340,13 +371,17 @@ public class BuyScene extends Scene
         fadeTransition.update(deltaTime);
     }
 
+    /**
+     * Render function overridden from the Scene parent class. The render function should contain
+     * the draw. The function is where the user interface is drawn so it is processed by the engine.
+     *
+     * @see     Scene
+     * @since   1.0
+     */
     @Override
     public void render()
     {
-        backButton.draw(uiCamera);
-        buyButton.draw(uiCamera);
-        titleText.draw(uiCamera);
-
+        // If the text is supposed to be shown, render it
         if(showText)
         {
             partListTitle.draw(uiCamera);
@@ -363,17 +398,39 @@ public class BuyScene extends Scene
             totalText.draw(uiCamera);
         }
 
+        // Render the other user interface components
+        backButton.draw(uiCamera);
+        buyButton.draw(uiCamera);
+        titleText.draw(uiCamera);
         saveDropdown.draw(uiCamera);
-
         fadeTransition.draw(uiCamera);
     }
 
+    /**
+     * Touch function overridden from the Scene parent class. The touch function allows you to
+     * intercept user touch input and process it. There is no touch controls on the home page except
+     * for the user interface which is handled by the engine.
+     *
+     * @param type      The type of touch event (e.g. click, release or drag)
+     * @param position  The position of the touch event (x, y)
+     * @see             Scene
+     * @since           1.0
+     */
     @Override
     public void touch(int type, Point2D position)
     {
-
+        // Nothing to do here
     }
 
+    /**
+     * Get a string of a given value in currency format. This will place a '£' symbol infront of the
+     * price and also make the price appear with two digits after the decimal place
+     *
+     * @param price The type of touch event (e.g. click, release or drag)
+     * @return      The price in string format. This returns with a '£' symbol and the price as a
+     *              string with two digits after the decimal point
+     * @since       1.0
+     */
     private String priceFormat(float price)
     {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();

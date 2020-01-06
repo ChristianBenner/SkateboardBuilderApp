@@ -1,10 +1,8 @@
-package com.games.crispin.skateboardbuilderapp;
+package com.games.crispin.skateboardbuilderapp.UserInterface;
 
 import android.view.MotionEvent;
 
 import com.games.crispin.crispinmobile.Geometry.Point2D;
-
-import java.lang.reflect.Array;
 
 public class TouchRotation
 {

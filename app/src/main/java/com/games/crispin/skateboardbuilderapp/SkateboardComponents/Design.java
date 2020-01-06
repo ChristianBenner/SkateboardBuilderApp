@@ -1,7 +1,8 @@
 package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
 /**
- * A data only class that is used to store valuable information on designs.
+ * A data only class that is used to store valuable information on designs. It extends the
+ * <code>ComponentBase</code> class.
  *
  * @author      Christian Benner
  * @version     %I%, %G%

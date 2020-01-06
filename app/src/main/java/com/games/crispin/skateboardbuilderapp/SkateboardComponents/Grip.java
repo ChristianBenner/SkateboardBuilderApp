@@ -1,5 +1,14 @@
 package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
+/**
+ * The grip class is a data only structure that holds information about a griptape component such as
+ * a texture resource ID. It extends the <code>ComponentBase</code> class.
+ *
+ * @see         ComponentBase
+ * @author      Christian Benner
+ * @version     %I%, %G%
+ * @since       1.0
+ */
 public class Grip extends ComponentBase
 {
     // When no price has been provided

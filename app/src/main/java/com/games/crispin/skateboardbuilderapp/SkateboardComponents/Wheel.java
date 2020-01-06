@@ -1,5 +1,14 @@
 package com.games.crispin.skateboardbuilderapp.SkateboardComponents;
 
+/**
+ * The wheel class is a data only structure that holds information about a skateboard wheel
+ * component such as a texture resource ID. It extends the <code>ComponentBase</code> class.
+ *
+ * @see         ComponentBase
+ * @author      Christian Benner
+ * @version     %I%, %G%
+ * @since       1.0
+ */
 public class Wheel extends ComponentBase
 {
     // When no price has been provided
