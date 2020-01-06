@@ -82,7 +82,9 @@ public class SaveManager
         try
         {
             Logger.info("Writing save file currentsave.xml");
-            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput("currentsave.xml", Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput(
+                    "currentsave.xml", Context.MODE_PRIVATE);
+
             XmlSerializer serializer = Xml.newSerializer();
             serializer.setOutput(fileOutputStream, "UTF-8");
             serializer.startDocument("UTF-8", true);
@@ -113,13 +115,20 @@ public class SaveManager
         }
         catch (Exception e)
         {
-            System.err.println("Failed to write save file currentsave.xml");
+            Logger.error(TAG, "Failed to write save file currentsave.xml");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Load the current skateboard saves from the saves.xml configuration file
+     *
+     * @return The list of skateboard saves
+     * @since 1.0
+     */
     public static List<Skateboard> loadSaves()
     {
+        // Attempt to load the saves configuration file
         try
         {
             List<Skateboard> skateboards = SaveManager.parse(Crispin.getApplicationContext().
@@ -129,12 +138,20 @@ public class SaveManager
         catch (Exception e)
         {
             e.printStackTrace();
+            Logger.error(TAG, "Failed to load the current saves from the saves.xml config");
             return new ArrayList<>();
         }
     }
 
+    /**
+     * Write the skateboard saves to the saves.xml configuration file
+     *
+     * @param skateboards   The list of skateboards to write to the config file
+     * @since 1.0
+     */
     public static void writeSave(List<Skateboard> skateboards)
     {
+        // Attempt to write to the saves config
         try
         {
             FileOutputStream fileOutputStream = Crispin.getApplicationContext().openFileOutput(
@@ -144,7 +161,7 @@ public class SaveManager
             serializer.startDocument("UTF-8", true);
             serializer.startTag("", "saves");
 
-            // Write skateboard XML
+            // Write each skateboard to the XML file
             for(Skateboard s : skateboards)
             {
                 serializer.startTag("", "skateboard");
@@ -166,11 +183,19 @@ public class SaveManager
         catch (Exception e)
         {
             e.printStackTrace();
+            Logger.error(TAG, "Failed to write saves to the saves.xml config");
         }
     }
 
+    /**
+     * Parse a configuration
+     *
+     * @param in    The input stream with the configuration to pass
+     * @since 1.0
+     */
     public static List parse(InputStream in) throws XmlPullParserException, IOException
     {
+        // Try to parse the input stream config
         try
         {
             XmlPullParser parser = Xml.newPullParser();
@@ -185,12 +210,24 @@ public class SaveManager
         }
     }
 
+    /**
+     * Read a save XML configuration format
+     *
+     * @param parser    The XML pull parser to read the save configuration format
+     * @since 1.0
+     */
     private static List readSaves(XmlPullParser parser) throws XmlPullParserException, IOException
     {
+        // The list of save entries
         List entries = new ArrayList();
+
+        // Require the saves tag
         parser.require(XmlPullParser.START_TAG, NAMESPACE, "saves");
+
+        // While an end tag has not been found, parse
         while(parser.next() != XmlPullParser.END_TAG)
         {
+            // If a new start tag has not been found, start the next loop cycle
             if(parser.getEventType() != XmlPullParser.START_TAG)
             {
                 continue;
@@ -198,9 +235,9 @@ public class SaveManager
 
             String name = parser.getName();
 
+            // If a new skateboard entry has been found, read the skateboard save
             if(name.equals("skateboard"))
             {
-                System.out.println("Found a board");
                 entries.add(readSkateboardSave(parser));
             }
             else
@@ -211,47 +248,62 @@ public class SaveManager
         return entries;
     }
 
-    private static Skateboard readSkateboardSave(XmlPullParser parser) throws XmlPullParserException, IOException
+    /**
+     * Read a skateboard XML format
+     *
+     * @param parser    The XML pull parser to read the skateboard configuration format
+     * @since 1.0
+     */
+    private static Skateboard readSkateboardSave(XmlPullParser parser) throws
+            XmlPullParserException, IOException
     {
         parser.require(XmlPullParser.START_TAG, NAMESPACE, "skateboard");
-        String name = null;
-        int deckId = 0;
-        int gripId = 0;
-        int trucksId = 0;
-        int bearingsId = 0;
-        int wheelsId = 0;
-        int designId = 0;
 
-        deckId = Integer.parseInt(parser.getAttributeValue(null, "deck"));
-        gripId = Integer.parseInt(parser.getAttributeValue(null, "grip"));
-        trucksId = Integer.parseInt(parser.getAttributeValue(null, "trucks"));
-        bearingsId = Integer.parseInt(parser.getAttributeValue(null, "bearings"));
-        wheelsId = Integer.parseInt(parser.getAttributeValue(null, "wheels"));
-        designId = Integer.parseInt(parser.getAttributeValue(null, "design"));
-        name = parser.getAttributeValue(null, "name");
+        // Load all of the IDs for each component
+        int deckId = Integer.parseInt(parser.getAttributeValue(null, "deck"));
+        int gripId = Integer.parseInt(parser.getAttributeValue(null, "grip"));
+        int trucksId = Integer.parseInt(parser.getAttributeValue(null, "trucks"));
+        int bearingsId = Integer.parseInt(parser.getAttributeValue(null,
+                "bearings"));
+        int wheelsId = Integer.parseInt(parser.getAttributeValue(null, "wheels"));
+        int designId = Integer.parseInt(parser.getAttributeValue(null, "design"));
+        String name = parser.getAttributeValue(null, "name");
 
+        // While no end tag has been found, parse
         while(parser.next() != XmlPullParser.END_TAG)
         {
+            // If a start tag hasn't been found, start next loop cycle
             if(parser.getEventType() != XmlPullParser.START_TAG)
             {
                 continue;
             }
 
             String elementName = parser.getName();
-            System.out.println("Unsupported Element: " + elementName);
+            Logger.info("Unsupported XML element found in saves.xml: " + elementName);
             skip(parser);
         }
         return new Skateboard(name, deckId, gripId, trucksId, bearingsId, wheelsId, designId);
     }
 
+    /**
+     * Skip an element from the XML configuration
+     *
+     * @param parser    The XML pull parser to skip the next element from
+     * @since 1.0
+     */
     private static void skip(XmlPullParser parser) throws XmlPullParserException, IOException
     {
+        // If a start tag has not been found then throw an exception because we are not at the
+        // start of a new element
         if(parser.getEventType() != XmlPullParser.START_TAG)
         {
             throw new IllegalStateException();
         }
 
+        // Keep track of how many levels we have traversed
         int levels = 1;
+
+        // Whilst we have not finished traversing all levels, go through the element
         while(levels != 0)
         {
             switch (parser.next())
