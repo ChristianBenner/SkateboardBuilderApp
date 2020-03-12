@@ -1,4 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <bearings>
 	<bearing id="0" price="19.0" texture="bones_redz" name="Bones Bearings Reds" info="Reds bearings by Bones"/>
+	<bearing id="1" price="60.0" texture="bones_super_swiss" name="Bones Bearings Super Swiss 6" info="High quality super swiss bearings from Bones."/>
+	<bearing id="2" price="35.0" texture="andale_guy_mariano" name="Andale Mariano Hot Sauce" info="Andale Mariano Hot Sauce bearings."/>
+	<bearing id="3" price="95.0" texture="bones_ceramic_super_reds" name="Bones Bearings Ceramic Super Reds" info="High quality ceramic bearings by Bones."/>
 </bearings>

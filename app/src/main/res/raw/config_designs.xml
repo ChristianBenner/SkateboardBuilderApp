@@ -9,4 +9,10 @@
 	<design id="6" price="60.0" deckId="2" texture="primitive_x_naruto_rodriguez_combat" name="Primitive X Naruto Rodriguez Combat" info="A 8.38 inch wide Naruto inspired deck"/>
 	<design id="7" price="50.0" deckId="2" texture="girl_mccrank_skull_of_fame" name="Girl McCrank Skull of Fame" info="A 8.375 inch wide deck by Girl"/>
 	<design id="8" price="60.0" deckId="1" texture="primitive_najera_cross_stitch" name="Primitive Najera Cross Stitch" info="A 8.5 inch wide deck by Primitive called Najera Cross Stitch"/>
+	<design id="9" price="40.0" deckId="1" texture="design_robotron_smile" name="Robotron Smile" info="8.5 inch deck by Robotron called smle."/>
+	<design id="10" price="45.0" deckId="1" texture="design_jart_freddy_pool" name="Freddy Pool Before Death" info="8.5 inch deck by Jart Skateboards called Freddy Pool Before Deth"/>
+	<design id="11" price="50.0" deckId="1" texture="design_creature_horror_feature" name="Creature Horror Feature" info="8.5 inch deck by Creature called Horror Feature"/>
+	<design id="12" price="50.0" deckId="1" texture="design_chocolate_tershy_window_sill" name="Chocolate Tershy Window Sill" info="8.5 inch deck by Chocolate called Tershy Window Sill"/>
+	<design id="13" price="50.0" deckId="2" texture="toy_machine_leabres_bottle_noah" name="Toy Machine Leabres Bottle Noah" info="8.38 inch deck by Toy Machine called Leabres Bottle Noah"/>
+	<design id="14" price="55.0" deckId="2" texture="design_palace_chewy_pro" name="Palace Skateboards Chewy Pro" info="8.375 inch deck by palace Skateboards called Chewy Pro S17"/>
 </designs>

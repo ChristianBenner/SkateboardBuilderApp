@@ -428,7 +428,7 @@ public class SelectDeckDesignScene extends Scene
      *
      * @since   1.0
      */
-    private void setDesign(int designArrayIndex)
+    private void setDesign()
     {
         // Check if the design array doesn't exist or have any contents
         if(designs == null || designs.isEmpty())
@@ -477,25 +477,25 @@ public class SelectDeckDesignScene extends Scene
     /**
      * Set the design of the deck to the next one in the array
      *
-     * @see     #setDesign(int)
+     * @see     #setDesign()
      * @since   1.0
      */
     private void nextDesign()
     {
         designArrayIndex++;
-        setDesign(designArrayIndex);
+        setDesign();
     }
 
     /**
      * Set the design of the deck to the previous one in the array
      *
-     * @see     #setDesign(int)
+     * @see     #setDesign()
      * @since   1.0
      */
     private void previousDesign()
     {
         designArrayIndex--;
-        setDesign(designArrayIndex);
+        setDesign();
     }
 
     /**

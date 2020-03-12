@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <wheels>
-	<wheel id="0" price="0.0" texture="wheel_test3" name="Test" info="Test"/>
+	<wheel id="0" price="35.0" texture="spitfire_classic_99d" name="Spitfire Classic 99D White" info="Spitefire classic 99D 50mm skateboard wheels"/>
 	<wheel id="1" price="50.0" texture="spitfire_x_neckface_spanky_formula_four" name="Spitfire X Neckface Spanky Formula Four" info="Spitfire wheels 52MM F4 99"/>
+	<wheel id="2" price="35.0" texture="spitfire_classic_99d_orange" name="Spitfire Classic 99D Orange" info="Orange Spitefire classic 99D 50mm skateboard wheels"/>
+	<wheel id="3" price="35.0" texture="spitfire_classic_99d_yellow" name="Spitfire Classic 99D Yellow" info="Yellow Spitefire classic 99D 50mm skateboard wheels"/>
+	<wheel id="4" price="35.0" texture="spitfire_bighead_classic_99d" name="Spitfire Bighead Classic 99D Lime" info="Lime Spitefire classic 99D 50mm skateboard wheels"/>
+	<wheel id="5" price="35.0" texture="spitfire_bighead_classic_99d_blue" name="Spitfire Bighead Classic 99D Blue" info="Blue Spitefire classic 99D 50mm skateboard wheels"/>
+	<wheel id="6" price="20.0" texture="toy_machine_bite_me_100a" name="Toy Machine Bite Me 100A" info="Toy Machine Bite Me Size 100A skateboard wheels"/>
 </wheels>

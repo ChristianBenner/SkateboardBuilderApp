@@ -1,4 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <trucks>
 	<truck id="1" price="40.0" texture="thunder_148_high_lights_two_night" model="thunder_148_high_lights_two" name="Thunder 148 High Lights II" info="Trucks by Thunder called 148 High Lights II. Night Version" wheelX="0.63" wheelY="-0.22" wheelZ="-0.12" bearingOneX="0.69" bearingOneY="-0.22" bearingOneZ="-0.12" bearingTwoX="0.57" bearingTwoY="-0.22" bearingTwoZ="-0.12"/>
+	<truck id="2" price="40.0" texture="silver_trucks" model="thunder_148_high_lights_two" name="Thunder 148 High Lights II" info="Trucks by Thunder called 148 High Lights II. Night Version" wheelX="0.63" wheelY="-0.22" wheelZ="-0.12" bearingOneX="0.69" bearingOneY="-0.22" bearingOneZ="-0.12" bearingTwoX="0.57" bearingTwoY="-0.22" bearingTwoZ="-0.12"/>
+	<truck id="3" price="40.0" texture="silver_trucks" model="venture_trucks" name="Venture Trucks" info="Silver 5.8 inch trucks by Venture" wheelX="0.63" wheelY="-0.22" wheelZ="-0.12" bearingOneX="0.69" bearingOneY="-0.22" bearingOneZ="-0.12" bearingTwoX="0.57" bearingTwoY="-0.22" bearingTwoZ="-0.12"/>
 </trucks>
